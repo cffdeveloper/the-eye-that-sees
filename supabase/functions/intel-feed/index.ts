@@ -53,10 +53,18 @@ function getWeekAgo(): string {
   return d.toISOString().split("T")[0];
 }
 
-function processFlights(raw: any) {
-  if (!raw?.states) return [];
-  // Return top 50 flights with most data
-  return raw.states
+function processFlights(raw: any, rawEu: any) {
+  const statesUS = raw?.states || [];
+  const statesEU = rawEu?.states || [];
+  const all = [...statesUS, ...statesEU];
+  // Deduplicate by icao24
+  const seen = new Set<string>();
+  const unique = all.filter((s: any[]) => {
+    if (!s[0] || seen.has(s[0])) return false;
+    seen.add(s[0]);
+    return true;
+  });
+  return unique
     .filter((s: any[]) => s[1] && s[2] && s[5] && s[6] && s[7])
     .slice(0, 60)
     .map((s: any[]) => ({
@@ -64,8 +72,8 @@ function processFlights(raw: any) {
       country: s[2],
       longitude: s[5],
       latitude: s[6],
-      altitude: Math.round((s[7] || 0) * 3.281), // meters to feet
-      velocity: Math.round((s[9] || 0) * 1.944), // m/s to knots
+      altitude: Math.round((s[7] || 0) * 3.281),
+      velocity: Math.round((s[9] || 0) * 1.944),
       heading: Math.round(s[10] || 0),
       on_ground: s[8],
     }));
