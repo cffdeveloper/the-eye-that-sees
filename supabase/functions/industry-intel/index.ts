@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,13 +70,32 @@ Return JSON:
     const aiData = await response.json();
     const content = aiData.choices?.[0]?.message?.content || "{}";
 
-    // Parse JSON from response (handle markdown code blocks)
     let parsed;
     try {
       const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       parsed = JSON.parse(cleaned);
     } catch {
       parsed = { analysis: content, news: [], gaps: [], alerts: [], liveData: {} };
+    }
+
+    // Store snapshot in database
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supabaseUrl && supabaseKey) {
+        const sb = createClient(supabaseUrl, supabaseKey);
+        await sb.from("intel_snapshots").insert({
+          scope_type: subFlow ? "subflow" : "industry",
+          scope_key: subFlow ? `${industry}::${subFlow}` : industry,
+          analysis: parsed.analysis,
+          gaps: parsed.gaps || [],
+          alerts: parsed.alerts || [],
+          live_data: parsed.liveData || {},
+          news: parsed.news || [],
+        });
+      }
+    } catch (snapErr) {
+      console.error("Snapshot save error:", snapErr);
     }
 
     return new Response(JSON.stringify(parsed), {
