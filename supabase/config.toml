@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.cross-intel]
 verify_jwt = false
+
+[functions.industry-news]
+verify_jwt = false
