@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type FormEvent } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, ArrowUp } from "lucide-react";
 
 export function ChatInput({
   onSend,
@@ -9,7 +9,7 @@ export function ChatInput({
   isStreaming: boolean;
 }) {
   const [value, setValue] = useState("");
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -21,6 +21,14 @@ export function ChatInput({
     window.addEventListener("nexus-quick-prompt", handler);
     return () => window.removeEventListener("nexus-quick-prompt", handler);
   }, [onSend]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 160) + "px";
+  }, [value]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -36,31 +44,51 @@ export function ChatInput({
     }
   };
 
+  const hasValue = value.trim().length > 0;
+
   return (
     <form onSubmit={submit} className="relative">
-      <div className="glass-panel glow-border flex items-end gap-2 p-2">
+      <div className="glass-panel-strong glow-border-strong p-2.5 flex items-end gap-2">
         <textarea
-          ref={inputRef}
+          ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask NEXUS anything — research, analyze, strategize..."
+          placeholder="Ask NEXUS anything..."
           rows={1}
-          className="flex-1 bg-transparent resize-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none py-2 px-2 font-mono max-h-32"
-          style={{ minHeight: "2.25rem" }}
+          className="flex-1 bg-transparent resize-none text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none py-2 px-3 font-mono leading-relaxed"
+          style={{ minHeight: "2.5rem" }}
           disabled={isStreaming}
+          autoFocus
         />
         <button
           type="submit"
-          disabled={!value.trim() || isStreaming}
-          className="w-9 h-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex-shrink-0"
+          disabled={!hasValue || isStreaming}
+          className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+            hasValue && !isStreaming
+              ? "bg-primary text-primary-foreground shadow-lg"
+              : "bg-muted text-muted-foreground/40 cursor-not-allowed"
+          }`}
+          style={
+            hasValue && !isStreaming
+              ? { boxShadow: "0 0 15px hsl(185 100% 50% / 0.2)" }
+              : undefined
+          }
         >
           {isStreaming ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <Send className="w-4 h-4" />
+            <ArrowUp className="w-4.5 h-4.5" strokeWidth={2.5} />
           )}
         </button>
+      </div>
+      <div className="flex items-center justify-between mt-1.5 px-1">
+        <p className="text-[10px] font-mono text-muted-foreground/30">
+          Press Enter to send · Shift+Enter for new line
+        </p>
+        <p className="text-[10px] font-mono text-muted-foreground/30">
+          AI-generated · Verify important information
+        </p>
       </div>
     </form>
   );

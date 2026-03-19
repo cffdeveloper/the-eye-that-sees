@@ -16,7 +16,7 @@ export function ModeSelector({
   onChange: (m: AnalysisMode) => void;
 }) {
   return (
-    <div className="flex gap-1.5">
+    <div className="flex gap-1 p-1 rounded-lg bg-muted/30 border border-border/30 w-fit">
       {modes.map((m) => {
         const Icon = m.icon;
         const active = mode === m.id;
@@ -24,14 +24,16 @@ export function ModeSelector({
           <button
             key={m.id}
             onClick={() => onChange(m.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono transition-all ${
+            title={m.desc}
+            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-mono transition-all duration-200 ${
               active
-                ? "bg-primary/15 text-primary glow-border"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                ? "bg-secondary text-primary shadow-sm glow-border"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             }`}
           >
-            <Icon className="w-3.5 h-3.5" />
-            {m.label}
+            <Icon className={`w-3.5 h-3.5 transition-colors ${active ? "text-primary" : ""}`} />
+            <span className="hidden sm:inline">{m.label}</span>
+            <span className="sm:hidden">{m.label.slice(0, 3)}</span>
           </button>
         );
       })}

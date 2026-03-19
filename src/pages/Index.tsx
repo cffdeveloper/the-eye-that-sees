@@ -4,7 +4,6 @@ import { StatusBar } from "@/components/StatusBar";
 import { ModeSelector } from "@/components/ModeSelector";
 import { MessageList } from "@/components/MessageList";
 import { ChatInput } from "@/components/ChatInput";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
@@ -16,29 +15,34 @@ const NexusDashboard = () => {
   }, [error]);
 
   return (
-    <div className="h-screen flex flex-col bg-background grid-bg overflow-hidden relative">
-      {/* Scan line effect */}
-      <div className="scan-line absolute inset-0 pointer-events-none z-50 h-[200%]" />
+    <div className="h-screen flex flex-col bg-background overflow-hidden relative">
+      {/* Subtle grid background */}
+      <div className="absolute inset-0 grid-bg opacity-60 pointer-events-none" />
 
-      <TopNav onClear={clear} hasMessages={messages.length > 0} />
-      <StatusBar />
+      {/* Radial gradient overlay for depth */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(185 100% 50% / 0.03) 0%, transparent 60%)",
+        }}
+      />
 
-      <div className="flex-1 flex flex-col min-h-0 max-w-5xl w-full mx-auto px-4 py-4 gap-3">
-        <ModeSelector mode={mode} onChange={setMode} />
+      <div className="relative z-10 flex flex-col h-full">
+        <TopNav onClear={clear} hasMessages={messages.length > 0} />
+        <StatusBar />
 
-        <div className="flex-1 flex flex-col min-h-0">
-          <MessageList messages={messages} isStreaming={isStreaming} />
+        <div className="flex-1 flex flex-col min-h-0 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-4 pb-3 gap-3">
+          <ModeSelector mode={mode} onChange={setMode} />
+
+          <div className="flex-1 flex flex-col min-h-0">
+            <MessageList messages={messages} isStreaming={isStreaming} />
+          </div>
+
+          <ChatInput onSend={send} isStreaming={isStreaming} />
         </div>
-
-        <ChatInput onSend={send} isStreaming={isStreaming} />
-
-        <p className="text-center text-[10px] font-mono text-muted-foreground/50">
-          NEXUS v1.0 · Powered by AI · All analysis is generated and should be verified
-        </p>
       </div>
     </div>
   );
 };
 
-const Index = NexusDashboard;
-export default Index;
+export default NexusDashboard;
