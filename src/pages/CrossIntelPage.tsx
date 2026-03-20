@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { industries } from "@/lib/industryData";
-import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp } from "lucide-react";
+import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp, Users, Handshake } from "lucide-react";
 import { WorldMap } from "@/components/intel/WorldMap";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { useSnapshots } from "@/hooks/useSnapshots";
