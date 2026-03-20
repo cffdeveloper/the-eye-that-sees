@@ -51,6 +51,9 @@ export default function IntelDashboard() {
             </div>
             <div><FlightsPanel data={feed.intel.flights} /></div>
             <div><ForexPanel data={feed.intel.forex} /></div>
+            <div><FiresPanel data={feed.intel.fires || []} /></div>
+            <div><ConflictsPanel data={feed.intel.conflicts || []} /></div>
+            <div className="xl:col-span-2"><InfrastructurePanel data={feed.intel.infrastructure || []} /></div>
           </div>
         </>
       ) : null}

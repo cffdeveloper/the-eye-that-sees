@@ -95,17 +95,12 @@ const NexusDashboard = () => {
 
               {/* Main grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" style={{ minHeight: 0 }}>
-                {/* Markets - takes more space */}
                 <div className="xl:row-span-2 min-h-[300px]">
                   <CryptoPanel data={feed.intel.crypto} />
                 </div>
-
-                {/* Earthquakes */}
                 <div className="min-h-[250px]">
                   <EarthquakePanel data={feed.intel.earthquakes} />
                 </div>
-
-                {/* Space */}
                 <div className="xl:row-span-2 min-h-[300px]">
                   <SpacePanel
                     launches={feed.intel.spacex}
@@ -114,15 +109,21 @@ const NexusDashboard = () => {
                     apod={feed.intel.apod}
                   />
                 </div>
-
-                {/* Flights */}
                 <div className="min-h-[250px]">
                   <FlightsPanel data={feed.intel.flights} />
                 </div>
-
-                {/* Forex */}
                 <div className="min-h-[200px]">
                   <ForexPanel data={feed.intel.forex} />
+                </div>
+                {/* NEW PANELS */}
+                <div className="min-h-[250px]">
+                  <FiresPanel data={feed.intel.fires || []} />
+                </div>
+                <div className="min-h-[250px]">
+                  <ConflictsPanel data={feed.intel.conflicts || []} />
+                </div>
+                <div className="xl:col-span-2 min-h-[300px]">
+                  <InfrastructurePanel data={feed.intel.infrastructure || []} />
                 </div>
               </div>
             </>
