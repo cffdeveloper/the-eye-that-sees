@@ -42,16 +42,14 @@ export function WorldMap() {
   const leafletMap = useRef<L.Map | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [activeDisruptions, setActiveDisruptions] = useState<typeof REGIONS[0]["disruptions"]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<typeof REGIONS[0] | null>(null);
   const navigate = useNavigate();
   const { addSelection } = useGeoContext();
 
   const handleRegionClick = useCallback((region: typeof REGIONS[0]) => {
     addSelection({ value: region.code, label: region.name, type: "continent" });
-    // Navigate to first matching industry
-    if (region.industries[0]) {
-      navigate(`/industry/${region.industries[0]}`);
-    }
-  }, [addSelection, navigate]);
+    setSelectedRegion(region);
+  }, [addSelection]);
 
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return;
