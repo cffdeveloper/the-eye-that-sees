@@ -117,6 +117,9 @@ export default function IndustryPage() {
         </div>
       )}
 
+      {/* Social Intelligence */}
+      <SocialIntelPanel data={socialData} loading={socialLoading} industryName={industry.name} />
+
       {/* Live News Feed */}
       <NewsFeed articles={articles} loading={newsLoading} industryName={industry.name} />
 
