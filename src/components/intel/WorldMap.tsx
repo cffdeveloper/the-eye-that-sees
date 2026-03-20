@@ -1,117 +1,169 @@
-import { Globe, MapPin } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Globe } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-// SVG world map with industry money flow connections
-const REGIONS: Record<string, { x: number; y: number; label: string }> = {
-  "North America": { x: 180, y: 160, label: "NA" },
-  "South America": { x: 240, y: 310, label: "SA" },
-  "Europe": { x: 440, y: 130, label: "EU" },
-  "Africa": { x: 440, y: 270, label: "AF" },
-  "Middle East": { x: 510, y: 200, label: "ME" },
-  "South Asia": { x: 570, y: 220, label: "SA" },
-  "East Asia": { x: 650, y: 170, label: "EA" },
-  "Southeast Asia": { x: 640, y: 260, label: "SEA" },
-  "Oceania": { x: 700, y: 340, label: "OC" },
-};
-
-const FLOWS: { from: string; to: string; label: string; color: string }[] = [
-  { from: "East Asia", to: "North America", label: "Tech Hardware", color: "hsl(var(--primary))" },
-  { from: "Middle East", to: "Europe", label: "Energy/Oil", color: "hsl(38 95% 55%)" },
-  { from: "Africa", to: "East Asia", label: "Mining/Raw Materials", color: "hsl(var(--destructive))" },
-  { from: "North America", to: "Europe", label: "Software/SaaS", color: "hsl(185 80% 65%)" },
-  { from: "South America", to: "North America", label: "Agriculture", color: "hsl(var(--success))" },
-  { from: "Southeast Asia", to: "Europe", label: "Textiles/Fashion", color: "hsl(280 70% 60%)" },
-  { from: "Europe", to: "Africa", label: "Financial Services", color: "hsl(210 70% 60%)" },
-  { from: "Middle East", to: "South Asia", label: "Construction/Real Estate", color: "hsl(30 70% 50%)" },
-  { from: "East Asia", to: "Southeast Asia", label: "Telecom Infrastructure", color: "hsl(200 80% 50%)" },
-  { from: "North America", to: "South Asia", label: "IT Services/BPO", color: "hsl(160 60% 50%)" },
-  { from: "Europe", to: "South America", label: "Automotive", color: "hsl(0 0% 65%)" },
-  { from: "Oceania", to: "East Asia", label: "Mining/LNG", color: "hsl(45 80% 55%)" },
+const REGIONS: { name: string; lat: number; lng: number; label: string }[] = [
+  { name: "North America", lat: 40, lng: -100, label: "NA" },
+  { name: "South America", lat: -15, lng: -60, label: "SA" },
+  { name: "Europe", lat: 50, lng: 10, label: "EU" },
+  { name: "Africa", lat: 5, lng: 20, label: "AF" },
+  { name: "Middle East", lat: 28, lng: 45, label: "ME" },
+  { name: "South Asia", lat: 22, lng: 78, label: "SAS" },
+  { name: "East Asia", lat: 35, lng: 115, label: "EA" },
+  { name: "Southeast Asia", lat: 5, lng: 110, label: "SEA" },
+  { name: "Oceania", lat: -28, lng: 135, label: "OC" },
 ];
 
+const FLOWS: { from: string; to: string; label: string; color: string }[] = [
+  { from: "East Asia", to: "North America", label: "Tech Hardware", color: "#00d4ff" },
+  { from: "Middle East", to: "Europe", label: "Energy/Oil", color: "#f59e0b" },
+  { from: "Africa", to: "East Asia", label: "Mining/Raw Materials", color: "#ef4444" },
+  { from: "North America", to: "Europe", label: "Software/SaaS", color: "#06b6d4" },
+  { from: "South America", to: "North America", label: "Agriculture", color: "#22c55e" },
+  { from: "Southeast Asia", to: "Europe", label: "Textiles/Fashion", color: "#a855f7" },
+  { from: "Europe", to: "Africa", label: "Financial Services", color: "#3b82f6" },
+  { from: "Middle East", to: "South Asia", label: "Construction", color: "#f97316" },
+  { from: "East Asia", to: "Southeast Asia", label: "Telecom Infra", color: "#0ea5e9" },
+  { from: "North America", to: "South Asia", label: "IT Services/BPO", color: "#10b981" },
+  { from: "Europe", to: "South America", label: "Automotive", color: "#94a3b8" },
+  { from: "Oceania", to: "East Asia", label: "Mining/LNG", color: "#eab308" },
+];
+
+function getRegion(name: string) {
+  return REGIONS.find(r => r.name === name);
+}
+
 export function WorldMap() {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const leafletMap = useRef<L.Map | null>(null);
+  const [hoveredFlow, setHoveredFlow] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mapRef.current || leafletMap.current) return;
+
+    const map = L.map(mapRef.current, {
+      center: [20, 20],
+      zoom: 2,
+      minZoom: 2,
+      maxZoom: 6,
+      zoomControl: false,
+      attributionControl: false,
+      scrollWheelZoom: true,
+      dragging: true,
+      worldCopyJump: true,
+    });
+
+    // Dark satellite tile layer
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      { maxZoom: 8, opacity: 0.7 }
+    ).addTo(map);
+
+    // Dark overlay for the command-center look
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png",
+      { maxZoom: 8, opacity: 0.9, subdomains: "abcd" }
+    ).addTo(map);
+
+    // Region markers
+    REGIONS.forEach(region => {
+      const marker = L.circleMarker([region.lat, region.lng], {
+        radius: 8,
+        fillColor: "#00d4ff",
+        fillOpacity: 0.7,
+        color: "#00d4ff",
+        weight: 2,
+        opacity: 0.9,
+      }).addTo(map);
+
+      // Pulsing outer ring
+      L.circleMarker([region.lat, region.lng], {
+        radius: 16,
+        fillColor: "#00d4ff",
+        fillOpacity: 0.1,
+        color: "#00d4ff",
+        weight: 1,
+        opacity: 0.3,
+        className: "animate-pulse",
+      }).addTo(map);
+
+      marker.bindTooltip(
+        `<div class="font-mono text-[10px]"><strong>${region.name}</strong></div>`,
+        { className: "map-tooltip", direction: "top", offset: [0, -12] }
+      );
+    });
+
+    // Flow lines (curved polylines)
+    FLOWS.forEach(flow => {
+      const from = getRegion(flow.from);
+      const to = getRegion(flow.to);
+      if (!from || !to) return;
+
+      // Create curved line via midpoint offset
+      const midLat = (from.lat + to.lat) / 2 + 10;
+      const midLng = (from.lng + to.lng) / 2;
+
+      const points: L.LatLngExpression[] = [];
+      const steps = 30;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const lat = (1 - t) * (1 - t) * from.lat + 2 * (1 - t) * t * midLat + t * t * to.lat;
+        const lng = (1 - t) * (1 - t) * from.lng + 2 * (1 - t) * t * midLng + t * t * to.lng;
+        points.push([lat, lng]);
+      }
+
+      const line = L.polyline(points, {
+        color: flow.color,
+        weight: 1.5,
+        opacity: 0.5,
+        dashArray: "6 4",
+        className: "flow-line",
+      }).addTo(map);
+
+      line.bindTooltip(
+        `<div class="font-mono text-[9px]"><strong>${flow.from}</strong> → <strong>${flow.to}</strong><br/>${flow.label}</div>`,
+        { className: "map-tooltip", sticky: true }
+      );
+
+      // Arrow at the end
+      const lastPt = points[points.length - 1] as [number, number];
+      L.circleMarker(lastPt, {
+        radius: 3,
+        fillColor: flow.color,
+        fillOpacity: 0.8,
+        color: flow.color,
+        weight: 1,
+      }).addTo(map);
+    });
+
+    leafletMap.current = map;
+
+    return () => {
+      map.remove();
+      leafletMap.current = null;
+    };
+  }, []);
+
   return (
     <div className="glass-panel p-4">
       <h2 className="text-xs font-mono font-bold text-foreground mb-3 flex items-center gap-1.5">
         <Globe className="w-3.5 h-3.5 text-primary" /> GLOBAL MONEY FLOW MAP
       </h2>
-      <div className="relative w-full overflow-hidden rounded border border-border/30 bg-background/50">
-        <svg viewBox="0 0 800 420" className="w-full h-auto">
-          {/* World map outline (simplified) */}
-          <defs>
-            <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
-              <polygon points="0 0, 6 2, 0 4" fill="hsl(var(--primary) / 0.6)" />
-            </marker>
-          </defs>
-          
-          {/* Simplified continent shapes */}
-          {/* North America */}
-          <path d="M100,80 L220,80 L250,120 L240,200 L200,220 L160,200 L120,180 L100,120 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-          {/* South America */}
-          <path d="M200,230 L260,240 L280,280 L270,350 L240,380 L210,360 L200,300 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-          {/* Europe */}
-          <path d="M390,80 L480,80 L490,120 L470,160 L430,170 L400,150 L390,110 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-          {/* Africa */}
-          <path d="M400,180 L480,180 L500,240 L480,340 L440,360 L400,320 L390,240 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-          {/* Asia */}
-          <path d="M490,70 L700,70 L720,120 L700,200 L650,240 L580,250 L520,220 L500,160 L490,100 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-          {/* Oceania */}
-          <path d="M660,290 L730,290 L740,340 L720,370 L670,360 L660,320 Z" 
-                fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--border))" strokeWidth="0.5" />
-
-          {/* Flow lines */}
-          {FLOWS.map((flow, i) => {
-            const from = REGIONS[flow.from];
-            const to = REGIONS[flow.to];
-            if (!from || !to) return null;
-            const midX = (from.x + to.x) / 2;
-            const midY = (from.y + to.y) / 2 - 20;
-            return (
-              <g key={i}>
-                <path
-                  d={`M${from.x},${from.y} Q${midX},${midY} ${to.x},${to.y}`}
-                  fill="none"
-                  stroke={flow.color}
-                  strokeWidth="1.5"
-                  strokeOpacity="0.4"
-                  strokeDasharray="4 2"
-                  markerEnd="url(#arrowhead)"
-                >
-                  <animate
-                    attributeName="stroke-dashoffset"
-                    values="0;-12"
-                    dur={`${2 + i * 0.3}s`}
-                    repeatCount="indefinite"
-                  />
-                </path>
-                <title>{`${flow.from} → ${flow.to}: ${flow.label}`}</title>
-              </g>
-            );
-          })}
-
-          {/* Region nodes */}
-          {Object.entries(REGIONS).map(([name, pos]) => (
-            <g key={name}>
-              <circle cx={pos.x} cy={pos.y} r="14" fill="hsl(var(--card))" stroke="hsl(var(--primary) / 0.5)" strokeWidth="1.5" />
-              <circle cx={pos.x} cy={pos.y} r="3" fill="hsl(var(--primary))" opacity="0.8">
-                <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
-              </circle>
-              <text x={pos.x} y={pos.y + 26} textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="8" fontFamily="monospace">
-                {name}
-              </text>
-            </g>
-          ))}
-        </svg>
-      </div>
-      
+      <div
+        ref={mapRef}
+        className="w-full h-[400px] rounded-lg border border-border/30 overflow-hidden"
+        style={{ background: "hsl(222 25% 5%)" }}
+      />
       {/* Legend */}
       <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-1.5">
         {FLOWS.slice(0, 8).map((flow, i) => (
-          <div key={i} className="flex items-center gap-1.5">
+          <div
+            key={i}
+            className={`flex items-center gap-1.5 cursor-default transition-opacity ${hoveredFlow && hoveredFlow !== flow.label ? "opacity-40" : ""}`}
+            onMouseEnter={() => setHoveredFlow(flow.label)}
+            onMouseLeave={() => setHoveredFlow(null)}
+          >
             <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: flow.color }} />
             <span className="text-[8px] font-mono text-muted-foreground truncate">{flow.label}</span>
           </div>
