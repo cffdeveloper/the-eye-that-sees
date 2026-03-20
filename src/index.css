@@ -227,7 +227,7 @@
 /* Leaflet map tooltip overrides */
 .map-tooltip {
   background: hsl(220 18% 7% / 0.96) !important;
-  border: 1px solid hsl(35 100% 55% / 0.3) !important;
+  border: 1px solid hsl(210 100% 56% / 0.3) !important;
   color: hsl(200 20% 92%) !important;
   border-radius: 3px !important;
   padding: 4px 8px !important;
