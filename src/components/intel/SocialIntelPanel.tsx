@@ -62,6 +62,30 @@ export function SocialIntelPanel({ data, loading, industryName, subFlowName }: S
         </div>
       </div>
 
+      {/* X Pulse */}
+      {synthesis.x_coverage && (
+        <div className="mb-3 p-2 rounded bg-muted/10 border border-border/10">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Twitter className="w-3 h-3 text-primary" />
+            <span className="text-[8px] font-mono font-bold text-foreground">X PULSE</span>
+            {synthesis.x_coverage.tweets_analyzed > 0 && (
+              <span className="text-[7px] font-mono text-muted-foreground">{synthesis.x_coverage.tweets_analyzed} tweets analyzed</span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {(synthesis.x_coverage.top_voices || []).slice(0, 5).map((v: string, i: number) => (
+              <span key={i} className="text-[7px] font-mono px-1.5 py-0.5 rounded bg-primary/15 text-primary">@{v}</span>
+            ))}
+            {(sentiment.x_pulse?.trending_hashtags || []).slice(0, 4).map((h: string, i: number) => (
+              <span key={`h-${i}`} className="text-[7px] font-mono px-1.5 py-0.5 rounded bg-accent/20 text-accent-foreground">#{h}</span>
+            ))}
+          </div>
+          {sentiment.x_pulse?.sentiment_shift && (
+            <p className="text-[8px] font-mono text-muted-foreground mt-1">↗ {sentiment.x_pulse.sentiment_shift}</p>
+          )}
+        </div>
+      )}
+
       {/* Sentiment tags */}
       {(sentiment.hot_topics?.length > 0 || sentiment.emerging_terms?.length > 0) && (
         <div className="flex flex-wrap gap-1 mb-3">
