@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { RegionAnalyticsDialog } from "./RegionAnalyticsDialog";
-import { MAP_REGIONS, MAP_FLOWS, getMapRegion } from "@/lib/mapRegionData";
+import { MAP_REGIONS, MAP_FLOWS, getMapRegion, nearestMapRegion } from "@/lib/mapRegionData";
 
 export function WorldMap() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -56,6 +56,12 @@ export function WorldMap() {
       subdomains: "abcd",
     }).addTo(map);
 
+    const onMapClick = (e: L.LeafletMouseEvent) => {
+      const region = nearestMapRegion(e.latlng.lat, e.latlng.lng);
+      handleRegionClick(region);
+    };
+    map.on("click", onMapClick);
+
     MAP_REGIONS.forEach((region) => {
       const pulseRing = L.circleMarker([region.lat, region.lng], {
         radius: 22,
@@ -105,8 +111,12 @@ export function WorldMap() {
         offset: [0, -12],
       });
 
-      marker.on("click", () => handleRegionClick(region));
-      pulseRing.on("click", () => handleRegionClick(region));
+      const onMarkerClick = (ev: L.LeafletMouseEvent) => {
+        if (ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
+        handleRegionClick(region);
+      };
+      marker.on("click", onMarkerClick);
+      pulseRing.on("click", onMarkerClick);
 
       marker.on("mouseover", () => setHoveredRegion(region.name));
       marker.on("mouseout", () => setHoveredRegion(null));
@@ -157,6 +167,7 @@ export function WorldMap() {
     leafletMap.current = map;
 
     return () => {
+      map.off("click", onMapClick);
       map.remove();
       leafletMap.current = null;
     };

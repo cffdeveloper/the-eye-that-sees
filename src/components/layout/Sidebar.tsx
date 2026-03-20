@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { industries } from "@/lib/industryData";
-import { LayoutDashboard, Radio, Network, ChevronDown, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Radio, Network, ChevronDown, ChevronRight, FlaskConical } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ export function Sidebar({ open }: { open: boolean }) {
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
     { to: "/intel", label: "Live Feed", icon: Radio },
     { to: "/cross-intel", label: "Cross-Intel", icon: Network },
+    { to: "/custom-intel", label: "Intel Lab", icon: FlaskConical },
   ];
 
   return (

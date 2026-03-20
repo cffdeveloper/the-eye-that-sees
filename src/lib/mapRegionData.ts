@@ -50,6 +50,28 @@ export function getMapRegion(name: string): MapRegion | undefined {
   return MAP_REGIONS.find((r) => r.name === name);
 }
 
+/** Closest macro-region to a map click (basemap has no country polygons; this ties tiles to our regions). */
+export function nearestMapRegion(lat: number, lng: number): MapRegion {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  let best = MAP_REGIONS[0];
+  let bestKm = Infinity;
+  for (const r of MAP_REGIONS) {
+    const dLat = toRad(r.lat - lat);
+    const dLng = toRad(r.lng - lng);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat)) * Math.cos(toRad(r.lat)) * Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const dist = R * c;
+    if (dist < bestKm) {
+      bestKm = dist;
+      best = r;
+    }
+  }
+  return best;
+}
+
 /** Trade corridors that start or end in this macro-region */
 export function getFlowsTouchingRegion(regionName: string): MapFlow[] {
   return MAP_FLOWS.filter((f) => f.from === regionName || f.to === regionName);

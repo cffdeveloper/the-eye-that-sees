@@ -10,6 +10,7 @@ import IndustryPage from "./pages/IndustryPage";
 import SubFlowPage from "./pages/SubFlowPage";
 import IntelDashboard from "./pages/IntelDashboard";
 import CrossIntelPage from "./pages/CrossIntelPage";
+import CustomIntelPage from "./pages/CustomIntelPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/" element={<Dashboard />} />
               <Route path="/intel" element={<IntelDashboard />} />
               <Route path="/cross-intel" element={<CrossIntelPage />} />
+              <Route path="/custom-intel" element={<CustomIntelPage />} />
               <Route path="/industry/:slug" element={<IndustryPage />} />
               <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
             </Route>
