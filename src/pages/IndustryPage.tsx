@@ -6,6 +6,7 @@ import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
+import { ClickableItem } from "@/components/intel/ClickableItem";
 
 export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -33,10 +34,16 @@ export default function IndustryPage() {
         <p className="text-xs font-mono text-muted-foreground">{industry.description}</p>
       </div>
 
-      {/* AI Industry Brief */}
-      <div className="glass-panel p-4">
+      {/* AI Industry Brief — clickable */}
+      <ClickableItem
+        title={`${industry.name} — Full Industry Intelligence Report`}
+        detail={data?.analysis}
+        industryName={industry.name}
+        className="glass-panel p-4 hover:glow-border transition-all"
+      >
         <h2 className="text-xs font-mono font-bold text-primary mb-2 flex items-center gap-1.5">
           <TrendingUp className="w-3.5 h-3.5" /> AI INDUSTRY BRIEF
+          <span className="text-[8px] font-mono text-muted-foreground/50 ml-auto">Click for deep dive →</span>
         </h2>
         {loading ? (
           <div className="flex items-center gap-2 py-4">
@@ -44,14 +51,14 @@ export default function IndustryPage() {
             <span className="text-xs font-mono text-muted-foreground">Analyzing {industry.name} landscape...</span>
           </div>
         ) : data?.analysis ? (
-          <p className="text-xs font-mono text-card-foreground leading-relaxed whitespace-pre-wrap">{data.analysis}</p>
+          <p className="text-xs font-mono text-card-foreground leading-relaxed whitespace-pre-wrap line-clamp-4">{data.analysis}</p>
         ) : (
           <p className="text-xs font-mono text-muted-foreground">Analysis unavailable — will retry on next refresh.</p>
         )}
-      </div>
+      </ClickableItem>
 
       {/* Live News Feed */}
-      <NewsFeed articles={articles} loading={newsLoading} />
+      <NewsFeed articles={articles} loading={newsLoading} industryName={industry.name} />
 
       {/* Sub-flows grid */}
       <div>
@@ -79,16 +86,22 @@ export default function IndustryPage() {
         </div>
       </div>
 
-      {/* News from AI analysis */}
+      {/* News from AI analysis — clickable */}
       {data?.news && data.news.length > 0 && (
         <div className="glass-panel p-4">
           <h2 className="text-xs font-mono font-bold text-foreground mb-3">AI-DETECTED DEVELOPMENTS</h2>
           <div className="space-y-2">
             {data.news.map((item: any, i: number) => (
-              <div key={i} className="p-2 rounded bg-muted/20 border border-border/20">
+              <ClickableItem
+                key={i}
+                title={item.title}
+                detail={item.summary}
+                industryName={industry.name}
+                className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors"
+              >
                 <p className="text-xs font-mono text-foreground">{item.title}</p>
                 <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{item.summary}</p>
-              </div>
+              </ClickableItem>
             ))}
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
+import { ClickableItem } from "@/components/intel/ClickableItem";
 
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
@@ -47,9 +48,16 @@ export default function SubFlowPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* AI Analysis */}
-        <div className="glass-panel p-4">
+        <ClickableItem
+          title={`${subFlow.name} — Full Market Analysis`}
+          detail={data?.analysis}
+          industryName={industry.name}
+          subFlowName={subFlow.name}
+          className="glass-panel p-4 hover:glow-border transition-all"
+        >
           <h2 className="text-xs font-mono font-bold text-primary mb-2 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" /> AI DEEP ANALYSIS
+            <span className="text-[8px] font-mono text-muted-foreground/50 ml-auto">Click for deep dive →</span>
           </h2>
           {loading && !data ? (
             <div className="flex items-center gap-2 py-6">
@@ -57,11 +65,11 @@ export default function SubFlowPage() {
               <span className="text-xs font-mono text-muted-foreground">Analyzing {subFlow.name}...</span>
             </div>
           ) : data?.analysis ? (
-            <p className="text-[11px] font-mono text-card-foreground leading-relaxed whitespace-pre-wrap">{data.analysis}</p>
+            <p className="text-[11px] font-mono text-card-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">{data.analysis}</p>
           ) : (
             <p className="text-xs font-mono text-muted-foreground">Analysis loading...</p>
           )}
-        </div>
+        </ClickableItem>
 
         {/* Gaps & Opportunities */}
         <div className="glass-panel p-4">
@@ -71,10 +79,17 @@ export default function SubFlowPage() {
           {data?.gaps && data.gaps.length > 0 ? (
             <div className="space-y-2">
               {data.gaps.map((gap: any, i: number) => (
-                <div key={i} className="p-2 rounded bg-accent/5 border border-accent/20">
+                <ClickableItem
+                  key={i}
+                  title={gap.title}
+                  detail={gap.detail}
+                  industryName={industry.name}
+                  subFlowName={subFlow.name}
+                  className="p-2 rounded bg-accent/5 border border-accent/20 hover:border-accent/50 transition-colors"
+                >
                   <p className="text-[10px] font-mono font-bold text-accent">{gap.title}</p>
                   <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{gap.detail}</p>
-                </div>
+                </ClickableItem>
               ))}
             </div>
           ) : loading ? (
@@ -88,7 +103,7 @@ export default function SubFlowPage() {
         </div>
 
         {/* Real News Feed */}
-        <NewsFeed articles={articles} loading={newsLoading} />
+        <NewsFeed articles={articles} loading={newsLoading} industryName={industry.name} subFlowName={subFlow.name} />
 
         {/* Key Alerts */}
         <div className="glass-panel p-4">
@@ -98,10 +113,17 @@ export default function SubFlowPage() {
           {data?.alerts && data.alerts.length > 0 ? (
             <div className="space-y-2">
               {data.alerts.map((alert: any, i: number) => (
-                <div key={i} className={`p-2 rounded border ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}>
+                <ClickableItem
+                  key={i}
+                  title={alert.title}
+                  detail={alert.detail}
+                  industryName={industry.name}
+                  subFlowName={subFlow.name}
+                  className={`p-2 rounded border hover:opacity-80 transition-opacity ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}
+                >
                   <p className="text-[10px] font-mono font-bold text-foreground">{alert.title}</p>
                   <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{alert.detail}</p>
-                </div>
+                </ClickableItem>
               ))}
             </div>
           ) : (
@@ -116,10 +138,16 @@ export default function SubFlowPage() {
           <h2 className="text-xs font-mono font-bold text-foreground mb-3">LIVE DATA FEEDS</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {Object.entries(data.liveData).map(([key, val]: [string, any]) => (
-              <div key={key} className="p-2 rounded bg-muted/20 border border-border/20">
+              <ClickableItem
+                key={key}
+                title={`${key.replace(/_/g, ' ')} — Detailed Analysis`}
+                industryName={industry.name}
+                subFlowName={subFlow.name}
+                className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/30 transition-colors"
+              >
                 <p className="text-[9px] font-mono text-muted-foreground uppercase">{key.replace(/_/g, ' ')}</p>
                 <p className="text-sm font-mono font-bold text-foreground">{typeof val === 'number' ? val.toLocaleString() : String(val)}</p>
-              </div>
+              </ClickableItem>
             ))}
           </div>
         </div>

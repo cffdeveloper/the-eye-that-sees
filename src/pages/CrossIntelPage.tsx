@@ -6,6 +6,7 @@ import { WorldMap } from "@/components/intel/WorldMap";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
+import { ClickableItem } from "@/components/intel/ClickableItem";
 
 type CrossIntel = {
   gaps: { title: string; detail: string; industries: string[] }[];
@@ -66,11 +67,18 @@ export default function CrossIntelPage() {
         </div>
       ) : data ? (
         <>
-          {/* Summary */}
-          <div className="glass-panel p-4 glow-border">
-            <h2 className="text-xs font-mono font-bold text-primary mb-2">EXECUTIVE SUMMARY</h2>
-            <p className="text-[11px] font-mono text-card-foreground leading-relaxed whitespace-pre-wrap">{data.summary}</p>
-          </div>
+          {/* Summary — clickable */}
+          <ClickableItem
+            title="Cross-Industry Executive Intelligence Report"
+            detail={data.summary}
+            className="glass-panel p-4 glow-border hover:glow-border-strong transition-all"
+          >
+            <h2 className="text-xs font-mono font-bold text-primary mb-2 flex items-center gap-1.5">
+              EXECUTIVE SUMMARY
+              <span className="text-[8px] font-mono text-muted-foreground/50 ml-auto">Click for deep dive →</span>
+            </h2>
+            <p className="text-[11px] font-mono text-card-foreground leading-relaxed whitespace-pre-wrap line-clamp-4">{data.summary}</p>
+          </ClickableItem>
 
           {/* World Map */}
           <WorldMap />
@@ -83,7 +91,12 @@ export default function CrossIntelPage() {
               </h2>
               <div className="space-y-2">
                 {data.gaps?.map((gap, i) => (
-                  <div key={i} className="p-2 rounded bg-accent/5 border border-accent/20">
+                  <ClickableItem
+                    key={i}
+                    title={gap.title}
+                    detail={gap.detail}
+                    className="p-2 rounded bg-accent/5 border border-accent/20 hover:border-accent/50 transition-colors"
+                  >
                     <p className="text-[10px] font-mono font-bold text-accent">{gap.title}</p>
                     <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{gap.detail}</p>
                     <div className="flex gap-1 mt-1 flex-wrap">
@@ -91,7 +104,7 @@ export default function CrossIntelPage() {
                         <span key={j} className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary">{ind}</span>
                       ))}
                     </div>
-                  </div>
+                  </ClickableItem>
                 ))}
               </div>
             </div>
@@ -103,7 +116,12 @@ export default function CrossIntelPage() {
               </h2>
               <div className="space-y-2">
                 {data.connections?.map((conn, i) => (
-                  <div key={i} className="p-2 rounded bg-primary/5 border border-primary/20">
+                  <ClickableItem
+                    key={i}
+                    title={conn.title}
+                    detail={conn.detail}
+                    className="p-2 rounded bg-primary/5 border border-primary/20 hover:border-primary/40 transition-colors"
+                  >
                     <p className="text-[10px] font-mono font-bold text-foreground">{conn.title}</p>
                     <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{conn.detail}</p>
                     <div className="flex items-center gap-1 mt-1 text-[8px] font-mono text-primary">
@@ -111,7 +129,7 @@ export default function CrossIntelPage() {
                       <span>→</span>
                       <span className="px-1.5 py-0.5 rounded bg-primary/10">{conn.to}</span>
                     </div>
-                  </div>
+                  </ClickableItem>
                 ))}
               </div>
             </div>
@@ -123,10 +141,15 @@ export default function CrossIntelPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {data.alerts?.map((alert, i) => (
-                  <div key={i} className={`p-2 rounded border ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}>
+                  <ClickableItem
+                    key={i}
+                    title={alert.title}
+                    detail={alert.detail}
+                    className={`p-2 rounded border hover:opacity-80 transition-opacity ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}
+                  >
                     <p className="text-[10px] font-mono font-bold text-foreground">{alert.title}</p>
                     <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{alert.detail}</p>
-                  </div>
+                  </ClickableItem>
                 ))}
               </div>
             </div>

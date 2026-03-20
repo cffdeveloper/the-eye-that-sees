@@ -1,4 +1,5 @@
 import { Newspaper, Loader2, ExternalLink } from "lucide-react";
+import { ClickableItem } from "./ClickableItem";
 
 interface Article {
   title: string;
@@ -9,7 +10,14 @@ interface Article {
   category?: string;
 }
 
-export function NewsFeed({ articles, loading }: { articles: Article[]; loading: boolean }) {
+interface NewsFeedProps {
+  articles: Article[];
+  loading: boolean;
+  industryName?: string;
+  subFlowName?: string;
+}
+
+export function NewsFeed({ articles, loading, industryName, subFlowName }: NewsFeedProps) {
   if (loading && !articles.length) {
     return (
       <div className="glass-panel p-4">
@@ -34,9 +42,13 @@ export function NewsFeed({ articles, loading }: { articles: Article[]; loading: 
       </h2>
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {articles.map((article, i) => (
-          <div
+          <ClickableItem
             key={i}
-            className="p-2.5 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors group"
+            title={article.title}
+            detail={article.summary}
+            industryName={industryName}
+            subFlowName={subFlowName}
+            className="p-2.5 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors"
           >
             <div className="flex items-start justify-between gap-2">
               <p className="text-[10px] font-mono font-bold text-foreground leading-snug">{article.title}</p>
@@ -46,6 +58,7 @@ export function NewsFeed({ articles, loading }: { articles: Article[]; loading: 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="w-3 h-3" />
                 </a>
@@ -63,11 +76,8 @@ export function NewsFeed({ articles, loading }: { articles: Article[]; loading: 
                   {new Date(article.publishedAt).toLocaleDateString()}
                 </span>
               )}
-              {article.category && (
-                <span className="text-[8px] font-mono text-muted-foreground uppercase">{article.category}</span>
-              )}
             </div>
-          </div>
+          </ClickableItem>
         ))}
       </div>
     </div>
