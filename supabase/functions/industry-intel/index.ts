@@ -55,39 +55,49 @@ serve(async (req) => {
 - Reference specific local companies, government programs, and market data for ${geoStr}.
 Every single insight and gap must be actionable in the context of ${geoStr}.`;
 
-    const systemPrompt = `You are a ruthless market intelligence analyst who finds MONEY-MAKING OPPORTUNITIES. Your job is to identify exploitable gaps in money flows, underserved markets, arbitrage opportunities, and emerging plays that someone with capital could leverage RIGHT NOW.
+    const systemPrompt = `You are an elite industry intelligence analyst with deep knowledge of every sector on earth. Your PRIMARY job is to provide COMPREHENSIVE INTELLIGENCE on every relevant player, activity, partnership, regulation, and movement in an industry — WHO is doing WHAT, with WHOM, WHY, WHEN, and WHERE. Your SECONDARY job is to derive money-making gaps from that intelligence.
 
-You think like a private equity analyst, a venture capitalist, and a hedge fund strategist combined. Every gap you find must have a clear path to profit. You cross-reference industries to find where value leaks between sectors.
+INTELLIGENCE COMES FIRST. You must paint a complete picture of:
+- KEY PLAYERS: Name every major company, startup, government body, NGO, investor, and individual driving this space. What are they doing? What's their strategy? Who are they partnering with? What have they announced recently?
+- ACTIVITIES & DEALS: Recent mergers, acquisitions, funding rounds, product launches, regulatory filings, patent applications, government tenders, contracts awarded, partnerships signed. Name names, cite amounts, give dates.
+- COMPETITIVE LANDSCAPE: Who competes with whom? What's each player's market share? Who's winning and losing? What strategies are working vs failing? Who just entered or exited?
+- REGULATORY ENVIRONMENT: What laws, policies, standards, or regulations are changing? Who's lobbying? What compliance requirements exist? What government programs or subsidies are available?
+- MONEY FLOWS: Where exactly does money move in this industry? Who pays whom? What are the margins at each step? Where are the biggest cost centers? Where are the highest-margin segments?
+- TECHNOLOGY & INNOVATION: What new technologies are being adopted? Who's building them? What R&D is happening? What patents were recently filed?
+- TALENT & WORKFORCE: Who's hiring? What skills are in demand? Where are talent gaps? Key C-suite moves?
+
+THEN from all this intelligence, identify the gaps and opportunities that emerge naturally.
 
 You MUST respond with valid JSON only — no markdown, no explanation outside the JSON.${geoPromptSection}
 
 KEY PRINCIPLES:
-- Every gap must include estimated addressable market value
-- Rate each opportunity by urgency (window closing), capital required, and expected ROI
-- Identify who's already trying (and failing) and WHY they're failing
-- Connect to adjacent industries that could provide unfair advantages
-- Flag regulatory tailwinds/headwinds that create timing opportunities
-- Note historical parallels — what worked before in similar situations
+- Name SPECIFIC companies, people, dollar amounts, and dates — never be vague
+- Every gap must emerge from the intelligence, not be stated in isolation
+- Connect the dots: show WHY a gap exists based on what the players are doing (or not doing)
+- Cross-reference with adjacent industries when relevant
 - Reference and build upon previous analyses when available${historicalContext}`;
 
     const userPrompt = detailed
-      ? `Analyze ${scope} for EXPLOITABLE MONEY-MAKING OPPORTUNITIES.${!isGlobal ? ` Focus on the ${geoStr} market specifically.` : ""} Keywords: ${keywordStr}.
+      ? `Provide COMPREHENSIVE INTELLIGENCE on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market specifically.` : ""} Keywords: ${keywordStr}.
 
 Return JSON with these exact keys:
 {
-  "analysis": "250-word deep analysis${!isGlobal ? ` contextualized to ${geoStr}` : ""}: Where is money flowing? Where is it STUCK? Where are the biggest inefficiencies? Who is overpaying? Who is underserved? What's about to break open? Be ruthlessly specific with numbers, company names, and dollar amounts${!isGlobal ? ` relevant to ${geoStr}` : ""}.",
-  "news": [{"title": "...", "summary": "30-word summary of why this matters for making money${!isGlobal ? ` in ${geoStr}` : ""}"}] (5 recent developments that create opportunities),
-  "gaps": [{"title": "...", "detail": "60-word explanation: What's the gap, its estimated market value, why it exists, and how to exploit it${!isGlobal ? ` in ${geoStr}` : ""}", "value": "$X estimate", "urgency": "high|medium|low", "capital_needed": "low|medium|high"}] (6 exploitable gaps with profit potential),
-  "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (4 time-sensitive market alerts),
+  "analysis": "400-word deep intelligence briefing${!isGlobal ? ` contextualized to ${geoStr}` : ""}: Who are the major players and what are they doing? What deals, launches, and partnerships happened recently? What regulatory changes are underway? Where is money flowing and where is it stuck? Name companies, people, amounts, and dates.",
+  "players": [{"name": "Company/Person name", "role": "what they do in this space", "recent_activity": "what they have done recently", "strategy": "their apparent strategy", "partnerships": "who they work with"}] (8-10 key players),
+  "news": [{"title": "...", "summary": "40-word summary covering who did what, when, why, and what it means${!isGlobal ? ` for ${geoStr}` : ""}"}] (6 recent developments with full context),
+  "deals": [{"type": "funding|M&A|partnership|contract|IPO|regulatory", "parties": "who is involved", "value": "$X", "date": "when", "significance": "why it matters"}] (4-6 recent deals/events),
+  "gaps": [{"title": "...", "detail": "60-word explanation grounded in intelligence above: What specific player activity or market condition creates this gap? Its estimated market value and how to exploit it${!isGlobal ? ` in ${geoStr}` : ""}", "value": "$X estimate", "urgency": "high|medium|low", "capital_needed": "low|medium|high", "related_players": "who is relevant"}] (6 exploitable gaps derived from the intel),
+  "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (4 time-sensitive alerts),
   "liveData": {"metric_name": value} (8 relevant quantitative metrics${!isGlobal ? ` for ${geoStr}` : ""})
 }`
-      : `Give a money-flow brief for ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market.` : ""} Keywords: ${keywordStr}.
+      : `Give comprehensive intelligence on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market.` : ""} Keywords: ${keywordStr}.
 
 Return JSON:
 {
-  "analysis": "150-word overview${!isGlobal ? ` for ${geoStr}` : ""}: Where does money flow? Where are the biggest leaks and underserved segments?",
-  "news": [{"title": "...", "summary": "..."}] (3 developments creating opportunities),
-  "gaps": [{"title": "...", "detail": "...", "value": "$X estimate"}] (3 major exploitable gaps)
+  "analysis": "250-word intelligence briefing${!isGlobal ? ` for ${geoStr}` : ""}: Who are the key players? What are they doing? What deals happened? Where does money flow? What gaps emerge from this landscape?",
+  "players": [{"name": "...", "role": "...", "recent_activity": "..."}] (5 key players),
+  "news": [{"title": "...", "summary": "..."}] (3 developments with full context on who/what/why),
+  "gaps": [{"title": "...", "detail": "...", "value": "$X estimate"}] (3 gaps derived from the intel)
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -145,6 +155,35 @@ Return JSON:
         // Store individual insights for persistent learning
         const insights: any[] = [];
 
+        // Store players as intel
+        for (const player of (parsed.players || [])) {
+          insights.push({
+            insight_type: "player",
+            title: player.name,
+            detail: `${player.role}. Recent: ${player.recent_activity}. Strategy: ${player.strategy}. Partners: ${player.partnerships || 'N/A'}`,
+            source_industry: industry,
+            source_subflow: subFlow || null,
+            geo_context: geoArray,
+            tags: ["player", "intelligence"],
+            raw_data: player,
+          });
+        }
+
+        // Store deals
+        for (const deal of (parsed.deals || [])) {
+          insights.push({
+            insight_type: "deal",
+            title: `${deal.type}: ${deal.parties}`,
+            detail: `${deal.significance}. Value: ${deal.value || 'undisclosed'}. Date: ${deal.date || 'recent'}`,
+            source_industry: industry,
+            source_subflow: subFlow || null,
+            geo_context: geoArray,
+            estimated_value: deal.value || null,
+            tags: ["deal", deal.type || "unknown"],
+            raw_data: deal,
+          });
+        }
+
         for (const gap of (parsed.gaps || [])) {
           insights.push({
             insight_type: "gap",
@@ -155,7 +194,7 @@ Return JSON:
             geo_context: geoArray,
             estimated_value: gap.value || null,
             urgency: gap.urgency || null,
-            tags: [gap.capital_needed ? `capital:${gap.capital_needed}` : ""].filter(Boolean),
+            tags: [gap.capital_needed ? `capital:${gap.capital_needed}` : "", gap.related_players || ""].filter(Boolean),
             raw_data: gap,
           });
         }

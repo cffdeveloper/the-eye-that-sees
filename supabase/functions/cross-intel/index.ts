@@ -48,29 +48,37 @@ serve(async (req) => {
       ? ""
       : `\n\nCRITICAL: ALL analysis must be contextualized to ${geoStr}. Every gap, connection, and alert must explain how it specifically impacts or creates opportunity in ${geoStr}. Reference local market conditions, regulations, companies, and infrastructure in ${geoStr}. Show how global trends can be exploited locally in ${geoStr}.`;
 
-    const systemPrompt = `You are an elite cross-industry MONEY FLOW analyst. Your ONLY job is finding where money leaks between industries and how to capture that value. You think like a billion-dollar private equity firm scanning for arbitrage across 20 industries simultaneously.
+    const systemPrompt = `You are an elite cross-industry intelligence analyst who maps the COMPLETE landscape of how industries interact, who the players are, what they're doing, and where money flows between sectors.
+
+YOUR PRIMARY MISSION: Provide comprehensive intelligence on cross-industry dynamics:
+- WHO is operating across multiple industries? Name the companies, funds, and individuals
+- WHAT deals, partnerships, and activities connect different sectors? Be specific with names, amounts, dates
+- WHERE does money flow between industries? Map the exact pathways
+- WHY are certain industries converging? What technology, regulatory, or market forces drive this?
+- WHEN did key cross-industry moves happen? What's the timeline?
+- WHO is failing at cross-industry plays and WHY?
+
+FROM this intelligence, THEN identify the gaps and arbitrage opportunities.
 
 You MUST respond with valid JSON only.${geoSection}
 
-YOUR MANDATE:
-- Find where Industry A's waste is Industry B's gold mine
-- Identify cross-sector arbitrage where pricing inefficiencies exist
-- Spot supply chain gaps where middlemen extract capturable value
-- Find regulatory gaps where one industry's rules create opportunity for another
-- Detect technology transfer opportunities from Industry X to Industry Y
-- Identify convergence plays where industries are merging into new markets
-- Every gap MUST have an estimated dollar value and a concrete exploitation strategy
+PRINCIPLES:
+- Name SPECIFIC companies, investors, deals, and partnerships — never be vague
+- Show the relationships: Company A from Industry X is partnering with Company B from Industry Y because...
+- Every gap/opportunity must be DERIVED from the intelligence, not stated in isolation
 - Reference and evolve previous analyses${historicalContext}`;
 
-    const userPrompt = `Scan ALL 20 industries for EXPLOITABLE CROSS-INDUSTRY OPPORTUNITIES${!isGlobal ? ` specifically for the ${geoStr} market` : ""}:
+    const userPrompt = `Provide COMPREHENSIVE CROSS-INDUSTRY INTELLIGENCE across all 20 industries${!isGlobal ? ` for the ${geoStr} market` : ""}:
 
 ${industryList}
 
 Return JSON:
 {
-  "summary": "250-word executive brief${!isGlobal ? ` for ${geoStr}` : ""}: biggest cross-industry money opportunities, capital flow inefficiencies, and highest ROI convergence plays. Be specific with dollar amounts and company names${!isGlobal ? ` relevant to ${geoStr}` : ""}.",
-  "gaps": [{"title": "...", "detail": "60-word explanation of the cross-industry gap, market value, and how to exploit it${!isGlobal ? ` in ${geoStr}` : ""}", "industries": ["A", "B"], "estimated_value": "$X", "urgency": "high|medium|low"}] (8 cross-industry gaps),
-  "connections": [{"title": "...", "detail": "50-word explanation and how to leverage for profit${!isGlobal ? ` in ${geoStr}` : ""}", "from": "A", "to": "B", "opportunity_type": "arbitrage|supply_chain|tech_transfer|convergence|regulatory"}] (8 cross-industry connections),
+  "summary": "350-word intelligence briefing${!isGlobal ? ` for ${geoStr}` : ""}: Map the key players operating across industries, recent cross-sector deals and partnerships, where money flows between sectors, and what forces are driving industry convergence. Name companies, people, amounts, and dates.",
+  "cross_industry_players": [{"name": "...", "industries": ["A","B"], "activity": "what they are doing across sectors", "strategy": "their cross-industry play"}] (6 key cross-industry operators),
+  "deals": [{"type": "M&A|partnership|investment|contract", "parties": "who", "industries": ["A","B"], "value": "$X", "significance": "why this cross-industry move matters"}] (5 recent cross-industry deals),
+  "gaps": [{"title": "...", "detail": "60-word explanation grounded in the intelligence: what player activity or market condition creates this cross-industry gap${!isGlobal ? ` in ${geoStr}` : ""}", "industries": ["A", "B"], "estimated_value": "$X", "urgency": "high|medium|low", "related_players": "who is relevant"}] (8 cross-industry gaps derived from intel),
+  "connections": [{"title": "...", "detail": "50-word explanation with specific companies and how to leverage${!isGlobal ? ` in ${geoStr}` : ""}", "from": "A", "to": "B", "opportunity_type": "arbitrage|supply_chain|tech_transfer|convergence|regulatory", "key_players": "who is involved"}] (8 cross-industry connections),
   "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (6 time-sensitive cross-industry alerts)
 }`;
 
@@ -126,6 +134,33 @@ Return JSON:
 
         // Persist individual insights
         const insights: any[] = [];
+        // Store cross-industry players
+        for (const player of (parsed.cross_industry_players || [])) {
+          insights.push({
+            insight_type: "player",
+            title: player.name,
+            detail: `Cross-industry: ${player.activity}. Strategy: ${player.strategy}`,
+            source_industry: "cross-industry",
+            related_industries: player.industries || [],
+            geo_context: geoArray,
+            tags: ["player", "cross-industry"],
+            raw_data: player,
+          });
+        }
+        // Store cross-industry deals
+        for (const deal of (parsed.deals || [])) {
+          insights.push({
+            insight_type: "deal",
+            title: `${deal.type}: ${deal.parties}`,
+            detail: deal.significance,
+            source_industry: "cross-industry",
+            related_industries: deal.industries || [],
+            geo_context: geoArray,
+            estimated_value: deal.value || null,
+            tags: ["deal", "cross-industry", deal.type || "unknown"],
+            raw_data: deal,
+          });
+        }
         for (const gap of (parsed.gaps || [])) {
           insights.push({
             insight_type: "gap",

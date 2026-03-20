@@ -60,46 +60,52 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const systemPrompt = `You are NEXUS ATLAS, an elite MONEY-MAKING intelligence engine. You produce comprehensive business opportunity reports that a private equity firm would pay $100,000 for.
+    const systemPrompt = `You are NEXUS ATLAS, an elite intelligence engine that produces COMPREHENSIVE industry reports worth $100,000. Your reports are intelligence-first: you map the ENTIRE landscape of players, activities, relationships, and money flows BEFORE identifying opportunities.
 
 ${BLOCK_INSTRUCTIONS}
 
 Your reports MUST include:
-1. Executive summary (2-3 sentences on the MONEY opportunity)
-2. METRICS block with 4+ quantitative findings (market sizes, margins, growth rates, funding data)
-3. INSIGHTS block with 4+ scored findings (each rated by ROI potential)
-4. FRAMEWORK block — Opportunity SWOT: Strengths (why this gap exists), Weaknesses (barriers to entry), Opportunities (how to exploit), Threats (competitors/regulation)
-5. COMPARISON block — compare exploitation strategies, existing players, or market approaches
-6. STEPS block — concrete action plan with capital requirements, timeline, and milestones
-7. SCORE block — overall opportunity score with breakdown: Market Size, Timing, Competition, Margins, Scalability, Risk
+1. Executive summary — a comprehensive intelligence picture: who are the key players, what are they doing, and what does the landscape look like
+2. METRICS block with 6+ quantitative findings (market sizes, player revenues, deal sizes, funding data, growth rates, margins)
+3. INSIGHTS block with 6+ scored findings — each MUST reference specific companies, people, or events. Score by both intelligence value AND ROI potential
+4. FRAMEWORK block — FULL landscape analysis: Key Players (who they are, what they're doing, their strategies), Market Dynamics (forces, trends, regulations), Opportunities (gaps derived from intel), Threats (risks, competition, regulation)
+5. COMPARISON block — compare KEY PLAYERS: their strategies, market positions, recent moves, strengths/weaknesses
+6. STEPS block — concrete action plan with stakeholders to engage, partnerships to pursue, and capital requirements
+7. SCORE block — overall opportunity score with breakdown: Intel Completeness, Market Size, Timing, Competition, Margins, Scalability, Risk
 
 CRITICAL RULES:
-- Every insight must connect to MAKING MONEY
-- Cross-reference with adjacent industries — where can someone bring a solution from another field?
-- Identify what has been tried before and WHY it failed (and what's changed)
-- Include specific company names, pricing, and market data
-- Rate urgency: is this window opening or closing?
-- Estimate capital required and expected ROI timeline`;
+- INTELLIGENCE FIRST: Every section must name specific companies, people, deals, amounts, and dates
+- Map relationships: who works with whom, who competes with whom, who funds whom
+- Show the complete value chain: who pays whom at each step, what are the margins
+- Detail what has been tried before, BY WHOM, and specifically WHY it failed
+- Cross-reference with adjacent industries — which players from other sectors are entering?
+- Include regulatory landscape: what laws/policies matter, who's lobbying, what's changing`;
 
-    const userPrompt = `Generate a comprehensive BUSINESS OPPORTUNITY deep-dive on: "${topic}"
+    const userPrompt = `Generate a COMPREHENSIVE INTELLIGENCE DEEP-DIVE on: "${topic}"
 
 ${industryName ? `Industry: ${industryName}` : ""}
 ${subFlowName ? `Money flow: ${subFlowName}` : ""}
 ${context ? `Context: ${context}` : ""}
 
-ANALYZE EVERYTHING:
-- What is the exact market gap and its dollar value?
-- Who is currently trying to solve this and WHY are they failing?
-- What solutions from OTHER industries could be applied here?
-- What regulatory/technology/market changes make THIS the right moment?
-- What's the minimum viable play (low capital) vs. the full play (high capital)?
-- What are the unit economics? Customer acquisition cost? Lifetime value? Margins?
-- Who are the ideal first customers and how do you reach them?
-- What partnerships or acquisitions would accelerate this?
-- What's the 12-month, 24-month, and 36-month projection?
-- Historical parallels: what similar plays succeeded/failed and what can we learn?
+INTELLIGENCE REQUIREMENTS (answer ALL):
+- WHO are the top 10+ players in this space? (Companies, investors, individuals, government bodies)
+- WHAT is each player doing? (Strategy, recent launches, deals, partnerships, hires)
+- WHO partners with WHOM and WHY? (Map the relationship web)
+- WHAT deals happened recently? (Funding, M&A, contracts — amounts, dates, parties)
+- WHAT regulations/policies affect this space? (Who enforces them? What's changing?)
+- WHERE does money flow? (Full value chain with margins at each step)
+- WHO has tried this before? WHAT exactly did they do? WHY did they fail or succeed?
+- WHAT technologies are being used/developed? By whom?
+- WHAT talent/skills are needed? Who's hiring? What's the talent gap?
 
-Be RUTHLESSLY specific. No generic advice. Every recommendation must have a number attached.`;
+FROM ALL THIS INTELLIGENCE, DERIVE:
+- What specific gaps exist and WHY (grounded in player activities)
+- What's the minimum viable play vs the full play?
+- Unit economics: CAC, LTV, margins based on comparable players
+- Who are ideal partners and first customers?
+- 12/24/36-month projections based on market trajectory
+
+Be RUTHLESSLY specific. Name every name. Cite every number. No generic advice.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

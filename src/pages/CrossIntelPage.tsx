@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { industries } from "@/lib/industryData";
-import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp } from "lucide-react";
+import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp, Users, Handshake } from "lucide-react";
 import { WorldMap } from "@/components/intel/WorldMap";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { useSnapshots } from "@/hooks/useSnapshots";
@@ -10,8 +10,10 @@ import { ClickableItem } from "@/components/intel/ClickableItem";
 import { useGeoContext } from "@/contexts/GeoContext";
 
 type CrossIntel = {
-  gaps: { title: string; detail: string; industries: string[]; estimated_value?: string; urgency?: string }[];
-  connections: { title: string; detail: string; from: string; to: string; opportunity_type?: string }[];
+  cross_industry_players?: { name: string; industries: string[]; activity: string; strategy: string }[];
+  deals?: { type: string; parties: string; industries: string[]; value?: string; significance: string }[];
+  gaps: { title: string; detail: string; industries: string[]; estimated_value?: string; urgency?: string; related_players?: string }[];
+  connections: { title: string; detail: string; from: string; to: string; opportunity_type?: string; key_players?: string }[];
   alerts: { title: string; detail: string; level: string }[];
   summary: string;
 };
@@ -85,6 +87,53 @@ export default function CrossIntelPage() {
 
           {/* World Map */}
           <WorldMap />
+
+          {/* Cross-Industry Players & Deals */}
+          {(data.cross_industry_players?.length || data.deals?.length) ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {data.cross_industry_players && data.cross_industry_players.length > 0 && (
+                <div className="glass-panel p-4">
+                  <h2 className="text-xs font-mono font-bold text-foreground mb-3 flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-primary" /> CROSS-INDUSTRY OPERATORS
+                  </h2>
+                  <div className="space-y-2">
+                    {data.cross_industry_players.map((player, i) => (
+                      <ClickableItem key={i} title={player.name} detail={`Activity: ${player.activity}\nStrategy: ${player.strategy}`}
+                        className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors">
+                        <p className="text-xs font-mono font-bold text-foreground">{player.name}</p>
+                        <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{player.activity}</p>
+                        <div className="flex gap-1 mt-1 flex-wrap">
+                          {player.industries.map((ind, j) => (
+                            <span key={j} className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary">{ind}</span>
+                          ))}
+                        </div>
+                      </ClickableItem>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {data.deals && data.deals.length > 0 && (
+                <div className="glass-panel p-4">
+                  <h2 className="text-xs font-mono font-bold text-foreground mb-3 flex items-center gap-1.5">
+                    <Handshake className="w-3.5 h-3.5 text-primary" /> CROSS-INDUSTRY DEALS
+                  </h2>
+                  <div className="space-y-2">
+                    {data.deals.map((deal, i) => (
+                      <ClickableItem key={i} title={`${deal.type}: ${deal.parties}`} detail={deal.significance}
+                        className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase">{deal.type}</span>
+                          <p className="text-[10px] font-mono text-foreground flex-1">{deal.parties}</p>
+                          {deal.value && <span className="text-[10px] font-mono text-primary font-bold">{deal.value}</span>}
+                        </div>
+                        <p className="text-[10px] font-mono text-muted-foreground mt-1">{deal.significance}</p>
+                      </ClickableItem>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Cross-Industry Gaps */}
