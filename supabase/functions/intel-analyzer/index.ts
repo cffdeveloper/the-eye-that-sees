@@ -17,13 +17,13 @@ serve(async (req) => {
 
     const sb = createClient(supabaseUrl, serviceKey);
 
-    // 1. Fetch recent raw data (last 24h)
-    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    // 1. Fetch recent raw data (last 6h for freshness)
+    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
     const { data: rawData } = await sb.from("raw_market_data")
-      .select("source, data_type, geo_scope, payload, tags")
-      .gte("created_at", dayAgo)
+      .select("source, data_type, geo_scope, payload, tags, created_at")
+      .gte("created_at", sixHoursAgo)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(500);
 
     // 2. Fetch existing insights to avoid duplicates
     const { data: existingInsights } = await sb.from("intel_insights")
@@ -32,63 +32,85 @@ serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(50);
 
-    // 3. Summarize raw data for AI
-    const dataSummary = {
-      crypto: rawData?.filter(r => r.data_type === "crypto_price").slice(0, 15).map(r => r.payload),
-      forex: rawData?.filter(r => r.data_type === "forex_rate").slice(0, 20).map(r => r.payload),
-      news: rawData?.filter(r => r.data_type === "news_signal").slice(0, 20).map(r => r.payload),
-      economics: rawData?.filter(r => r.data_type === "economic_indicator").slice(0, 30).map(r => r.payload),
-    };
+    // 3. Categorize and summarize for AI
+    const byType: Record<string, any[]> = {};
+    for (const r of (rawData || [])) {
+      const key = r.data_type;
+      if (!byType[key]) byType[key] = [];
+      if (byType[key].length < 25) byType[key].push(r.payload);
+    }
 
-    const existingTitles = existingInsights?.map(i => i.title).join("; ") || "none yet";
+    const existingTitles = existingInsights?.map(i => i.title).join("; ") || "none";
 
-    // 4. Ask AI to find gaps and opportunities
-    const systemPrompt = `You are a proactive market intelligence engine. Your job has TWO phases:
+    // 4. INTELLIGENCE-FIRST analysis
+    const systemPrompt = `You are a REAL-TIME market intelligence engine with access to live data feeds from Google News, Reddit, Hacker News, GDELT, cryptocurrency markets, forex, GitHub, and economic indicators.
 
-PHASE 1 — INTELLIGENCE GATHERING (PRIMARY):
-Analyze the raw data to build a comprehensive picture of:
-- WHO are the key players in each data stream? Name companies, investors, individuals
-- WHAT are they doing? What deals, launches, partnerships happened?
-- WHERE is money flowing? Map capital movements across industries and geographies
-- WHY are things changing? What forces (regulatory, technological, market) drive shifts?
-- WHAT relationships exist between players across different industries?
+YOUR PRIMARY MISSION: Be a comprehensive intelligence system that tells the user EVERYTHING happening in every industry RIGHT NOW.
 
-PHASE 2 — GAP IDENTIFICATION (SECONDARY):
-FROM the intelligence gathered, identify money-making gaps and opportunities:
-- Every insight MUST be grounded in specific intelligence (name the player/deal/event that creates the gap)
-- Cross-reference across industries: if education needs water tech, SAY SO and name who's involved
-- Every insight MUST have a dollar value estimate
-- Flag timing: why NOW is the moment to act, based on specific recent events
+PHASE 1 — LIVE INTELLIGENCE (80% of your output):
+For EVERY data point, extract and report:
+- **WHO**: Name specific companies, CEOs, investors, funds, government officials. Be specific — "Safaricom CEO Peter Ndegwa" not "a telecom company"
+- **WHAT**: Exact actions — product launches, M&A deals, funding rounds, regulatory filings, strategy pivots, hirings/firings
+- **WHEN**: Exact dates, "today", "this week", "3 hours ago" — freshness is CRITICAL
+- **WHERE**: Countries, cities, markets affected
+- **WHY**: The strategic reasoning — why is this move happening now?
+- **WITH WHO**: Partners, competitors responding, supply chain implications
+- **HOW MUCH**: Deal values, market sizes, investment amounts, revenue figures
 
-DO NOT repeat these existing insights: ${existingTitles}
+CROSS-REFERENCE everything: If Company A in tech does something, check if it affects Company B in finance. Track EVERY player across industries.
 
-Return ONLY valid JSON array of objects, each with:
+PHASE 2 — ACTIONABLE INTELLIGENCE (20%):
+From the intelligence, derive:
+- Stock/crypto recommendations with confidence levels (e.g., "BUY signal for $AAPL — 78% confidence based on...")
+- Arbitrage opportunities between markets/geographies
+- Gaps where demand exists but supply doesn't
+- Timing windows that are closing
+
+ACCURACY RULES:
+- If you recommend buying/selling, explain the EXACT data points supporting it
+- Include risk assessment for every recommendation
+- Mark confidence: HIGH (80%+), MEDIUM (50-79%), LOW (<50%)
+- NEVER fabricate specific numbers — use data from the feeds or clearly mark estimates
+
+DO NOT repeat: ${existingTitles}
+
+Return ONLY valid JSON array. Each object:
 {
-  "insight_type": "player|deal|gap|opportunity|arbitrage|trend|warning",
-  "title": "specific actionable title naming companies/people",
-  "detail": "3-4 sentences: the intelligence first (who/what/when/why), then the opportunity derived from it, and cross-industry connections",
+  "insight_type": "player_move|deal|partnership|product_launch|regulatory|market_shift|stock_signal|crypto_signal|arbitrage|gap|warning|competitor_intel",
+  "title": "SPECIFIC title naming companies/people/amounts",
+  "detail": "5-6 sentences: WHO is doing WHAT, WHEN it happened, WHY it matters, WHO else is affected, WHAT the opportunity/risk is, cross-industry connections",
   "source_industry": "primary industry",
-  "related_industries": ["list of related industries"],
-  "geo_context": ["country codes or global"],
-  "estimated_value": "$X million/billion",
+  "related_industries": ["all affected industries"],
+  "geo_context": ["specific country codes"],
+  "estimated_value": "$X with basis",
   "urgency": "immediate|short-term|medium-term",
   "score": 0-100,
-  "tags": ["relevant", "tags"]
+  "confidence": "HIGH|MEDIUM|LOW",
+  "action": "specific action to take (buy/sell/watch/build/partner)",
+  "risk_level": "low|medium|high",
+  "tags": ["relevant", "tags", "company-names"],
+  "data_freshness": "hours/minutes old"
 }
 
-Return 8-12 insights. Mix player intelligence, deal intel, AND actionable gaps.`;
+Return 15-20 insights. PRIORITIZE freshness — data from the last hour > last day > older.`;
 
-    const userPrompt = `Analyze this real-time market data and find exploitable gaps and opportunities:
+    const userPrompt = `ANALYZE THIS LIVE DATA AND TELL ME EVERYTHING HAPPENING RIGHT NOW:
 
-CRYPTO MARKETS: ${JSON.stringify(dataSummary.crypto?.slice(0, 10))}
+BREAKING NEWS (Google News + GDELT): ${JSON.stringify(byType["news_signal"]?.slice(0, 20))}
 
-FOREX RATES: ${JSON.stringify(dataSummary.forex?.slice(0, 15))}
+SOCIAL SIGNALS (Reddit + HackerNews): ${JSON.stringify(byType["social_signal"]?.slice(0, 15))}
 
-NEWS SIGNALS: ${JSON.stringify(dataSummary.news?.slice(0, 15))}
+CRYPTO MARKETS (Live): ${JSON.stringify(byType["crypto_price"]?.slice(0, 15))}
 
-ECONOMIC INDICATORS: ${JSON.stringify(dataSummary.economics?.slice(0, 20))}
+FOREX RATES (Live): ${JSON.stringify(byType["forex_rate"]?.slice(0, 15))}
 
-Find cross-industry connections, supply-demand mismatches, regulatory arbitrage, and timing opportunities. Every insight must have a specific dollar value and actionable steps.`;
+TECH TRENDS (GitHub + DevTo): ${JSON.stringify(byType["tech_signal"]?.slice(0, 10))}
+
+ECONOMIC INDICATORS: ${JSON.stringify(byType["economic_indicator"]?.slice(0, 20))}
+
+MARKET SENTIMENT: ${JSON.stringify(byType["market_sentiment"]?.slice(0, 5))}
+
+I need to know: Who are the key players? What are they doing RIGHT NOW? What deals just happened? What should I buy/sell/watch? What gaps exist? Be specific with names, amounts, dates.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -117,11 +139,11 @@ Find cross-industry connections, supply-demand mismatches, regulatory arbitrage,
       insights = JSON.parse(content);
       if (!Array.isArray(insights)) insights = [insights];
     } catch {
-      console.error("Failed to parse AI response:", content.substring(0, 200));
+      console.error("Failed to parse AI response:", content.substring(0, 300));
       insights = [];
     }
 
-    // 5. Store insights (System 3 - Intel Capture)
+    // 5. Store insights
     let stored = 0;
     for (const insight of insights) {
       const { error } = await sb.from("intel_insights").insert({
@@ -134,15 +156,22 @@ Find cross-industry connections, supply-demand mismatches, regulatory arbitrage,
         estimated_value: insight.estimated_value || null,
         urgency: insight.urgency || "medium-term",
         score: insight.score || 50,
-        tags: insight.tags || [],
-        raw_data: { source: "intel-analyzer", analyzed_at: new Date().toISOString() },
+        tags: [...(insight.tags || []), insight.confidence || "MEDIUM", insight.action || "watch"],
+        raw_data: {
+          source: "intel-analyzer",
+          confidence: insight.confidence,
+          action: insight.action,
+          risk_level: insight.risk_level,
+          data_freshness: insight.data_freshness,
+          analyzed_at: new Date().toISOString(),
+        },
       });
       if (!error) stored++;
       else console.error("Insert insight error:", error.message);
     }
 
-    // 6. Create intel_matches for high-confidence cross-industry opportunities
-    const highValue = insights.filter(i => (i.score || 0) >= 70 && (i.related_industries?.length || 0) > 1);
+    // 6. Create intel_matches for high-value cross-industry opportunities
+    const highValue = insights.filter(i => (i.score || 0) >= 65 && (i.related_industries?.length || 0) > 1);
     let matches = 0;
     for (const h of highValue) {
       const { error } = await sb.from("intel_matches").insert({
@@ -153,15 +182,16 @@ Find cross-industry connections, supply-demand mismatches, regulatory arbitrage,
         geo_context: h.geo_context || ["global"],
         estimated_value: h.estimated_value,
         confidence: h.score || 70,
-        action_items: [],
-        challenges: [],
+        action_items: h.action ? [{ step: h.action, priority: h.urgency || "medium" }] : [],
+        challenges: h.risk_level ? [{ challenge: `Risk: ${h.risk_level}`, mitigation: "Monitor closely" }] : [],
       });
       if (!error) matches++;
     }
 
     return new Response(JSON.stringify({
-      analyzed: rawData?.length || 0,
-      insights_found: insights.length,
+      raw_data_analyzed: rawData?.length || 0,
+      data_types: Object.keys(byType).length,
+      insights_generated: insights.length,
       insights_stored: stored,
       matches_created: matches,
       timestamp: new Date().toISOString(),

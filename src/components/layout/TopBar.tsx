@@ -7,34 +7,27 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
   const { isGlobal, geoString } = useGeoContext();
 
   return (
-    <header className="flex items-center justify-between px-4 py-2 border-b border-border/50 glass-panel-strong shrink-0">
-      <div className="flex items-center gap-3">
-        <button onClick={toggleSidebar} className="p-1 rounded hover:bg-muted/30 transition-colors text-muted-foreground">
-          {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
-        </button>
-        <Link to="/" className="flex items-center gap-2">
-          <div className="relative">
-            <Hexagon className="w-5 h-5 text-primary" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-sm font-mono font-bold tracking-wider text-foreground">
-              NEXUS <span className="text-primary">ATLAS</span>
-            </h1>
-            <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-widest">
-              {isGlobal ? "Global Market Intelligence" : `Market Intel → ${geoString}`}
-            </p>
-          </div>
-        </Link>
-      </div>
-      <div className="flex items-center gap-3">
+    <header className="h-9 border-b border-border/50 bg-card/60 flex items-center px-2 gap-2 shrink-0">
+      <button onClick={toggleSidebar} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+        {sidebarOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeft className="w-3.5 h-3.5" />}
+      </button>
+
+      <Link to="/" className="flex items-center gap-1.5">
+        <Hexagon className="w-4 h-4 text-primary" strokeWidth={2.5} />
+        <span className="terminal-header text-[11px]">NEXUS ATLAS</span>
+      </Link>
+
+      <span className="text-[9px] text-muted-foreground hidden md:block">
+        {isGlobal ? "Global Market Intelligence" : `Intel → ${geoString}`}
+      </span>
+
+      <div className="ml-auto flex items-center gap-2">
         <GeoSelector />
-        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-border/50 bg-card/50">
-          <Activity className="w-3 h-3 text-emerald-400 animate-pulse" />
-          <span className="text-[9px] font-mono text-muted-foreground">20 INDUSTRIES</span>
-          <span className="text-[9px] font-mono text-emerald-400">LIVE</span>
+        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/50 border border-border/50">
+          <span className="text-[9px] text-muted-foreground">20 IND</span>
+          <span className="w-px h-3 bg-border/50" />
+          <Activity className="w-3 h-3 text-accent animate-pulse" />
+          <span className="text-[9px] text-accent font-semibold">LIVE</span>
         </div>
       </div>
     </header>
