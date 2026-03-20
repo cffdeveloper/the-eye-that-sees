@@ -168,13 +168,18 @@ export function SocialIntelPanel({ data, loading, industryName, subFlowName }: S
       </div>
 
       {/* Source breakdown */}
-      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-border/20">
+      <div className="flex flex-wrap items-center gap-3 mt-3 pt-2 border-t border-border/20">
         <span className="text-[7px] font-mono text-muted-foreground">Sources:</span>
         {data?.sources && Object.entries(data.sources).map(([key, val]) => (
           <span key={key} className="text-[7px] font-mono text-muted-foreground">
             {key}: {val as number}
           </span>
         ))}
+        {data?.countries_scraped?.length > 0 && (
+          <span className="text-[7px] font-mono text-primary/60">
+            | {data.countries_scraped.length} countries: {data.countries_scraped.join(", ")}
+          </span>
+        )}
       </div>
     </div>
   );
