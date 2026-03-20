@@ -1,10 +1,11 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { getIndustryBySlug } from "@/lib/industryData";
-import { ArrowRight, TrendingUp, Loader2, Users, Handshake } from "lucide-react";
+import { ArrowRight, TrendingUp, Loader2, Users, Handshake, Database, Clock } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSocialIntel } from "@/hooks/useSocialIntel";
 import { useSnapshots } from "@/hooks/useSnapshots";
+import { useCachedIntel } from "@/hooks/useCachedIntel";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
@@ -20,6 +21,7 @@ export default function IndustryPage() {
   const { articles, loading: newsLoading } = useIndustryNews(keywords);
   const { data: socialData, loading: socialLoading } = useSocialIntel(industry?.name || "", null, keywords, geoString);
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "");
+  const { report: cachedReport, loading: cacheLoading } = useCachedIntel("industry", industry?.name || "");
 
   if (!industry) return <Navigate to="/" replace />;
 
