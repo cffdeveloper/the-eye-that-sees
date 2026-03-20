@@ -4,6 +4,7 @@ import { ArrowRight, TrendingUp, Loader2 } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSnapshots } from "@/hooks/useSnapshots";
+import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
@@ -12,7 +13,8 @@ export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
   const industry = slug ? getIndustryBySlug(slug) : undefined;
   const keywords = industry?.subFlows.flatMap(sf => sf.keywords).slice(0, 10) || [];
-  const { data, loading } = useIndustryIntel(industry?.name || "", keywords);
+  const { geoString } = useGeoContext();
+  const { data, loading } = useIndustryIntel(industry?.name || "", keywords, geoString);
   const { articles, loading: newsLoading } = useIndustryNews(keywords);
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "");
 
