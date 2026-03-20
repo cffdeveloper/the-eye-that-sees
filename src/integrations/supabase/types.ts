@@ -280,7 +280,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cron_invoke_edge_function: {
+        Args: { function_path: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
