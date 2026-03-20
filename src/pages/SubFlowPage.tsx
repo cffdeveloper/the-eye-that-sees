@@ -1,10 +1,11 @@
 import { useParams, Navigate, Link } from "react-router-dom";
 import { getSubFlow } from "@/lib/industryData";
-import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle, Database } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSocialIntel } from "@/hooks/useSocialIntel";
 import { useSnapshots } from "@/hooks/useSnapshots";
+import { useCachedIntel } from "@/hooks/useCachedIntel";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
@@ -27,6 +28,7 @@ export default function SubFlowPage() {
   );
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";
   const { snapshots, loading: snapsLoading } = useSnapshots("subflow", scopeKey);
+  const { report: cachedReport } = useCachedIntel("subflow", scopeKey);
 
   if (!result) return <Navigate to="/" replace />;
   const { industry, subFlow } = result;
