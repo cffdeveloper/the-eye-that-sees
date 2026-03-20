@@ -4,6 +4,7 @@ import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle } f
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSnapshots } from "@/hooks/useSnapshots";
+import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
@@ -11,10 +12,12 @@ import { ClickableItem } from "@/components/intel/ClickableItem";
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
   const result = slug && subFlowId ? getSubFlow(slug, subFlowId) : undefined;
+  const { geoString } = useGeoContext();
   const { data, loading, refresh } = useSubFlowIntel(
     result?.subFlow.name || "",
     result?.subFlow.keywords || [],
-    result?.industry.name || ""
+    result?.industry.name || "",
+    geoString
   );
   const { articles, loading: newsLoading } = useIndustryNews(result?.subFlow.keywords || []);
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";

@@ -12,37 +12,66 @@ serve(async (req) => {
   }
 
   try {
-    const { industries } = await req.json();
+    const { industries, geoContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const isGlobal = !geoContext || geoContext === "global";
+    const geoStr = isGlobal ? "" : geoContext;
 
     const industryList = (industries || [])
       .map((i: any) => `${i.name}: sub-flows=[${i.subFlows.join(", ")}], keywords=[${i.keywords.join(", ")}]`)
       .join("\n");
 
+    // Fetch historical cross-industry insights
+    let historicalContext = "";
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supabaseUrl && supabaseKey) {
+        const sb = createClient(supabaseUrl, supabaseKey);
+        const { data: pastInsights } = await sb
+          .from("intel_insights")
+          .select("title, detail, insight_type, source_industry, estimated_value, created_at")
+          .eq("still_relevant", true)
+          .order("created_at", { ascending: false })
+          .limit(15);
+        if (pastInsights?.length) {
+          historicalContext = `\n\nHISTORICAL INTELLIGENCE (build upon these, note what's changed, identify patterns):\n${pastInsights.map(i => `- [${i.insight_type}/${i.source_industry}] ${i.title}: ${i.detail} (${i.estimated_value || 'N/A'}, ${i.created_at})`).join("\n")}`;
+        }
+      }
+    } catch (e) {
+      console.error("Historical fetch error:", e);
+    }
+
+    const geoSection = isGlobal
+      ? ""
+      : `\n\nCRITICAL: ALL analysis must be contextualized to ${geoStr}. Every gap, connection, and alert must explain how it specifically impacts or creates opportunity in ${geoStr}. Reference local market conditions, regulations, companies, and infrastructure in ${geoStr}. Show how global trends can be exploited locally in ${geoStr}.`;
+
     const systemPrompt = `You are an elite cross-industry MONEY FLOW analyst. Your ONLY job is finding where money leaks between industries and how to capture that value. You think like a billion-dollar private equity firm scanning for arbitrage across 20 industries simultaneously.
 
-You MUST respond with valid JSON only.
+You MUST respond with valid JSON only.${geoSection}
 
 YOUR MANDATE:
 - Find where Industry A's waste is Industry B's gold mine
-- Identify cross-sector arbitrage where pricing inefficiencies exist between related industries
-- Spot supply chain gaps where middlemen are extracting value that could be captured directly
+- Identify cross-sector arbitrage where pricing inefficiencies exist
+- Spot supply chain gaps where middlemen extract capturable value
 - Find regulatory gaps where one industry's rules create opportunity for another
-- Detect technology transfer opportunities — what worked in Industry X that Industry Y hasn't adopted
-- Identify convergence plays where two industries are merging and creating new markets
-- Every gap MUST have an estimated dollar value and a concrete exploitation strategy`;
+- Detect technology transfer opportunities from Industry X to Industry Y
+- Identify convergence plays where industries are merging into new markets
+- Every gap MUST have an estimated dollar value and a concrete exploitation strategy
+- Reference and evolve previous analyses${historicalContext}`;
 
-    const userPrompt = `Scan ALL 20 industries and their money flows for EXPLOITABLE CROSS-INDUSTRY OPPORTUNITIES:
+    const userPrompt = `Scan ALL 20 industries for EXPLOITABLE CROSS-INDUSTRY OPPORTUNITIES${!isGlobal ? ` specifically for the ${geoStr} market` : ""}:
 
 ${industryList}
 
-Return JSON with:
+Return JSON:
 {
-  "summary": "250-word executive brief: What are the BIGGEST money-making opportunities at the intersections of these industries RIGHT NOW? Where is capital flowing inefficiently across sectors? Which convergence plays have the highest ROI potential? Be specific with dollar amounts and company names.",
-  "gaps": [{"title": "...", "detail": "60-word explanation of the cross-industry gap, its estimated market value, and how to exploit it", "industries": ["Industry A", "Industry B"], "estimated_value": "$X", "urgency": "high|medium|low"}] (8 cross-industry gaps where money is being lost or left on the table),
-  "connections": [{"title": "...", "detail": "50-word explanation of the money flow connection and how to leverage it for profit", "from": "Industry A", "to": "Industry B", "opportunity_type": "arbitrage|supply_chain|tech_transfer|convergence|regulatory"}] (8 strong cross-industry connections that create exploitable opportunities),
-  "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (6 time-sensitive cross-industry alerts — market windows opening/closing, regulatory changes, demand shifts, competitor moves, funding trends)
+  "summary": "250-word executive brief${!isGlobal ? ` for ${geoStr}` : ""}: biggest cross-industry money opportunities, capital flow inefficiencies, and highest ROI convergence plays. Be specific with dollar amounts and company names${!isGlobal ? ` relevant to ${geoStr}` : ""}.",
+  "gaps": [{"title": "...", "detail": "60-word explanation of the cross-industry gap, market value, and how to exploit it${!isGlobal ? ` in ${geoStr}` : ""}", "industries": ["A", "B"], "estimated_value": "$X", "urgency": "high|medium|low"}] (8 cross-industry gaps),
+  "connections": [{"title": "...", "detail": "50-word explanation and how to leverage for profit${!isGlobal ? ` in ${geoStr}` : ""}", "from": "A", "to": "B", "opportunity_type": "arbitrage|supply_chain|tech_transfer|convergence|regulatory"}] (8 cross-industry connections),
+  "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (6 time-sensitive cross-industry alerts)
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -78,23 +107,80 @@ Return JSON with:
       parsed = { summary: content, gaps: [], connections: [], alerts: [] };
     }
 
-    // Store snapshot
+    // Persist everything
     try {
       const supabaseUrl = Deno.env.get("SUPABASE_URL");
       const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       if (supabaseUrl && supabaseKey) {
         const sb = createClient(supabaseUrl, supabaseKey);
+        const geoArray = isGlobal ? [] : geoStr.split(",").map((g: string) => g.trim());
+
         await sb.from("intel_snapshots").insert({
           scope_type: "cross-industry",
-          scope_key: "all",
+          scope_key: isGlobal ? "all" : `all::${geoStr}`,
           summary: parsed.summary,
           gaps: parsed.gaps || [],
           connections: parsed.connections || [],
           alerts: parsed.alerts || [],
         });
+
+        // Persist individual insights
+        const insights: any[] = [];
+        for (const gap of (parsed.gaps || [])) {
+          insights.push({
+            insight_type: "gap",
+            title: gap.title,
+            detail: gap.detail,
+            source_industry: "cross-industry",
+            related_industries: gap.industries || [],
+            geo_context: geoArray,
+            estimated_value: gap.estimated_value || null,
+            urgency: gap.urgency || null,
+            raw_data: gap,
+          });
+        }
+        for (const conn of (parsed.connections || [])) {
+          insights.push({
+            insight_type: "connection",
+            title: conn.title,
+            detail: conn.detail,
+            source_industry: "cross-industry",
+            related_industries: [conn.from, conn.to].filter(Boolean),
+            geo_context: geoArray,
+            tags: [conn.opportunity_type].filter(Boolean),
+            raw_data: conn,
+          });
+        }
+        for (const alert of (parsed.alerts || [])) {
+          insights.push({
+            insight_type: "alert",
+            title: alert.title,
+            detail: alert.detail,
+            source_industry: "cross-industry",
+            geo_context: geoArray,
+            urgency: alert.level,
+            raw_data: alert,
+          });
+        }
+        if (insights.length > 0) {
+          await sb.from("intel_insights").insert(insights);
+        }
+
+        // Geo cache
+        if (!isGlobal) {
+          await sb.from("geo_intel_cache").insert({
+            geo_scope: geoStr,
+            scope_type: "cross-industry",
+            scope_key: "all",
+            analysis: parsed.summary,
+            gaps: parsed.gaps || [],
+            alerts: parsed.alerts || [],
+            connections: parsed.connections || [],
+          });
+        }
       }
     } catch (snapErr) {
-      console.error("Cross-intel snapshot error:", snapErr);
+      console.error("Storage error:", snapErr);
     }
 
     return new Response(JSON.stringify(parsed), {

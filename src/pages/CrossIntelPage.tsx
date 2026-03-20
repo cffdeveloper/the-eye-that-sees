@@ -7,10 +7,11 @@ import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
 import { ClickableItem } from "@/components/intel/ClickableItem";
+import { useGeoContext } from "@/contexts/GeoContext";
 
 type CrossIntel = {
-  gaps: { title: string; detail: string; industries: string[] }[];
-  connections: { title: string; detail: string; from: string; to: string }[];
+  gaps: { title: string; detail: string; industries: string[]; estimated_value?: string; urgency?: string }[];
+  connections: { title: string; detail: string; from: string; to: string; opportunity_type?: string }[];
   alerts: { title: string; detail: string; level: string }[];
   summary: string;
 };
@@ -18,6 +19,7 @@ type CrossIntel = {
 export default function CrossIntelPage() {
   const [data, setData] = useState<CrossIntel | null>(null);
   const [loading, setLoading] = useState(true);
+  const { geoString, isGlobal } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all");
   useAlertNotifications(data?.alerts || [], true);
 
@@ -31,6 +33,7 @@ export default function CrossIntelPage() {
             subFlows: i.subFlows.map(sf => sf.name),
             keywords: i.subFlows.flatMap(sf => sf.keywords).slice(0, 5),
           })),
+          geoContext: geoString,
         },
       });
       if (error) throw error;
@@ -40,7 +43,7 @@ export default function CrossIntelPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [geoString]);
 
   useEffect(() => { fetchIntel(); }, [fetchIntel]);
 

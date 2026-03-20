@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      geo_intel_cache: {
+        Row: {
+          alerts: Json | null
+          analysis: string | null
+          connections: Json | null
+          created_at: string
+          gaps: Json | null
+          geo_scope: string
+          id: string
+          market_data: Json | null
+          opportunities: Json | null
+          scope_key: string
+          scope_type: string
+        }
+        Insert: {
+          alerts?: Json | null
+          analysis?: string | null
+          connections?: Json | null
+          created_at?: string
+          gaps?: Json | null
+          geo_scope: string
+          id?: string
+          market_data?: Json | null
+          opportunities?: Json | null
+          scope_key: string
+          scope_type: string
+        }
+        Update: {
+          alerts?: Json | null
+          analysis?: string | null
+          connections?: Json | null
+          created_at?: string
+          gaps?: Json | null
+          geo_scope?: string
+          id?: string
+          market_data?: Json | null
+          opportunities?: Json | null
+          scope_key?: string
+          scope_type?: string
+        }
+        Relationships: []
+      }
+      intel_insights: {
+        Row: {
+          created_at: string
+          detail: string | null
+          estimated_value: string | null
+          geo_context: string[] | null
+          id: string
+          insight_type: string
+          raw_data: Json | null
+          referenced_count: number | null
+          related_industries: string[] | null
+          score: number | null
+          source_industry: string | null
+          source_subflow: string | null
+          still_relevant: boolean | null
+          tags: string[] | null
+          title: string
+          urgency: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          estimated_value?: string | null
+          geo_context?: string[] | null
+          id?: string
+          insight_type: string
+          raw_data?: Json | null
+          referenced_count?: number | null
+          related_industries?: string[] | null
+          score?: number | null
+          source_industry?: string | null
+          source_subflow?: string | null
+          still_relevant?: boolean | null
+          tags?: string[] | null
+          title: string
+          urgency?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          estimated_value?: string | null
+          geo_context?: string[] | null
+          id?: string
+          insight_type?: string
+          raw_data?: Json | null
+          referenced_count?: number | null
+          related_industries?: string[] | null
+          score?: number | null
+          source_industry?: string | null
+          source_subflow?: string | null
+          still_relevant?: boolean | null
+          tags?: string[] | null
+          title?: string
+          urgency?: string | null
+        }
+        Relationships: []
+      }
       intel_snapshots: {
         Row: {
           alerts: Json | null
@@ -53,6 +152,33 @@ export type Database = {
           scope_key?: string
           scope_type?: string
           summary?: string | null
+        }
+        Relationships: []
+      }
+      user_geo_preferences: {
+        Row: {
+          created_at: string
+          geo_type: string
+          geo_values: string[]
+          id: string
+          is_active: boolean | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          geo_type: string
+          geo_values?: string[]
+          id?: string
+          is_active?: boolean | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          geo_type?: string
+          geo_values?: string[]
+          id?: string
+          is_active?: boolean | null
+          session_id?: string
         }
         Relationships: []
       }
