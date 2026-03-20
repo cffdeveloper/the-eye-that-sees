@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { useNavigate } from "react-router-dom";
+import { RegionAnalyticsDialog } from "./RegionAnalyticsDialog";
 
 const REGIONS: { name: string; lat: number; lng: number; label: string; code: string; industries: string[]; tradeVolume: string; disruptions: string[] }[] = [
   { name: "North America", lat: 40, lng: -100, label: "NA", code: "NA", industries: ["technology", "finance", "healthcare", "energy", "media"], tradeVolume: "$8.2T", disruptions: ["AI regulation wave", "Fed rate decisions"] },
@@ -41,16 +42,14 @@ export function WorldMap() {
   const leafletMap = useRef<L.Map | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [activeDisruptions, setActiveDisruptions] = useState<typeof REGIONS[0]["disruptions"]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<typeof REGIONS[0] | null>(null);
   const navigate = useNavigate();
   const { addSelection } = useGeoContext();
 
   const handleRegionClick = useCallback((region: typeof REGIONS[0]) => {
     addSelection({ value: region.code, label: region.name, type: "continent" });
-    // Navigate to first matching industry
-    if (region.industries[0]) {
-      navigate(`/industry/${region.industries[0]}`);
-    }
-  }, [addSelection, navigate]);
+    setSelectedRegion(region);
+  }, [addSelection]);
 
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return;
@@ -239,6 +238,13 @@ export function WorldMap() {
           </div>
         ))}
       </div>
+
+      {/* Region analytics popup */}
+      <RegionAnalyticsDialog
+        open={!!selectedRegion}
+        onClose={() => setSelectedRegion(null)}
+        region={selectedRegion}
+      />
     </div>
   );
 }
