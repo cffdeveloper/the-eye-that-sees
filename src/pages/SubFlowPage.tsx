@@ -3,9 +3,11 @@ import { getSubFlow } from "@/lib/industryData";
 import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
+import { useSocialIntel } from "@/hooks/useSocialIntel";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
+import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 
@@ -20,6 +22,9 @@ export default function SubFlowPage() {
     geoString
   );
   const { articles, loading: newsLoading } = useIndustryNews(result?.subFlow.keywords || []);
+  const { data: socialData, loading: socialLoading } = useSocialIntel(
+    result?.industry.name || "", result?.subFlow.name || null, result?.subFlow.keywords || [], geoString
+  );
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";
   const { snapshots, loading: snapsLoading } = useSnapshots("subflow", scopeKey);
 
@@ -104,6 +109,9 @@ export default function SubFlowPage() {
             <p className="text-xs font-mono text-muted-foreground">No gaps detected yet.</p>
           )}
         </div>
+
+        {/* Social Intelligence */}
+        <SocialIntelPanel data={socialData} loading={socialLoading} industryName={industry.name} subFlowName={subFlow.name} />
 
         {/* Real News Feed */}
         <NewsFeed articles={articles} loading={newsLoading} industryName={industry.name} subFlowName={subFlow.name} />

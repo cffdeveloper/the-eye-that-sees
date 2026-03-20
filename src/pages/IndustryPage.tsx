@@ -3,9 +3,11 @@ import { getIndustryBySlug } from "@/lib/industryData";
 import { ArrowRight, TrendingUp, Loader2, Users, Handshake } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
+import { useSocialIntel } from "@/hooks/useSocialIntel";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
+import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 
@@ -16,6 +18,7 @@ export default function IndustryPage() {
   const { geoString } = useGeoContext();
   const { data, loading } = useIndustryIntel(industry?.name || "", keywords, geoString);
   const { articles, loading: newsLoading } = useIndustryNews(keywords);
+  const { data: socialData, loading: socialLoading } = useSocialIntel(industry?.name || "", null, keywords, geoString);
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "");
 
   if (!industry) return <Navigate to="/" replace />;
@@ -113,6 +116,9 @@ export default function IndustryPage() {
           </div>
         </div>
       )}
+
+      {/* Social Intelligence */}
+      <SocialIntelPanel data={socialData} loading={socialLoading} industryName={industry.name} />
 
       {/* Live News Feed */}
       <NewsFeed articles={articles} loading={newsLoading} industryName={industry.name} />
