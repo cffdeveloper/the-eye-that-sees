@@ -80,7 +80,8 @@ serve(async (req) => {
       .map((s) => `- ${s.industryName} → ${s.subFlowName}${s.moneyFlow ? ` (${s.moneyFlow})` : ""}`)
       .join("\n");
 
-    const hasPrimary = (primarySubflows as unknown[]).length > 0 || (String(freeTextPrimary || "").trim() && freeTextMode === "primary");
+    const hasPrimary =
+      (primarySubflows as unknown[]).length > 0 || (String(freeTextPrimary || "").trim() && freeTextMode === "primary");
 
     const systemPrompt = `You are Maverick, an elite cross-domain intelligence engine. The user has defined a CUSTOM scope with optional PRIMARY focus areas and SECONDARY lenses.
 
