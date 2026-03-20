@@ -3,9 +3,11 @@ import { getSubFlow } from "@/lib/industryData";
 import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
+import { useSocialIntel } from "@/hooks/useSocialIntel";
 import { useSnapshots } from "@/hooks/useSnapshots";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { NewsFeed } from "@/components/intel/NewsFeed";
+import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 
