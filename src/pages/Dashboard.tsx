@@ -145,7 +145,7 @@ export default function Dashboard() {
           <span className="text-[9px] text-muted-foreground">{industries.length} sectors · {totalFlows} flows</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-          {industries.map((ind) => (
+          {sortedIndustries.map((ind) => (
             <Link
               key={ind.slug}
               to={`/industry/${ind.slug}`}
