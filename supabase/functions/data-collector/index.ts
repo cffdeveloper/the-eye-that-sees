@@ -420,7 +420,7 @@ async function collectTwitter(): Promise<any[]> {
     { Authorization: `Bearer ${BEARER}` }, 18000,
   );
   if (!data?.data?.length) return [];
-  const users = new Map((data.includes?.users || []).map((u: any) => [u.id, u]));
+  const users = new Map<string, any>((data.includes?.users || []).map((u: any) => [u.id, u]));
   return data.data.map((tweet: any) => {
     const author = users.get(tweet.author_id);
     return { source: "twitter", data_type: "social_signal", geo_scope: "global", payload: { text: tweet.text?.slice(0, 500), author: author?.name, username: author?.username, verified: author?.verified ?? false, likes: tweet.public_metrics?.like_count ?? 0, retweets: tweet.public_metrics?.retweet_count ?? 0, url: `https://x.com/${author?.username}/status/${tweet.id}`, date: tweet.created_at, lang: tweet.lang }, tags: ["social", "twitter", "macro", "markets"] };
@@ -450,7 +450,7 @@ async function collectIndustryTwitter(): Promise<any[]> {
           { Authorization: `Bearer ${BEARER}` }, 12000,
         );
         if (!data?.data?.length) continue;
-        const users = new Map((data.includes?.users || []).map((u: any) => [u.id, u]));
+        const users = new Map<string, any>((data.includes?.users || []).map((u: any) => [u.id, u]));
         for (const tweet of data.data.slice(0, 10)) {
           const author = users.get(tweet.author_id);
           indRows.push({

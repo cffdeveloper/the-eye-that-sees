@@ -4,13 +4,25 @@ import { industries } from "@/lib/industryData";
 import { ArrowRight, TrendingUp, Zap, Bell, BellOff, Activity, Database, Radio, BarChart3 } from "lucide-react";
 import { WorldMap } from "@/components/intel/WorldMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
+  const { profile } = useAuth();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const { requestNotificationPermission } = useAlertNotifications([], alertsEnabled);
   const [dbStats, setDbStats] = useState({ rawData: 0, insights: 0, matches: 0 });
+
+  // Personalize: show user's preferred industries first
+  const sortedIndustries = useMemo(() => {
+    if (!profile?.industries_of_interest?.length) return industries;
+    const preferred = new Set(profile.industries_of_interest);
+    return [
+      ...industries.filter((i) => preferred.has(i.slug)),
+      ...industries.filter((i) => !preferred.has(i.slug)),
+    ];
+  }, [profile]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -73,9 +85,16 @@ export default function Dashboard() {
               </span>
             </div>
             <h1 className="text-lg font-bold text-foreground mb-0.5 tracking-tight">
-              World Industry <span className="text-gradient-primary">Money Flows</span> Intelligence
+              {profile?.display_name ? (
+                <>Welcome back, <span className="text-gradient-primary">{profile.display_name}</span></>
+              ) : (
+                <>World Industry <span className="text-gradient-primary">Money Flows</span> Intelligence</>
+              )}
             </h1>
             <p className="text-[11px] text-muted-foreground max-w-xl">
+              {profile?.role && profile.role !== "explorer"
+                ? `Personalized for ${profile.role.replace(/_/g, " ")}${profile.organization ? ` at ${profile.organization}` : ""}. `
+                : ""}
               Autonomous 3-tier intelligence engine. Real-time data from 11+ sources. AI-powered gap detection across {industries.length} industries and {totalFlows}+ money flows.
             </p>
           </div>
@@ -126,7 +145,7 @@ export default function Dashboard() {
           <span className="text-[9px] text-muted-foreground">{industries.length} sectors · {totalFlows} flows</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-          {industries.map((ind) => (
+          {sortedIndustries.map((ind) => (
             <Link
               key={ind.slug}
               to={`/industry/${ind.slug}`}
