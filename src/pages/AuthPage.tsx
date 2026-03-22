@@ -64,13 +64,26 @@ export default function AuthPage() {
   };
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: window.location.origin,
+        // Full top-level navigation — required when the app runs in an iframe (e.g. previews)
+        // or the browser would block cross-origin OAuth in a subframe.
+        skipBrowserRedirect: true,
       },
     });
-    if (error) toast.error("Google sign-in failed");
+    if (error) {
+      toast.error("Google sign-in failed");
+      return;
+    }
+    if (data?.url) {
+      try {
+        window.top!.location.href = data.url;
+      } catch {
+        window.location.href = data.url;
+      }
+    }
   };
 
   return (
