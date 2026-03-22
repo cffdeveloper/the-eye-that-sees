@@ -70,23 +70,23 @@ export default function LandingPage() {
             </span>
             <BrandWordmark className="truncate text-base leading-none sm:text-lg md:text-xl" />
           </Link>
-          <nav className="order-3 flex w-full basis-full items-center justify-start gap-0.5 border-t border-border/35 pt-2 text-[12px] font-semibold text-muted-foreground sm:text-[13px] md:order-2 md:basis-auto md:w-auto md:flex-1 md:justify-center md:border-t-0 md:pt-0">
+          <nav className="order-3 grid w-full grid-cols-2 gap-2 border-t border-border/35 pt-2 text-[12px] font-semibold text-muted-foreground sm:gap-2.5 sm:text-[13px] md:order-2 md:flex md:w-auto md:basis-auto md:flex-1 md:items-center md:justify-center md:gap-2 md:border-t-0 md:pt-0">
             <Popover>
               <PopoverTrigger asChild>
                 <button
                   type="button"
                   className={cn(
-                    "group rounded-full px-2 sm:px-3 py-2 hover:text-foreground hover:bg-muted/70 transition-colors",
-                    "inline-flex items-center gap-1 max-w-[44vw] sm:max-w-none",
+                    "group touch-manipulation inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-background/85 px-2.5 py-2 text-center shadow-sm backdrop-blur-sm transition-colors",
+                    "hover:border-border hover:bg-muted/60 hover:text-foreground",
                     "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "md:min-h-9 md:min-w-0 md:px-3",
                   )}
                 >
-                  <Workflow className="w-3.5 h-3.5 shrink-0 text-primary/80 group-hover:text-primary transition-colors" />
-                  <span className="truncate">
-                    <span className="sm:hidden">How</span>
-                    <span className="hidden sm:inline">How it works</span>
+                  <Workflow className="h-3.5 w-3.5 shrink-0 text-primary/80 group-hover:text-primary transition-colors" />
+                  <span className="min-w-0 text-center text-[11px] leading-snug sm:text-[13px] md:whitespace-nowrap">
+                    How it works
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
                 </button>
               </PopoverTrigger>
               <PopoverContent
@@ -160,14 +160,15 @@ export default function LandingPage() {
                 <button
                   type="button"
                   className={cn(
-                    "group rounded-full px-2 sm:px-3 py-2 hover:text-foreground hover:bg-muted/70 transition-colors",
-                    "inline-flex items-center gap-1 max-w-[44vw] sm:max-w-none",
+                    "group touch-manipulation inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-background/85 px-2.5 py-2 text-center shadow-sm backdrop-blur-sm transition-colors",
+                    "hover:border-border hover:bg-muted/60 hover:text-foreground",
                     "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    "md:min-h-9 md:min-w-0 md:px-3",
                   )}
                 >
-                  <BadgePercent className="w-3.5 h-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
-                  <span className="truncate sm:max-w-none">Pricing</span>
-                  <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                  <BadgePercent className="h-3.5 w-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
+                  <span className="min-w-0 text-center text-[11px] leading-snug sm:text-[13px] md:whitespace-nowrap">Pricing</span>
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
                 </button>
               </PopoverTrigger>
               <PopoverContent
