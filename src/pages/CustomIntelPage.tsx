@@ -451,9 +451,9 @@ Answer the user's follow-up with the same structured block style when analytical
             <span className="text-[9px] text-muted-foreground">{totalSelected} selected</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading} type="button">
+            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading || !isPro} type="button">
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-              Run custom intel
+              {isPro ? "Run custom intel" : "Pro required"}
             </Button>
             {report && (
               <Button variant="outline" className="h-9 text-xs gap-1.5 px-3" type="button" onClick={runIntel} disabled={loading}>
