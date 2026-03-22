@@ -12,7 +12,7 @@ export function TopNav({ onClear, hasMessages }: { onClear: () => void; hasMessa
             <h1 className="text-2xl sm:text-3xl md:text-4xl leading-tight">
               <BrandWordmark />
             </h1>
-            <span className="text-[11px] font-medium text-muted-foreground">Maverick AI</span>
+            <span className="text-[11px] font-medium text-muted-foreground">Intel GoldMine</span>
           </div>
         </div>
       </div>

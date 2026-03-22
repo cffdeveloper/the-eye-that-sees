@@ -1,6 +1,6 @@
 # Intel GoldMine
 
-React + Vite frontend: **Intel GoldMine** is the platform; **Maverick** is the AI agent (Supabase-backed intel pipelines, edge functions, and structured analysis).
+React + Vite frontend: **Intel GoldMine** is the product — AI-powered market intelligence (Supabase-backed intel pipelines, edge functions, and structured analysis).
 
 ## Development
 

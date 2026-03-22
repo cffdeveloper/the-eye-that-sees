@@ -11,7 +11,7 @@ import { RefreshCw, Loader2 } from "lucide-react";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
 
-const MaverickDashboard = () => {
+const IntelGoldmineFeedPreview = () => {
   const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
 
   return (
@@ -33,7 +33,7 @@ const MaverickDashboard = () => {
               <h1 className="text-2xl sm:text-3xl md:text-[2.25rem] leading-tight">
                 <BrandWordmark />
               </h1>
-              <p className="text-[9px] text-muted-foreground mt-0.5">Maverick AI</p>
+              <p className="text-[9px] text-muted-foreground mt-0.5">Intel GoldMine</p>
               <p className="text-[10px] uppercase tracking-widest mt-0.5">
                 <span className="text-primary/90">Money flow</span>
                 <span className="text-muted-foreground/55"> • </span>
@@ -118,4 +118,4 @@ const MaverickDashboard = () => {
   );
 };
 
-export default MaverickDashboard;
+export default IntelGoldmineFeedPreview;

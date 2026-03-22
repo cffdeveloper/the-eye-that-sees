@@ -154,6 +154,10 @@
 }
 
 @layer utilities {
+  .prose-intel-goldmine {
+    @apply prose prose-sm max-w-none dark:prose-invert;
+  }
+
   .font-display {
     font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   }

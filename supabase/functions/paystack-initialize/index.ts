@@ -42,7 +42,7 @@ async function ensurePlan(secretKey: string): Promise<string> {
       interval: PLAN_INTERVAL,
       currency: PLAN_CURRENCY,
       description:
-        "Full Intel GoldMine access — Maverick AI, deep dives, cross-industry analysis, Intel Lab.",
+        "Full Intel GoldMine access — AI intelligence, deep dives, cross-industry analysis, Intel Lab.",
     }),
   });
 

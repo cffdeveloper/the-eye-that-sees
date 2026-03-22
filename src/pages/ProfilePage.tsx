@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
       <PageIntro eyebrow="Personalize Intel GoldMine" title="Why this page matters">
         <p>
-          Role, organization, and industry picks tune how Maverick writes briefs and prioritizes what you see. Geography is set in the top bar and applies across the app.
+          Role, organization, and industry picks tune how Intel GoldMine writes briefs and prioritizes what you see. Geography is set in the top bar and applies across the app.
         </p>
         <p className="text-foreground/90">
           Back to{" "}

@@ -41,10 +41,10 @@ export function useAlertNotifications(alerts: any[], enabled: boolean = true) {
     // Browser notification
     if ("Notification" in window && Notification.permission === "granted") {
       const top = criticalAlerts[0];
-      new Notification(`⚠️ Intel GoldMine · Maverick AI`, {
+      new Notification(`⚠️ Intel GoldMine`, {
         body: `${top.title}\n${top.detail || ""}`,
         icon: "/favicon.png",
-        tag: "maverick-alert",
+        tag: "intel-goldmine-alert",
       });
     }
   }, [alerts, enabled, playAlert]);

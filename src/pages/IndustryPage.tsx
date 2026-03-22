@@ -41,7 +41,7 @@ export default function IndustryPage() {
     getIndustryIntelCopy(industry.slug) ?? {
       eyebrow: "Sector workspace",
       title: `Why ${industry.name} intel here`,
-      body: `${industry.description} Maverick maps markets, news, and social layers to this sector so you can spot gaps, research angles, and timely updates as conditions change.\n\nOpen each money flow below for lane-specific analysis, alerts, and snapshot history.`,
+      body: `${industry.description} Intel GoldMine maps markets, news, and social layers to this sector so you can spot gaps, research angles, and timely updates as conditions change.\n\nOpen each money flow below for lane-specific analysis, alerts, and snapshot history.`,
     };
 
   return (

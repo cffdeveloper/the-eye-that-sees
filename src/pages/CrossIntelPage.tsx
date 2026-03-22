@@ -66,7 +66,7 @@ export default function CrossIntelPage() {
             <Network className="w-5 h-5 text-brand-orange" /> Cross-industry intelligence
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">
-            Maverick AI runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
+            Intel GoldMine runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
           </p>
         </div>
         <button onClick={fetchIntel} disabled={loading || subscriptionLoading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">

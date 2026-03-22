@@ -12,7 +12,7 @@ export type Message = {
 
 export type AnalysisMode = "general" | "research" | "analyze" | "strategize";
 
-export function useMaverickChat() {
+export function useIntelGoldmineChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export function useMaverickChat() {
     if (!input.trim() || isStreaming) return;
 
     if (!isPro) {
-      toast.error("Maverick AI is included with Pro. Upgrade for full access to use this feature.");
+      toast.error("Intel GoldMine chat is included with Pro. Upgrade for full access to use this feature.");
       return;
     }
 

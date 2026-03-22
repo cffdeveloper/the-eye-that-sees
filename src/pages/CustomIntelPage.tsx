@@ -184,7 +184,7 @@ export default function CustomIntelPage() {
       .filter(Boolean)
       .join("\n");
 
-    const systemPreamble = `You are Maverick AI, the intelligence agent inside Intel GoldMine, continuing a custom intel session.
+    const systemPreamble = `You are the Intel GoldMine intelligence engine, continuing a custom intel session.
 
 SCOPE:
 ${scopeSummary}
@@ -280,7 +280,7 @@ Answer the user's follow-up with the same structured block style when analytical
             Pick industries and money flows below — promote lanes to <strong className="text-foreground">Primary</strong> (main thesis) and{" "}
             <strong className="text-foreground">Secondary</strong> (context), or keep candidates in the pool.
           </li>
-          <li>Add free-text context (deal, client, question) so Maverick AI aligns tone and depth.</li>
+          <li>Add free-text context (deal, client, question) so Intel GoldMine aligns tone and depth.</li>
           <li>Generate a structured brief, then use chat for follow-ups on the same scope.</li>
         </ol>
         <p>
@@ -313,7 +313,7 @@ Answer the user's follow-up with the same structured block style when analytical
                 Scoped brief · primary vs secondary lanes · structured output
               </p>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
-                Maverick AI builds on the same structured blocks as industry and money-flow pages—scoped to the flows you choose and the context you add—so outputs stay comparable and actionable.
+                Intel GoldMine builds on the same structured blocks as industry and money-flow pages—scoped to the flows you choose and the context you add—so outputs stay comparable and actionable.
               </p>
             </div>
           </div>
@@ -540,14 +540,14 @@ Answer the user's follow-up with the same structured block style when analytical
                       : "bg-primary/5 border-primary/20 text-foreground mr-2 md:mr-6",
                   )}
                 >
-                  <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Maverick AI · "}</span>
+                  <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Intel GoldMine · "}</span>
                   {msgSegments ? <BlockRenderer segments={msgSegments} /> : m.content}
                 </div>
               );
             })}
             {chatStreaming && (
               <div className="rounded-md px-3 py-2 text-[11px] whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
-                <span className="text-muted-foreground">Maverick AI · </span>
+                <span className="text-muted-foreground">Intel GoldMine · </span>
                 <BlockRenderer segments={parseBlocks(chatStreaming)} />
               </div>
             )}

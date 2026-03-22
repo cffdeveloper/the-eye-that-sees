@@ -54,7 +54,7 @@ const CHOOSE_LANE_CARDS = [
   },
   {
     title: "Intel Lab",
-    desc: "Scope industries & money flows, add context, and let Maverick AI generate research-grade briefs you can challenge line by line — your private lab.",
+    desc: "Scope industries & money flows, add context, and let Intel GoldMine generate research-grade briefs you can challenge line by line — your private lab.",
     icon: FlaskConical,
     grad: "bg-gradient-to-br from-amber-500/35 via-brand-orange/15 to-slate-900/85",
   },
@@ -144,7 +144,7 @@ function ChooseLaneCarousel() {
           "flex gap-4 overflow-x-auto overscroll-x-contain scroll-smooth scroll-pl-4 scroll-pr-4 pb-3 pt-1",
           "snap-x snap-mandatory [-webkit-overflow-scrolling:touch]",
           "-mx-4 px-4 sm:-mx-8 sm:px-8",
-          "[scrollbar-width:thin]",
+          "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
         )}
       >
         {CHOOSE_LANE_CARDS.map((item, i) => {
@@ -279,7 +279,7 @@ export default function LandingPage() {
                         title: "01 — Ingest · scope · prioritize",
                         body: (
                           <p>
-                            Maverick AI pulls from markets, macro, news, funding rails, and social signals —{" "}
+                            Intel GoldMine pulls from markets, macro, news, funding rails, and social signals —{" "}
                             <span className="font-semibold text-foreground">{SOURCE_INTEGRATIONS_LABEL} integrated feed types</span>{" "}
                             — then respects <em>your</em> industries, regions, and watchlists. You’re not drowning in tabs;
                             the machine aggregates toward answers that match how you think.
@@ -377,7 +377,7 @@ export default function LandingPage() {
                           serious operators use to stay ahead of headlines.
                         </p>
                         <p className="text-xs text-muted-foreground/90">
-                          Start free; upgrade when you want the full firehose and Maverick AI without limits.
+                          Start free; upgrade when you want the full firehose and Intel GoldMine without limits.
                         </p>
                         <Button size="sm" className="w-full font-bold rounded-lg" asChild>
                           <Link to="/auth?mode=signup">
@@ -401,7 +401,7 @@ export default function LandingPage() {
                       <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
                         <ul className="space-y-2 text-sm text-muted-foreground pt-2">
                           {[
-                            "Maverick AI research, synthesis & follow-up chat",
+                            "Intel GoldMine research, synthesis & follow-up chat",
                             `${industries.length} global sectors · ${FLOW_LANES_LABEL} mapped capital lanes`,
                             `${SOURCE_INTEGRATIONS_LABEL} source integrations — aggregated for you`,
                             "Cross-industry bridges, gaps & second-order links",
@@ -486,7 +486,7 @@ export default function LandingPage() {
                 <span className="inline-flex max-w-full items-start gap-2 rounded-2xl border border-primary/15 bg-card/90 px-3.5 py-2.5 text-foreground shadow-sm backdrop-blur-sm sm:max-w-4xl">
                   <Activity className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
                   <span className="min-w-0 text-[13px] font-medium leading-snug text-foreground sm:text-sm">
-                    Maverick AI is an intelligence agent that continuously gathers news and intel from hundreds of sources, maps how money moves, surfaces business gaps, research angles, and the relationships analysts and researchers need for cross-reading, and delivers high-signal updates to you proactively across every industry, 24/7—not scattered headlines.
+                    Intel GoldMine is an intelligence agent that continuously gathers news and intel from hundreds of sources, maps how money moves, surfaces business gaps, research angles, and the relationships analysts and researchers need for cross-reading, and delivers high-signal updates to you proactively across every industry, 24/7—not scattered headlines.
                   </span>
                 </span>
               </p>
@@ -645,7 +645,7 @@ export default function LandingPage() {
                 Three ways in. One global brain.
               </h2>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Pulse the world, stress-test relationships across sectors, or run a private brief — same Maverick AI engine,
+                Pulse the world, stress-test relationships across sectors, or run a private brief — same Intel GoldMine engine,
                 same truth bar.
               </p>
             </div>
