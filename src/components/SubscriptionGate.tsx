@@ -3,6 +3,9 @@ import { Shield, Sparkles, Zap, Lock } from "lucide-react";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { BrandHexMark } from "@/components/BrandHexMark";
+import { BrandWordmark } from "@/components/BrandWordmark";
 
 interface SubscriptionGateProps {
   children: React.ReactNode;
@@ -34,6 +37,25 @@ export function SubscriptionGate({ children, feature }: SubscriptionGateProps) {
           </p>
           <UpgradeButton size="default" />
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Full-page paywall shown when free users try to access premium pages. */
+export function FullPagePaywall() {
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="text-center p-8 max-w-lg">
+        <BrandHexMark size="lg" className="mx-auto mb-6" />
+        <h2 className="text-2xl font-bold text-foreground mb-2 font-display">
+          Upgrade to unlock this page
+        </h2>
+        <p className="text-base text-muted-foreground mb-8 leading-relaxed">
+          This section is available to Pro subscribers. Upgrade now to access all Intel GoldMine features — live feeds, cross-industry scans, custom intel lab, and more.
+        </p>
+        <UpgradeButton size="default" className="mx-auto" />
+        <p className="text-xs text-muted-foreground mt-4">Cancel anytime · Instant access</p>
       </div>
     </div>
   );

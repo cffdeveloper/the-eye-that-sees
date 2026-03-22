@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { GeoProvider } from "@/contexts/GeoContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { useSubscription } from "@/hooks/useSubscription";
+import { FullPagePaywall } from "@/components/SubscriptionGate";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import IndustryPage from "./pages/IndustryPage";
@@ -55,6 +57,22 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** Wraps pages that require a Pro subscription — free users see a paywall. */
+function ProRoute({ children }: { children: React.ReactNode }) {
+  const { isPro, loading } = useSubscription();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isPro) return <FullPagePaywall />;
+  return <>{children}</>;
+}
+
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -90,12 +108,14 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     >
+      {/* Dashboard is free */}
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/intel" element={<IntelDashboard />} />
-      <Route path="/cross-intel" element={<CrossIntelPage />} />
-      <Route path="/custom-intel" element={<CustomIntelPage />} />
-      <Route path="/industry/:slug" element={<IndustryPage />} />
-      <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
+      {/* Everything else requires Pro */}
+      <Route path="/intel" element={<ProRoute><IntelDashboard /></ProRoute>} />
+      <Route path="/cross-intel" element={<ProRoute><CrossIntelPage /></ProRoute>} />
+      <Route path="/custom-intel" element={<ProRoute><CustomIntelPage /></ProRoute>} />
+      <Route path="/industry/:slug" element={<ProRoute><IndustryPage /></ProRoute>} />
+      <Route path="/industry/:slug/:subFlowId" element={<ProRoute><SubFlowPage /></ProRoute>} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>
