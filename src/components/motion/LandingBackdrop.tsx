@@ -1,31 +1,28 @@
 import { motion } from "framer-motion";
 
-/** Ambient motion behind the marketing hero — keeps brand colors separate (no blended gradients). */
+/** Soft ambient glow behind the landing hero — warm and inviting. */
 export function LandingBackdrop() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      <div className="absolute inset-0 grid-bg opacity-[0.12]" />
+      {/* Warm top glow */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 95% 65% at 50% -28%, hsl(var(--primary) / 0.1) 0%, transparent 55%)",
+            "radial-gradient(ellipse 100% 60% at 50% -20%, hsl(var(--primary) / 0.06) 0%, transparent 60%)",
         }}
       />
+      {/* Soft orange accent */}
       <motion.div
-        className="absolute -top-24 -right-24 h-[28rem] w-[28rem] rounded-full bg-primary/20 blur-3xl"
-        animate={{ scale: [1, 1.08, 1], opacity: [0.35, 0.5, 0.35] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-20 right-[10%] h-[24rem] w-[24rem] rounded-full bg-brand-orange/8 blur-[100px]"
+        animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.6, 0.4] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
+      {/* Blue accent */}
       <motion.div
-        className="absolute top-1/3 -left-32 h-[22rem] w-[22rem] rounded-full bg-brand-orange/15 blur-3xl"
-        animate={{ scale: [1, 1.12, 1], opacity: [0.25, 0.4, 0.25] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-primary/10 blur-2xl"
-        animate={{ y: [0, -20, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[40%] -left-20 h-[20rem] w-[20rem] rounded-full bg-primary/6 blur-[100px]"
+        animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 3 }}
       />
     </div>
   );

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
-import { Loader2, Mail, Lock, User, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "forgot";
@@ -75,112 +75,91 @@ export default function AuthPage() {
     <div className="min-h-screen bg-background flex relative overflow-hidden">
       <Link
         to="/"
-        className="absolute top-5 left-5 z-30 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute top-5 left-5 z-30 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        ← Back to home
+        <ArrowLeft className="w-4 h-4" />
+        Back
       </Link>
 
-      {/* Brand panel — hidden on small screens */}
-      <motion.div
-        initial={{ opacity: 0, x: -24 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="hidden lg:flex lg:w-[46%] xl:w-[48%] relative min-h-screen flex-col justify-between p-10 xl:p-12 text-primary-foreground overflow-hidden"
-      >
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/92 via-primary/85 to-primary/75" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-40" />
-        </div>
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-[45%] relative min-h-screen flex-col justify-between p-10 xl:p-14 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "24px 24px",
+        }} />
+
         <div className="relative z-10 flex flex-col h-full">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-white/10 p-3 backdrop-blur-md border border-white/15">
-              <Sparkles className="w-7 h-7 text-amber-200" />
+            <div className="rounded-xl bg-white/15 p-2.5 backdrop-blur-md">
+              <BrandHexMark size="sm" className="[&>div]:bg-white/20 [&>div]:shadow-none" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white leading-tight">
+              <h2 className="text-lg font-bold text-white leading-tight">
                 Intel <span className="text-amber-200">GoldMine</span>
               </h2>
-              <p className="text-xs text-white/80 mt-0.5">Maverick AI</p>
+              <p className="text-xs text-white/70">Powered by Maverick AI</p>
             </div>
           </div>
 
-          <div className="mt-auto space-y-6 max-w-md">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <Sparkles className="w-8 h-8 text-amber-200/90 mb-3" />
-              <p className="text-2xl font-semibold text-white tracking-tight leading-snug">
-                Structured intelligence for teams who move on capital, not vibes.
+          <div className="mt-auto space-y-8 max-w-md">
+            <div>
+              <p className="text-2xl font-bold text-white tracking-tight leading-snug">
+                Intelligence that helps you make better decisions, faster.
               </p>
-              <p className="mt-3 text-sm text-white/80 leading-relaxed">
-                Live feeds, geo-scoped research, and Intel Lab — built for operators who need receipts, not noise.
+              <p className="mt-3 text-sm text-white/75 leading-relaxed">
+                Join decision makers who use Intel GoldMine to track markets, spot opportunities, and stay ahead.
               </p>
-            </motion.div>
-            <div className="flex flex-wrap gap-2">
-              {["20 industries", "70+ flows", "11+ sources"].map((t) => (
-                <span
-                  key={t}
-                  className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm"
-                >
-                  {t}
-                </span>
+            </div>
+
+            <div className="space-y-3">
+              {["20 industries tracked live", "AI-powered research reports", "Personalized to your needs"].map((t) => (
+                <div key={t} className="flex items-center gap-2.5 text-sm text-white/90">
+                  <CheckCircle2 className="w-4 h-4 text-amber-200 shrink-0" />
+                  <span>{t}</span>
+                </div>
               ))}
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Form column */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-10 relative min-h-screen">
-        <div className="absolute inset-0 grid-bg opacity-[0.08] pointer-events-none" />
-        <div
-          className="absolute inset-x-0 top-0 h-[min(50vh,24rem)] pointer-events-none lg:hidden"
-          style={{
-            background: "radial-gradient(ellipse 80% 90% at 50% 0%, hsl(var(--primary) / 0.08) 0%, transparent 65%)",
-          }}
-        />
-
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 relative min-h-screen">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-          className="relative z-10 w-full max-w-md"
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 w-full max-w-[420px]"
         >
           <div className="flex flex-col items-center mb-8 lg:hidden">
             <BrandHexMark size="lg" />
-            <h1 className="text-xl font-semibold text-foreground mt-5">
+            <h1 className="text-xl font-bold text-foreground mt-4">
               <BrandWordmark />
             </h1>
-            <p className="text-sm text-muted-foreground mt-2 text-center max-w-sm leading-relaxed">
-              Intelligence platform · <span className="text-brand-orange font-semibold">Maverick</span> is your AI research agent
+            <p className="text-sm text-muted-foreground mt-1.5 text-center">
+              Your AI-powered intelligence platform
             </p>
           </div>
 
-          <div className="glass-panel p-8 glow-border space-y-6 rounded-2xl shadow-xl border border-border/50">
+          <div className="rounded-2xl border border-border bg-card p-8 shadow-lg space-y-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={mode}
-                initial={{ opacity: 0, x: mode === "signup" ? 12 : -12 }}
+                initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: mode === "signup" ? -8 : 8 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.2 }}
                 className="text-center"
               >
-                <h2 className="text-lg font-semibold text-foreground">
-                  {mode === "login" ? "Sign in" : mode === "signup" ? "Create account" : "Reset password"}
+                <h2 className="text-xl font-bold text-foreground">
+                  {mode === "login" ? "Welcome back" : mode === "signup" ? "Create your account" : "Reset password"}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1.5">
                   {mode === "login"
-                    ? "Access your personalized intelligence dashboard"
+                    ? "Sign in to access your dashboard"
                     : mode === "signup"
-                      ? "Start your intelligence journey"
+                      ? "Get started with Intel GoldMine"
                       : "We'll send you a reset link"}
                 </p>
               </motion.div>
@@ -188,7 +167,7 @@ export default function AuthPage() {
 
             <Button
               variant="outline"
-              className="w-full h-11 text-sm gap-2 hover:bg-muted/60 transition-colors"
+              className="w-full h-11 text-sm gap-2.5 rounded-xl font-medium hover:bg-muted/50"
               onClick={handleGoogleLogin}
               type="button"
             >
@@ -207,7 +186,7 @@ export default function AuthPage() {
               <div className="flex-1 h-px bg-border" />
             </div>
 
-            <form onSubmit={handleEmailAuth} className="space-y-3">
+            <form onSubmit={handleEmailAuth} className="space-y-4">
               <AnimatePresence mode="wait">
                 {mode === "signup" && (
                   <motion.div
@@ -216,16 +195,16 @@ export default function AuthPage() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="space-y-1.5 overflow-hidden"
+                    className="space-y-2 overflow-hidden"
                   >
-                    <Label className="text-xs font-medium text-foreground">Full name</Label>
+                    <Label className="text-sm font-medium text-foreground">Full name</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Your name"
-                        className="pl-9 h-10 text-sm transition-shadow focus-visible:ring-2 focus-visible:ring-primary/30"
+                        className="pl-10 h-11 text-sm rounded-xl"
                         required
                       />
                     </div>
@@ -233,32 +212,32 @@ export default function AuthPage() {
                 )}
               </AnimatePresence>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">Email</Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="pl-9 h-10 text-sm transition-shadow focus-visible:ring-2 focus-visible:ring-primary/30"
+                    className="pl-10 h-11 text-sm rounded-xl"
                     required
                   />
                 </div>
               </div>
 
               {mode !== "forgot" && (
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-foreground">Password</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground">Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="pl-9 pr-9 h-10 text-sm transition-shadow focus-visible:ring-2 focus-visible:ring-primary/30"
+                      className="pl-10 pr-10 h-11 text-sm rounded-xl"
                       required
                       minLength={6}
                     />
@@ -267,7 +246,7 @@ export default function AuthPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -283,26 +262,24 @@ export default function AuthPage() {
                 </button>
               )}
 
-              <motion.div whileTap={{ scale: 0.99 }}>
-                <Button type="submit" className="w-full h-10 text-sm font-medium shadow-md" disabled={loading}>
-                  {loading && <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />}
-                  {mode === "login" ? "Sign In" : mode === "signup" ? "Create Account" : "Send Reset Link"}
-                </Button>
-              </motion.div>
+              <Button type="submit" className="w-full h-11 text-sm font-semibold rounded-xl shadow-sm" disabled={loading}>
+                {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                {mode === "login" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
+              </Button>
             </form>
 
             <div className="text-center">
               {mode === "login" ? (
                 <p className="text-sm text-muted-foreground">
-                  No account?{" "}
-                  <button type="button" onClick={() => setMode("signup")} className="text-primary font-medium hover:underline">
+                  Don't have an account?{" "}
+                  <button type="button" onClick={() => setMode("signup")} className="text-primary font-semibold hover:underline">
                     Sign up
                   </button>
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <button type="button" onClick={() => setMode("login")} className="text-primary font-medium hover:underline">
+                  <button type="button" onClick={() => setMode("login")} className="text-primary font-semibold hover:underline">
                     Sign in
                   </button>
                 </p>
