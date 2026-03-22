@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { industries } from "@/lib/industryData";
@@ -17,6 +17,7 @@ import {
   Network,
   Shield,
   MapPin,
+  CheckCircle2,
 } from "lucide-react";
 import { WorldMap } from "@/components/intel/WorldMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
@@ -25,9 +26,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeButton, SubscriptionBadge } from "@/components/SubscriptionGate";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { isPro, verifyPayment, loading: subLoading, subscription } = useSubscription();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const { requestNotificationPermission } = useAlertNotifications([], alertsEnabled);
   const [dbStats, setDbStats] = useState({ rawData: 0, insights: 0, matches: 0 });
@@ -54,6 +60,28 @@ export default function Dashboard() {
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Verify Paystack payment on callback
+  useEffect(() => {
+    if (searchParams.get("payment") === "verify") {
+      const ref = localStorage.getItem("paystack_reference");
+      if (ref) {
+        verifyPayment(ref)
+          .then((result) => {
+            if (result?.verified) {
+              toast.success("Payment successful! Welcome to Pro 🎉");
+            } else {
+              toast.error("Payment verification failed. Please try again.");
+            }
+          })
+          .catch(() => toast.error("Could not verify payment"))
+          .finally(() => {
+            localStorage.removeItem("paystack_reference");
+            setSearchParams({}, { replace: true });
+          });
+      }
+    }
+  }, [searchParams]);
 
   const handleEnableNotifications = async () => {
     await requestNotificationPermission();
@@ -167,18 +195,45 @@ export default function Dashboard() {
 
             {/* Pricing card */}
             <div className="w-full lg:w-[min(100%,320px)] shrink-0">
-              <div className="rounded-xl border border-border/70 bg-card p-6 shadow-lg border-t-4 border-t-primary">
+              <div className={cn(
+                "rounded-xl border bg-card p-6 shadow-lg border-t-4",
+                isPro ? "border-primary/40 border-t-primary" : "border-border/70 border-t-brand-orange"
+              )}>
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-medium text-foreground">Subscription</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-foreground">Subscription</span>
+                    <SubscriptionBadge />
+                  </div>
                   <Shield className="w-4 h-4 text-brand-orange/80" />
                 </div>
-                <div className="mt-3 flex items-end gap-1">
-                  <span className="text-4xl font-bold tabular-nums text-foreground">${SUBSCRIPTION_USD_MONTHLY}</span>
-                  <span className="text-lg font-semibold text-muted-foreground pb-1">/month</span>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground leading-snug">
-                  Full Intel GoldMine access — Maverick powers briefs, chat, deep dives, cross-industry analysis, and Custom Intel Lab.
-                </p>
+
+                {isPro ? (
+                  <>
+                    <div className="mt-3 flex items-center gap-2">
+                      <CheckCircle2 className="w-6 h-6 text-primary" />
+                      <span className="text-xl font-bold text-foreground">Pro Active</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground leading-snug">
+                      You have full access to Intel GoldMine, Maverick AI, deep dives, and all premium features.
+                    </p>
+                    {subscription?.current_period_end && (
+                      <p className="mt-2 text-xs text-primary font-medium">
+                        Renews {new Date(subscription.current_period_end).toLocaleDateString()}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-3 flex items-end gap-1">
+                      <span className="text-4xl font-bold tabular-nums text-foreground">${SUBSCRIPTION_USD_MONTHLY}</span>
+                      <span className="text-lg font-semibold text-muted-foreground pb-1">/month</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground leading-snug">
+                      Full Intel GoldMine access — Maverick powers briefs, chat, deep dives, cross-industry analysis, and Custom Intel Lab.
+                    </p>
+                  </>
+                )}
+
                 <ul className="mt-4 space-y-2.5 text-sm text-card-foreground">
                   {[
                     "Structured AI reports & chat with Maverick",
@@ -191,9 +246,12 @@ export default function Dashboard() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 text-xs text-muted-foreground border-t border-border/50 pt-3 leading-relaxed">
-                  Billing is handled by your workspace admin — contact support to activate or change plans.
-                </p>
+
+                {!isPro && (
+                  <div className="mt-4 border-t border-border/50 pt-3">
+                    <UpgradeButton className="w-full" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
