@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: PLAN_AMOUNT_CENTS * 100,
+          amount: PLAN_AMOUNT_LOWEST,
           currency: PLAN_CURRENCY,
           callback_url:
             callbackUrl || "https://intelgoldmine.onrender.com/dashboard?payment=verify",
