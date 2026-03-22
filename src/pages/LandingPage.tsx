@@ -23,7 +23,6 @@ import {
   Globe2,
   Layers,
   Radio,
-  TrendingUp,
   PlayCircle,
   FlaskConical,
   Workflow,
@@ -33,7 +32,9 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
-const totalFlows = industries.reduce((a, i) => a + i.subFlows.length, 0);
+/** Marketing — emphasise coverage (feed integrations & mapped capital lanes). */
+const SOURCE_INTEGRATIONS_LABEL = "40+";
+const FLOW_LANES_LABEL = "120+";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -94,7 +95,7 @@ export default function LandingPage() {
                 className="w-[min(92vw,22rem)] sm:w-[26rem] p-0 overflow-hidden border-border/60 shadow-xl z-[100] bg-card/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
               >
                 <div className="border-b border-border/50 bg-gradient-to-r from-primary/8 via-transparent to-violet-500/10 px-4 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Flow</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Inside the machine</p>
                   <p className="font-display text-base font-bold text-foreground tracking-tight">How it works</p>
                 </div>
                 <div className="max-h-[min(60vh,420px)] overflow-y-auto p-3">
@@ -102,31 +103,36 @@ export default function LandingPage() {
                     {[
                       {
                         id: "hiw-1",
-                        title: "01 — Set your scope",
+                        title: "01 — Ingest · scope · prioritize",
                         body: (
                           <p>
-                            Choose industries, regions, and what matters most in your profile. That scope carries into
-                            Maverick briefs, alerts, and geo filters so intel stays relevant — not generic.
+                            Maverick pulls from markets, macro, news, funding rails, and social signals —{" "}
+                            <span className="font-semibold text-foreground">{SOURCE_INTEGRATIONS_LABEL} integrated feed types</span>{" "}
+                            — then respects <em>your</em> industries, regions, and watchlists. You’re not drowning in tabs;
+                            the machine aggregates toward answers that match how you think.
                           </p>
                         ),
                       },
                       {
                         id: "hiw-2",
-                        title: "02 — Maverick synthesizes",
+                        title: "02 — Map · link · brief",
                         body: (
                           <p>
-                            Data from 11+ sources is structured into clear outputs: frameworks, risks, opportunities, and
-                            scores — not a wall of headlines.
+                            Every sector is decomposed into money-flow lanes so you can see{" "}
+                            <span className="font-semibold text-foreground">how capital actually moves</span>. Cross-industry
+                            mode surfaces bridges, bottlenecks, and second-order effects — built for analysts and
+                            researchers who live in the space <em>between</em> silos.
                           </p>
                         ),
                       },
                       {
                         id: "hiw-3",
-                        title: "03 — Decide with proof",
+                        title: "03 — Read · challenge · act",
                         body: (
                           <p>
-                            Use the live feed for pulse, industries and money flows for depth, cross-industry for
-                            connections, and Intel Lab when you need a custom brief with follow-ups.
+                            Outputs read like a serious research desk: frameworks, risks, opportunities, and follow-up
+                            prompts — not a ticker wall. Use the live pulse for rhythm, deep dives for rigor, Intel Lab when
+                            you need a bespoke brief, and geo snapshots when place matters as much as price.
                           </p>
                         ),
                       },
@@ -192,11 +198,12 @@ export default function LandingPage() {
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 space-y-3">
                         <p>
-                          One Pro subscription unlocks the full product: live intel feed, AI industry and money-flow deep
-                          dives, cross-industry analysis, Intel Lab, and geo-scoped snapshots.
+                          Pro is the full desk: unlimited live global pulse, deep sector & money-flow workspaces,{" "}
+                          cross-industry relationship maps, Intel Lab sessions, and geo-scoped snapshots — the same stack
+                          serious operators use to stay ahead of headlines.
                         </p>
                         <p className="text-xs text-muted-foreground/90">
-                          Start with a free account; upgrade when you need unrestricted access.
+                          Start free; upgrade when you want the full firehose and Maverick without limits.
                         </p>
                         <Button size="sm" className="w-full font-bold rounded-lg" asChild>
                           <Link to="/auth?mode=signup">
@@ -220,11 +227,12 @@ export default function LandingPage() {
                       <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
                         <ul className="space-y-2 text-sm text-muted-foreground pt-2">
                           {[
-                            "AI research & follow-up chat",
-                            `${industries.length} industries · ${totalFlows}+ money flows`,
-                            "Geo-scoped analysis & snapshots",
-                            "Cross-industry intelligence",
-                            "Custom Intel Lab sessions",
+                            "Maverick AI research, synthesis & follow-up chat",
+                            `${industries.length} global sectors · ${FLOW_LANES_LABEL} mapped capital lanes`,
+                            `${SOURCE_INTEGRATIONS_LABEL} source integrations — aggregated for you`,
+                            "Cross-industry bridges, gaps & second-order links",
+                            "Intel Lab — scoped briefs when you need a private lens",
+                            "Geo filters & regional snapshots (where place matters)",
                           ].map((line) => (
                             <li key={line} className="flex gap-2">
                               <CheckCircle2 className="w-4 h-4 text-signal-emerald shrink-0 mt-0.5" />
@@ -300,14 +308,14 @@ export default function LandingPage() {
             className="relative z-10 flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8"
           >
             <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0">
-              <p className="text-center lg:text-left text-[13px] sm:text-sm text-muted-foreground font-medium mb-3 sm:mb-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5">
-                <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card/90 backdrop-blur-sm px-3 py-1.5 text-foreground shadow-sm">
-                  <Activity className="w-3.5 h-3.5 text-primary" />
-                  Maverick AI · live pipelines · geo snapshots
+              <p className="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-center text-[13px] font-medium text-muted-foreground sm:mb-4 sm:text-sm lg:justify-start lg:text-left">
+                <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card/90 px-3 py-1.5 text-foreground shadow-sm backdrop-blur-sm">
+                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  Private intelligence layer · global pipelines · live geo
                 </span>
-                <span className="hidden sm:inline text-border">·</span>
-                <span className="text-muted-foreground max-w-md sm:max-w-none">
-                  Evidence-backed intelligence — not another noise feed.
+                <span className="hidden text-border sm:inline">·</span>
+                <span className="max-w-md text-muted-foreground sm:max-w-none">
+                  Built for people who connect dots across markets — not for scrolling another feed.
                 </span>
               </p>
 
@@ -333,38 +341,42 @@ export default function LandingPage() {
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-emerald/40" />
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-signal-emerald" />
                     </span>
-                    <span className="font-semibold text-foreground">Now live</span>
+                    <span className="font-semibold text-foreground">Live desk</span>
                     <span className="text-border">·</span>
-                    <span className="text-brand-orange font-semibold">Research-grade briefs</span>
+                    <span className="font-semibold text-brand-orange">Maverick synthesis</span>
                   </motion.div>
 
                   <motion.h1
                     variants={fadeUp}
-                    className="font-display text-[2.35rem] sm:text-5xl md:text-6xl xl:text-[3.5rem] font-bold tracking-[-0.03em] leading-[1.05] text-foreground"
+                    className="font-display text-[2.35rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl xl:text-[3.5rem]"
                   >
-                    Turn noise into{" "}
-                    <span className="text-gradient-gold bg-clip-text text-transparent">decisions</span>
+                    Global market intelligence —{" "}
+                    <span className="text-gradient-gold bg-clip-text text-transparent">one command center</span>
                     <span className="text-foreground">.</span>
                   </motion.h1>
 
                   <motion.p
                     variants={fadeUp}
-                    className="mt-5 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                    className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg lg:mx-0"
                   >
-                    <span className="font-semibold text-foreground">{industries.length} industries</span> ·{" "}
-                    <span className="font-semibold text-foreground">{totalFlows}+ money flows</span> ·{" "}
-                    <span className="font-semibold text-foreground">11+ sources</span>
-                    <span> — structured intel, geo scope, and cross-industry scans in one workspace.</span>
+                    <span className="font-semibold text-foreground">{industries.length} sectors</span> ·{" "}
+                    <span className="font-semibold text-foreground">{FLOW_LANES_LABEL} capital lanes</span> ·{" "}
+                    <span className="font-semibold text-foreground">{SOURCE_INTEGRATIONS_LABEL} feed integrations</span>
+                    <span>
+                      {" "}
+                      — Maverick ingests sources from around the world, maps how money moves, and surfaces the
+                      relationships analysts and researchers need for cross-reading — not scattered headlines.
+                    </span>
                   </motion.p>
 
                   <motion.div
                     variants={fadeUp}
-                    className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-[13px] sm:text-sm"
+                    className="mt-5 flex flex-wrap items-center justify-center gap-2.5 text-[13px] sm:text-sm lg:justify-start"
                   >
                     {[
-                      { icon: TrendingUp, label: "Live signals", c: "text-signal-emerald" },
-                      { icon: Cpu, label: "Intel Lab", c: "text-primary" },
-                      { icon: Globe2, label: "Geo-scoped", c: "text-brand-orange" },
+                      { icon: Globe2, label: "Worldwide signal mesh", c: "text-brand-orange" },
+                      { icon: Layers, label: "Cross-industry links", c: "text-signal-violet" },
+                      { icon: Cpu, label: "Intel Lab & briefs", c: "text-primary" },
                     ].map(({ icon: Icon, label, c }) => (
                       <span
                         key={label}
@@ -429,18 +441,18 @@ export default function LandingPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/35 via-transparent to-transparent pointer-events-none" />
                     </div>
-                    <div className="grid grid-cols-3 gap-px border-t border-border/40 bg-border/30 text-[11px]">
-                      <div className="bg-card/95 p-3 text-center backdrop-blur-sm">
-                        <p className="font-bold text-primary tabular-nums">{industries.length}</p>
-                        <p className="text-muted-foreground">Industries</p>
+                    <div className="grid grid-cols-3 gap-px border-t border-border/40 bg-border/30 text-[10px] sm:text-[11px]">
+                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
+                        <p className="font-bold tabular-nums text-primary">{industries.length}</p>
+                        <p className="text-muted-foreground">Sectors</p>
                       </div>
-                      <div className="bg-card/95 p-3 text-center backdrop-blur-sm">
-                        <p className="font-bold text-brand-orange tabular-nums">{totalFlows}+</p>
-                        <p className="text-muted-foreground">Flows</p>
+                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
+                        <p className="font-bold tabular-nums text-brand-orange">{FLOW_LANES_LABEL}</p>
+                        <p className="text-muted-foreground">Capital lanes</p>
                       </div>
-                      <div className="bg-card/95 p-3 text-center backdrop-blur-sm">
-                        <p className="font-bold text-signal-emerald tabular-nums">11+</p>
-                        <p className="text-muted-foreground">Sources</p>
+                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
+                        <p className="font-bold tabular-nums text-signal-emerald">{SOURCE_INTEGRATIONS_LABEL}</p>
+                        <p className="text-muted-foreground">Feed types</p>
                       </div>
                     </div>
                   </motion.div>
@@ -481,32 +493,33 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 dot-pattern-fine opacity-[0.28] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-4 sm:px-8 py-14 sm:py-20 relative">
-            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-              <p className="text-sm font-semibold text-primary tracking-[0.2em] uppercase mb-3">Explore</p>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-bold text-foreground tracking-tight leading-[1.1]">
-                Three entry points. One intelligence stack.
+            <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-14">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Choose your lane</p>
+              <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-[2.75rem]">
+                Three ways in. One global brain.
               </h2>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-base sm:text-lg">
-                Pick how you work — live pulse, custom lab, or cross-sector sweep.
+              <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+                Pulse the world, stress-test relationships across sectors, or run a private brief — same Maverick engine,
+                same truth bar.
               </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid gap-5 sm:gap-6 md:grid-cols-3">
               {[
                 {
                   title: "Live intel feed",
-                  desc: "Crypto, FX, commodities, VC & macro — refreshed continuously.",
+                  desc: "A continuous global pulse — markets, macro, commodities, funding, and socials where configured. Built for operators who need rhythm without noise.",
                   icon: Radio,
                   grad: "bg-gradient-to-br from-primary/30 via-primary/10 to-slate-900/80",
                 },
                 {
                   title: "Intel Lab",
-                  desc: "Scope industries & flows, add context, generate briefs + follow-ups.",
+                  desc: "Scope industries & money flows, add context, and let Maverick generate research-grade briefs you can challenge line by line — your private lab.",
                   icon: FlaskConical,
                   grad: "bg-gradient-to-br from-amber-500/35 via-brand-orange/15 to-slate-900/85",
                 },
                 {
                   title: "Cross-industry scan",
-                  desc: "Gaps, deals, and bridges across all mapped sectors in one pass.",
+                  desc: "See bridges, gaps, and knock-on effects across all mapped sectors — for analysts who think in systems, not single tickers.",
                   icon: Layers,
                   grad: "bg-gradient-to-br from-violet-500/30 via-signal-violet/15 to-slate-900/85",
                 },
@@ -560,8 +573,9 @@ export default function LandingPage() {
               <BrandHexMark size="footer" variant="onDark" />
               <BrandWordmark className="text-lg" variant="onDark" />
             </div>
-            <p className="text-sm text-zinc-500 leading-relaxed max-w-sm">
-              Market intelligence with geo scope, structured AI, and Maverick — your research copilot.
+            <p className="max-w-sm text-sm leading-relaxed text-zinc-500">
+              A private intelligence layer for people who read across markets — global ingestion, structured synthesis,
+              and cross-sector clarity. You’re not using another dashboard; you’re joining a serious desk.
             </p>
             <p className="text-sm">
               <a href="#explore" className="text-zinc-400 hover:text-white transition-colors font-medium">
