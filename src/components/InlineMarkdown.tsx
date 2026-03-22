@@ -55,9 +55,9 @@ export function BlockMarkdown({ content, className = "" }: InlineMarkdownProps) 
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h1 className="text-sm font-bold text-primary font-mono tracking-wide mt-3 mb-1">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-xs font-bold text-primary font-mono tracking-wide uppercase mt-2 mb-1">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-xs font-semibold text-foreground font-mono tracking-wide mt-2 mb-0.5">{children}</h3>,
+          h1: ({ children }) => <h1 className="text-sm font-semibold text-primary tracking-tight mt-3 mb-1">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-xs font-semibold text-primary tracking-wide uppercase mt-2 mb-1">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-xs font-medium text-foreground tracking-tight mt-2 mb-0.5">{children}</h3>,
           strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
           em: ({ children }) => <em className="text-card-foreground/90">{children}</em>,
           code: ({ children, className: cn }) => {

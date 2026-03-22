@@ -166,27 +166,27 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
               backgroundSize: "24px 24px",
             }}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-accent/10" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent" />
           <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
 
           <DialogHeader className="relative">
             <div className="flex flex-wrap items-start gap-3 gap-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded border border-primary/40 bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary">
                 <Radio className="w-3 h-3 animate-pulse" />
                 {region.code}
               </span>
-              <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 font-mono text-[9px] text-muted-foreground">
+              <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 text-[9px] text-muted-foreground">
                 {region.lat.toFixed(1)}°, {region.lng.toFixed(1)}°
               </span>
             </div>
-            <DialogTitle className="text-lg font-mono font-bold text-foreground flex items-center gap-2 mt-2 pr-8">
+            <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2 mt-2 pr-8">
               <Globe className="w-5 h-5 text-primary shrink-0" />
               <span>{region.name}</span>
-              <span className="text-[10px] font-normal text-muted-foreground font-mono tracking-wide">
+              <span className="text-[10px] font-normal text-muted-foreground tracking-wide">
                 — REGIONAL INTEL COMMAND
               </span>
             </DialogTitle>
-            <p className="text-[10px] font-mono text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            <p className="text-[10px] text-muted-foreground mt-1 max-w-2xl leading-relaxed">
               Live cross-reference of tracked industries, trade corridors, intel signals, and an AI brief tuned to this geography.
             </p>
           </DialogHeader>
@@ -194,20 +194,20 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
           {/* KPI strip */}
           <div className="relative mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
-              <p className="text-[8px] font-mono uppercase tracking-wider text-muted-foreground">Trade volume</p>
-              <p className="text-sm font-mono font-bold text-primary">{region.tradeVolume}</p>
+              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Trade volume</p>
+              <p className="text-sm font-bold text-primary">{region.tradeVolume}</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
-              <p className="text-[8px] font-mono uppercase tracking-wider text-muted-foreground">Intel pulse</p>
-              <p className="text-sm font-mono font-bold text-foreground">{intelScore}/100</p>
+              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Intel pulse</p>
+              <p className="text-sm font-bold text-foreground">{intelScore}/100</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
-              <p className="text-[8px] font-mono uppercase tracking-wider text-muted-foreground">Corridors</p>
-              <p className="text-sm font-mono font-bold text-accent">{flowsCorridor.length} active</p>
+              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Corridors</p>
+              <p className="text-sm font-bold text-accent">{flowsCorridor.length} active</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
-              <p className="text-[8px] font-mono uppercase tracking-wider text-muted-foreground">Industries</p>
-              <p className="text-sm font-mono font-bold text-foreground">{industryNames.length} tracked</p>
+              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Industries</p>
+              <p className="text-sm font-bold text-foreground">{industryNames.length} tracked</p>
             </div>
           </div>
 
@@ -219,7 +219,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
                   className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-destructive/10 border border-destructive/25"
                 >
                   <Zap className="w-3 h-3 text-destructive shrink-0" />
-                  <span className="text-[10px] font-mono text-destructive">{d}</span>
+                  <span className="text-[10px] text-destructive">{d}</span>
                 </div>
               ))}
             </div>
@@ -230,7 +230,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
           {/* Trade corridors — from global flow map */}
           {flowsCorridor.length > 0 && (
             <div>
-              <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <GitBranch className="w-3 h-3 text-primary" />
                 Trade corridors (this region)
               </h3>
@@ -240,14 +240,14 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
                     key={i}
                     className="flex items-center justify-between gap-2 rounded-lg border border-border/30 bg-muted/10 px-3 py-2"
                   >
-                    <div className="min-w-0 flex items-center gap-1.5 text-[10px] font-mono text-foreground">
+                    <div className="min-w-0 flex items-center gap-1.5 text-[10px] text-foreground">
                       <span className="truncate text-primary/90">{f.from}</span>
                       <ArrowRight className="w-3 h-3 shrink-0 text-muted-foreground" />
                       <span className="truncate text-primary/90">{f.to}</span>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-[9px] font-mono font-semibold text-foreground">{f.volume}</div>
-                      <div className="text-[8px] font-mono text-muted-foreground">{f.label}</div>
+                      <div className="text-[9px] font-semibold text-foreground">{f.volume}</div>
+                      <div className="text-[8px] text-muted-foreground">{f.label}</div>
                     </div>
                   </div>
                 ))}
@@ -257,7 +257,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
 
           {/* Industry grid */}
           <div>
-            <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <BarChart3 className="w-3 h-3 text-primary" />
               Key industries in {region.name}
             </h3>
@@ -272,10 +272,10 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
                   className="group glass-panel p-2.5 text-left hover:border-primary/50 hover:shadow-[0_0_20px_-4px_hsl(var(--primary)/0.35)] transition-all"
                 >
                   <div className="text-base mb-1">{ind.icon}</div>
-                  <div className="text-[10px] font-mono font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                  <div className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                     {ind.name}
                   </div>
-                  <div className="text-[8px] font-mono text-muted-foreground">{ind.subFlows.length} flows</div>
+                  <div className="text-[8px] text-muted-foreground">{ind.subFlows.length} flows</div>
                 </button>
               ))}
             </div>
@@ -284,13 +284,13 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
           {loading ? (
             <div className="flex items-center justify-center py-8 gap-2">
               <Loader2 className="w-5 h-5 text-primary animate-spin" />
-              <span className="text-xs font-mono text-muted-foreground">Pulling signals from intelligence graph…</span>
+              <span className="text-xs text-muted-foreground">Pulling signals from intelligence graph…</span>
             </div>
           ) : (
             <>
               {insights.length > 0 && (
                 <div>
-                  <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <Activity className="w-3 h-3 text-primary" />
                     Latest signals ({insights.length})
                   </h3>
@@ -307,21 +307,21 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
                           }`}
                         />
                         <div className="min-w-0 flex-1">
-                          <div className="text-[10px] font-mono font-semibold text-foreground truncate">{ins.title}</div>
+                          <div className="text-[10px] font-semibold text-foreground truncate">{ins.title}</div>
                           {ins.detail && (
-                            <div className="text-[9px] font-mono text-muted-foreground line-clamp-3 mt-0.5 min-w-0">
+                            <div className="text-[9px] text-muted-foreground line-clamp-3 mt-0.5 min-w-0">
                               <InlineMarkdown content={ins.detail} />
                             </div>
                           )}
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {ins.source_industry && (
-                              <span className="text-[8px] font-mono text-primary/70">{ins.source_industry}</span>
+                              <span className="text-[8px] text-primary/70">{ins.source_industry}</span>
                             )}
                             {ins.urgency && (
-                              <span className={`text-[8px] font-mono ${urgencyColor(ins.urgency)}`}>⚡ {ins.urgency}</span>
+                              <span className={`text-[8px] ${urgencyColor(ins.urgency)}`}>⚡ {ins.urgency}</span>
                             )}
                             {ins.score != null && (
-                              <span className="text-[8px] font-mono text-accent">score: {ins.score}</span>
+                              <span className="text-[8px] text-accent">score: {ins.score}</span>
                             )}
                           </div>
                         </div>
@@ -333,27 +333,27 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
 
               {matches.length > 0 && (
                 <div>
-                  <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <AlertTriangle className="w-3 h-3 text-accent" />
                     Cross-industry connections ({matches.length})
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {matches.slice(0, 6).map((m) => (
                       <div key={m.id} className="glass-panel p-2.5">
-                        <div className="text-[10px] font-mono font-semibold text-foreground truncate">{m.title}</div>
+                        <div className="text-[10px] font-semibold text-foreground truncate">{m.title}</div>
                         {m.description && (
-                          <div className="text-[9px] font-mono text-muted-foreground line-clamp-2 mt-0.5 min-w-0 [&_p]:inline">
+                          <div className="text-[9px] text-muted-foreground line-clamp-2 mt-0.5 min-w-0 [&_p]:inline">
                             <InlineMarkdown content={m.description} />
                           </div>
                         )}
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           {m.confidence != null && (
-                            <span className="text-[8px] font-mono text-primary">conf: {Math.round(m.confidence * 100)}%</span>
+                            <span className="text-[8px] text-primary">conf: {Math.round(m.confidence * 100)}%</span>
                           )}
                           {m.estimated_value && (
-                            <span className="text-[8px] font-mono text-accent">{m.estimated_value}</span>
+                            <span className="text-[8px] text-accent">{m.estimated_value}</span>
                           )}
-                          <span className="text-[8px] font-mono text-muted-foreground">{m.match_type}</span>
+                          <span className="text-[8px] text-muted-foreground">{m.match_type}</span>
                         </div>
                       </div>
                     ))}
@@ -365,15 +365,15 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
 
           {/* AI deep-dive report */}
           <div>
-            <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Zap className="w-3 h-3 text-primary" />
               AI regional briefing (structured)
             </h3>
             {reportLoading ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 rounded-lg border border-dashed border-primary/20 bg-primary/5">
                 <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                <p className="text-[10px] font-mono text-muted-foreground">Generating {region.name} command brief…</p>
-                <p className="text-[8px] font-mono text-muted-foreground/50 text-center max-w-md">
+                <p className="text-[10px] text-muted-foreground">Generating {region.name} command brief…</p>
+                <p className="text-[8px] text-muted-foreground/50 text-center max-w-md">
                   Weaving corridors, disruptions, and industry signals into a single structured report
                 </p>
               </div>
@@ -382,7 +382,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
                 <BlockRenderer segments={reportSegments} />
               </div>
             ) : (
-              <p className="text-[10px] font-mono text-muted-foreground text-center py-8 rounded-lg border border-border/30 bg-muted/5">
+              <p className="text-[10px] text-muted-foreground text-center py-8 rounded-lg border border-border/30 bg-muted/5">
                 No AI briefing yet — run more intel jobs or try again shortly.
               </p>
             )}

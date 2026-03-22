@@ -207,7 +207,7 @@ export function WorldMap() {
         style={{ background: "hsl(220 20% 4%)" }}
       >
         {hoveredRegion && (
-          <div className="pointer-events-none absolute bottom-2 left-2 z-[500] px-2 py-1 rounded bg-background/80 border border-primary/20 text-[9px] font-mono text-primary/90 backdrop-blur-sm">
+          <div className="pointer-events-none absolute bottom-2 left-2 z-[500] px-2 py-1 rounded bg-background/80 border border-primary/20 text-[9px] text-primary/90 backdrop-blur-sm">
             {hoveredRegion}
           </div>
         )}

@@ -39,8 +39,8 @@ export function MessageList({
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold font-mono tracking-widest text-gradient-primary">
-              INTELLIGENCE ENGINE
+            <h2 className="text-lg font-semibold tracking-tight text-primary">
+              Intelligence engine
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
               Not a chatbot — an analytical engine. Ask me to research, analyze, compare, or strategize. I produce structured intelligence with visual data blocks, scored insights, and actionable frameworks.
@@ -62,7 +62,7 @@ export function MessageList({
                     <Icon className="w-4 h-4 text-primary/60 group-hover:text-primary/90 transition-colors" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-mono font-semibold text-foreground/80 mb-1">{q.label}</p>
+                    <p className="text-xs font-semibold text-foreground/80 mb-1">{q.label}</p>
                     <p className="text-[11px] text-muted-foreground group-hover:text-foreground/70 transition-colors leading-relaxed">
                       {q.text.length > 80 ? q.text.slice(0, 80) + "…" : q.text}
                     </p>
@@ -107,7 +107,7 @@ export function MessageList({
                   {isStreaming && isLastAssistant && <span className="typing-cursor" />}
                 </div>
               ) : (
-                <span className="font-mono text-sm">{msg.content}</span>
+                <span className="text-sm">{msg.content}</span>
               )}
             </div>
             {msg.role === "user" && (

@@ -54,8 +54,8 @@ export function ArtifactsSidebar({
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary/70" />
-          <h2 className="text-xs font-mono font-semibold text-foreground tracking-wide">ARTIFACTS</h2>
-          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary/70 border border-primary/15">
+          <h2 className="text-xs font-semibold text-foreground tracking-wide">ARTIFACTS</h2>
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary/70 border border-primary/15">
             {artifacts.length}
           </span>
         </div>
@@ -70,7 +70,7 @@ export function ArtifactsSidebar({
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {artifacts.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-xs text-muted-foreground font-mono">
+            <p className="text-xs text-muted-foreground">
               No artifacts yet. Start a query to generate structured intelligence.
             </p>
           </div>
@@ -84,7 +84,7 @@ export function ArtifactsSidebar({
               >
                 <div className="flex items-center gap-2">
                   <Icon className="w-3.5 h-3.5 text-primary/60" />
-                  <span className="text-[10px] font-mono text-primary/70 uppercase tracking-wider">
+                  <span className="text-[10px] text-primary/70 uppercase tracking-wider">
                     {blockLabel[a.block.type]}
                   </span>
                 </div>

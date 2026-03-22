@@ -24,7 +24,7 @@ export function InsightsBlockView({ data }: { data: InsightsBlock["data"] }) {
     <div className="my-4">
       <div className="flex items-center gap-2 mb-3">
         <Lightbulb className="w-4 h-4 text-primary/70" />
-        <h3 className="text-xs font-mono font-semibold text-foreground tracking-wide">{data.title}</h3>
+        <h3 className="text-xs font-semibold text-foreground tracking-wide">{data.title}</h3>
       </div>
       <div className="space-y-2">
         {sorted.map((item, i) => (
@@ -32,14 +32,14 @@ export function InsightsBlockView({ data }: { data: InsightsBlock["data"] }) {
             key={i}
             className="glass-panel flex items-start gap-3 p-3.5 hover:glow-border transition-all duration-300"
           >
-            <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 font-mono text-sm font-bold ${scoreColor(item.score)}`}>
+            <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 text-sm font-bold ${scoreColor(item.score)}`}>
               {item.score}
             </div>
             <div className="flex-1 min-w-0 space-y-1.5">
               <div className="text-xs text-card-foreground leading-relaxed">
                 <InlineMarkdown content={item.text} />
               </div>
-              <span className={`inline-block text-[9px] font-mono px-2 py-0.5 rounded-full border tracking-wider uppercase ${tagColor(item.tag)}`}>
+              <span className={`inline-block text-[9px] px-2 py-0.5 rounded-full border tracking-wider uppercase ${tagColor(item.tag)}`}>
                 {item.tag}
               </span>
             </div>

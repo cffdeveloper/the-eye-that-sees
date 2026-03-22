@@ -18,27 +18,27 @@ export function Sidebar({ open }: { open: boolean }) {
   ];
 
   return (
-    <aside className="w-52 shrink-0 border-r border-border/50 bg-sidebar overflow-y-auto">
-      <div className="p-1.5 space-y-0.5">
+    <aside className="w-56 shrink-0 border-r border-border/60 bg-sidebar overflow-y-auto">
+      <div className="p-2 space-y-1">
         {navItems.map((item) => (
           <Link
             key={item.to}
             to={item.to}
             className={cn(
-              "flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors",
+              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors border-l-2",
               location.pathname === item.to
-                ? "bg-primary/10 text-primary font-semibold"
-                : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent"
+                ? "border-primary bg-primary/5 text-foreground font-medium"
+                : "border-transparent text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent"
             )}
           >
-            <item.icon className="w-3 h-3" />
+            <item.icon className={cn("w-4 h-4 shrink-0", location.pathname === item.to ? "text-primary" : "text-muted-foreground")} />
             {item.label}
           </Link>
         ))}
       </div>
 
-      <div className="px-2 py-1">
-        <p className="terminal-header text-[8px] px-2 mb-0.5">INDUSTRIES</p>
+      <div className="px-3 py-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1">Industries</p>
       </div>
 
       <div className="px-1.5 space-y-0.5 pb-4">
@@ -51,10 +51,10 @@ export function Sidebar({ open }: { open: boolean }) {
               <button
                 onClick={() => setExpanded(isExpanded && !isActive ? null : ind.slug)}
                 className={cn(
-                  "w-full flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors text-left",
+                  "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors text-left",
                   isActive
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent"
+                    ? "bg-brand-orange/10 text-foreground font-medium border-l-2 border-brand-orange -ml-px pl-[7px]"
+                    : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent border-l-2 border-transparent"
                 )}
               >
                 <span className="text-sm">{ind.icon}</span>
@@ -67,9 +67,9 @@ export function Sidebar({ open }: { open: boolean }) {
                   <Link
                     to={`/industry/${ind.slug}`}
                     className={cn(
-                      "block px-1.5 py-0.5 rounded text-[10px] transition-colors",
+                      "block px-2 py-1 rounded-md text-xs transition-colors",
                       location.pathname === `/industry/${ind.slug}`
-                        ? "text-primary bg-primary/5"
+                        ? "text-primary bg-primary/8 font-medium"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -80,9 +80,9 @@ export function Sidebar({ open }: { open: boolean }) {
                       key={sf.id}
                       to={`/industry/${ind.slug}/${sf.id}`}
                       className={cn(
-                        "block px-1.5 py-0.5 rounded text-[10px] transition-colors truncate",
+                        "block px-2 py-1 rounded-md text-[11px] transition-colors truncate",
                         location.pathname === `/industry/${ind.slug}/${sf.id}`
-                          ? "text-primary bg-primary/5"
+                          ? "text-brand-orange font-medium bg-brand-orange/10"
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >

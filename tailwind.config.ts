@@ -52,6 +52,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        brand: {
+          orange: "hsl(var(--brand-orange) / <alpha-value>)",
+        },
         signal: {
           amber: "hsl(var(--signal-amber) / <alpha-value>)",
           emerald: "hsl(var(--signal-emerald) / <alpha-value>)",
@@ -99,6 +102,28 @@ export default {
           "0%": { backgroundPosition: "-200% center" },
           "100%": { backgroundPosition: "200% center" },
         },
+        "hero-rise": {
+          from: { opacity: "0", transform: "translateY(14px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "hero-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "ai-shimmer-sweep": {
+          "0%": { transform: "translateX(-120%)", opacity: "0" },
+          "20%": { opacity: "0.4" },
+          "80%": { opacity: "0.4" },
+          "100%": { transform: "translateX(120%)", opacity: "0" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -107,6 +132,11 @@ export default {
         "pulse-glow": "pulse-glow 3s ease-in-out infinite",
         "float": "float 4s ease-in-out infinite",
         "shimmer": "shimmer 3s ease-in-out infinite",
+        "hero-rise": "hero-rise 0.7s ease-out forwards",
+        "hero-float": "hero-float 9s ease-in-out infinite",
+        "ai-shimmer-sweep": "ai-shimmer-sweep 3.5s ease-in-out infinite",
+        marquee: "marquee 45s linear infinite",
+        "spin-slow": "spin-slow 28s linear infinite",
       },
     },
   },

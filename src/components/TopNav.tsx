@@ -12,8 +12,8 @@ export function TopNav({ onClear, hasMessages }: { onClear: () => void; hasMessa
             <h1 className="text-xl sm:text-2xl md:text-[1.7rem] leading-tight">
               <BrandWordmark />
             </h1>
-            <span className="text-[9px] font-mono text-muted-foreground">Maverick AI</span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-signal-violet/10 text-signal-violet border border-signal-violet/25 tracking-wider">
+            <span className="text-[11px] font-medium text-muted-foreground">Maverick AI</span>
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-brand-orange/10 text-brand-orange border border-brand-orange/25">
               v1.0
             </span>
           </div>
@@ -24,18 +24,18 @@ export function TopNav({ onClear, hasMessages }: { onClear: () => void; hasMessa
         {hasMessages && (
           <button
             onClick={onClear}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all border border-transparent hover:border-border/50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all border border-transparent hover:border-border/50"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">New Session</span>
+            <span className="hidden sm:inline">New session</span>
           </button>
         )}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border" style={{
-          background: "hsl(155 70% 45% / 0.08)",
-          borderColor: "hsl(155 70% 45% / 0.2)"
-        }}>
-          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(155 70% 45%)" }} />
-          <span className="text-[10px] font-mono font-semibold tracking-wide" style={{ color: "hsl(155 70% 55%)" }}>ACTIVE</span>
+        <div
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-primary/10"
+          style={{ borderColor: "hsl(var(--primary) / 0.22)" }}
+        >
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-primary" />
+          <span className="text-[10px] font-semibold tracking-wide text-primary">Live</span>
         </div>
       </div>
     </header>

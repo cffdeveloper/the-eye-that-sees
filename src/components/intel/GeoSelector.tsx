@@ -46,7 +46,7 @@ export function GeoSelector() {
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-md border text-xs font-mono transition-all",
+          "flex items-center gap-2 px-3 py-1.5 rounded-md border text-xs transition-all",
           selections.length > 0
             ? "border-primary/50 bg-primary/10 text-primary"
             : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground hover:border-border"
@@ -61,7 +61,7 @@ export function GeoSelector() {
       {selections.length > 0 && !open && (
         <div className="absolute top-full left-0 mt-1 flex flex-wrap gap-1 z-50">
           {selections.slice(0, 5).map(s => (
-            <span key={s.value} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-mono border border-primary/20">
+            <span key={s.value} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] border border-primary/20">
               {s.label}
               <button onClick={(e) => { e.stopPropagation(); removeSelection(s.value); }} className="hover:text-destructive">
                 <X className="w-2.5 h-2.5" />
@@ -69,7 +69,7 @@ export function GeoSelector() {
             </span>
           ))}
           {selections.length > 5 && (
-            <span className="text-[9px] font-mono text-muted-foreground px-1">+{selections.length - 5} more</span>
+            <span className="text-[9px] text-muted-foreground px-1">+{selections.length - 5} more</span>
           )}
         </div>
       )}
@@ -86,7 +86,7 @@ export function GeoSelector() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search locations..."
-                className="flex-1 text-xs font-mono bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
+                className="flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
                 autoFocus
               />
             </div>
@@ -99,7 +99,7 @@ export function GeoSelector() {
                 key={t}
                 onClick={() => setTab(t)}
                 className={cn(
-                  "flex-1 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors",
+                  "flex-1 py-1.5 text-[10px] uppercase tracking-wider transition-colors",
                   tab === t ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -115,7 +115,7 @@ export function GeoSelector() {
                 key={opt.value}
                 onClick={() => toggle(opt)}
                 className={cn(
-                  "w-full flex items-center gap-2 px-2.5 py-2 rounded text-xs font-mono text-left transition-colors",
+                  "w-full flex items-center gap-2 px-2.5 py-2 rounded text-xs text-left transition-colors",
                   selectedValues.has(opt.value) ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/30"
                 )}
               >
@@ -134,7 +134,7 @@ export function GeoSelector() {
               }
               return Object.entries(grouped).map(([continent, countries]) => (
                 <div key={continent}>
-                  <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider px-2.5 py-1 mt-1">
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-wider px-2.5 py-1 mt-1">
                     {CONTINENTS.find(c => c.value === continent)?.label || continent}
                   </p>
                   {countries.map(opt => (
@@ -142,7 +142,7 @@ export function GeoSelector() {
                       key={opt.value}
                       onClick={() => toggle(opt)}
                       className={cn(
-                        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-mono text-left transition-colors",
+                        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs text-left transition-colors",
                         selectedValues.has(opt.value) ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/30"
                       )}
                     >
@@ -160,7 +160,7 @@ export function GeoSelector() {
                 key={opt.value}
                 onClick={() => toggle(opt)}
                 className={cn(
-                  "w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-mono text-left transition-colors",
+                  "w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-xs text-left transition-colors",
                   selectedValues.has(opt.value) ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/30"
                 )}
               >
@@ -173,14 +173,14 @@ export function GeoSelector() {
 
           {/* Footer */}
           <div className="p-2 border-t border-border/50 flex items-center justify-between">
-            <span className="text-[9px] font-mono text-muted-foreground">{selections.length} selected</span>
+            <span className="text-[9px] text-muted-foreground">{selections.length} selected</span>
             <div className="flex gap-2">
               {selections.length > 0 && (
-                <button onClick={clearSelections} className="text-[9px] font-mono text-destructive hover:underline">
+                <button onClick={clearSelections} className="text-[9px] text-destructive hover:underline">
                   Clear all
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="text-[9px] font-mono text-primary hover:underline">
+              <button onClick={() => setOpen(false)} className="text-[9px] text-primary hover:underline">
                 Done
               </button>
             </div>

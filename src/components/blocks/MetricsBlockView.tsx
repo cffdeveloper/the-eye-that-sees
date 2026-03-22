@@ -29,14 +29,14 @@ export function MetricsBlockView({ data }: { data: MetricItem[] }) {
             key={i}
             className="glass-panel p-3.5 space-y-2 hover:glow-border transition-all duration-300"
           >
-            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
               {m.label}
             </p>
-            <p className="text-xl font-bold font-mono text-foreground tracking-tight">
+            <p className="text-xl font-bold text-foreground tracking-tight">
               {m.value}
             </p>
             {m.delta && (
-              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono ${trendBg[m.trend]} ${trendColor[m.trend]}`}>
+              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] ${trendBg[m.trend]} ${trendColor[m.trend]}`}>
                 <Icon className="w-3 h-3" />
                 {m.delta}
               </div>

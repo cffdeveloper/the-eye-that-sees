@@ -15,11 +15,11 @@ export default function IntelDashboard() {
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Radio className="w-3.5 h-3.5 text-primary" />
-          <span className="terminal-header text-[10px]">LIVE MARKET FEED</span>
-          <span className="text-[9px] text-muted-foreground">11+ sources · auto-refresh 60s</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+        <div className="flex items-center gap-2 flex-wrap">
+          <Radio className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Live market feed</span>
+          <span className="text-xs text-muted-foreground">11+ sources · refresh 60s</span>
+          <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
         </div>
         <div className="flex items-center gap-2">
           {feed?.sources_status && <SourcesStatus status={feed.sources_status} timestamp={feed.timestamp} />}

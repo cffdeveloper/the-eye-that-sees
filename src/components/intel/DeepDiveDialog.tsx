@@ -71,12 +71,12 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
       >
         <div className="shrink-0 px-6 pt-6 pb-3 pr-14">
           <DialogHeader>
-            <DialogTitle className="text-sm font-mono font-bold text-foreground flex items-center gap-2">
+            <DialogTitle className="text-sm font-bold text-foreground flex items-center gap-2">
               <Search className="w-4 h-4 text-primary" />
               DEEP DIVE: {topic}
             </DialogTitle>
             {industryName && (
-              <p className="text-[10px] font-mono text-muted-foreground">
+              <p className="text-[10px] text-muted-foreground">
                 {industryName}{subFlowName ? ` → ${subFlowName}` : ""} • Full structured intelligence report
               </p>
             )}
@@ -87,17 +87,17 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-xs font-mono text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Generating comprehensive intelligence report...
               </p>
-              <p className="text-[9px] font-mono text-muted-foreground/50">
+              <p className="text-[9px] text-muted-foreground/50">
                 Pulling data from all related industries, cross-referencing gaps and trends
               </p>
             </div>
           ) : segments.length > 0 ? (
             <BlockRenderer segments={segments} />
           ) : (
-            <p className="text-xs font-mono text-muted-foreground text-center py-10">
+            <p className="text-xs text-muted-foreground text-center py-10">
               No content available.
             </p>
           )}

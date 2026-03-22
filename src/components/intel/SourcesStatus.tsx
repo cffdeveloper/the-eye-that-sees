@@ -10,7 +10,7 @@ export function SourcesStatus({ status, timestamp }: { status: Record<string, bo
     <div className="flex items-center gap-3 flex-wrap">
       <div className="flex items-center gap-1.5">
         <div className={`w-1.5 h-1.5 rounded-full ${active === total ? "bg-emerald-400" : "bg-accent"} animate-pulse`} />
-        <span className="text-[10px] font-mono text-muted-foreground">
+        <span className="text-[10px] text-muted-foreground">
           {active}/{total} sources active
         </span>
       </div>
@@ -18,7 +18,7 @@ export function SourcesStatus({ status, timestamp }: { status: Record<string, bo
         {Object.entries(status).map(([key, ok]) => (
           <span
             key={key}
-            className={`inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+            className={`inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded border ${
               ok
                 ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
                 : "text-destructive bg-destructive/10 border-destructive/20"
@@ -29,7 +29,7 @@ export function SourcesStatus({ status, timestamp }: { status: Record<string, bo
           </span>
         ))}
       </div>
-      <span className="text-[10px] font-mono text-muted-foreground ml-auto">
+      <span className="text-[10px] text-muted-foreground ml-auto">
         Last scan: {time.toLocaleTimeString()}
       </span>
     </div>

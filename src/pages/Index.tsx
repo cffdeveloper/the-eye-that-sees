@@ -20,11 +20,8 @@ const MaverickDashboard = () => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: [
-            "radial-gradient(ellipse 80% 40% at 50% 0%, hsl(185 90% 48% / 0.07) 0%, transparent 60%)",
-            "radial-gradient(ellipse 55% 45% at 100% 0%, hsl(265 82% 62% / 0.05) 0%, transparent 55%)",
-            "radial-gradient(ellipse 50% 40% at 0% 100%, hsl(155 62% 48% / 0.045) 0%, transparent 58%)",
-          ].join(", "),
+          background:
+            "radial-gradient(ellipse 90% 50% at 50% 0%, hsl(var(--primary) / 0.06) 0%, transparent 58%)",
         }}
       />
 
@@ -36,8 +33,8 @@ const MaverickDashboard = () => {
               <h1 className="text-xl sm:text-2xl md:text-[1.85rem] leading-tight">
                 <BrandWordmark />
               </h1>
-              <p className="text-[9px] font-mono text-muted-foreground mt-0.5">Maverick AI</p>
-              <p className="text-[10px] font-mono uppercase tracking-widest mt-0.5">
+              <p className="text-[9px] text-muted-foreground mt-0.5">Maverick AI</p>
+              <p className="text-[10px] uppercase tracking-widest mt-0.5">
                 <span className="text-primary/90">Money flow</span>
                 <span className="text-muted-foreground/55"> • </span>
                 <span className="text-signal-emerald/90">Gaps</span>
@@ -66,7 +63,7 @@ const MaverickDashboard = () => {
               <div className="text-center space-y-3">
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
                 <div>
-                  <p className="text-xs font-mono text-foreground">Scanning market data sources...</p>
+                  <p className="text-xs text-foreground">Scanning market data sources...</p>
                   <p className="text-[10px] text-muted-foreground mt-1">Aggregating crypto, forex, commodities, VC signals</p>
                 </div>
               </div>
@@ -74,8 +71,8 @@ const MaverickDashboard = () => {
           ) : error && !feed ? (
             <div className="flex-1 flex items-center justify-center h-full">
               <div className="text-center space-y-2">
-                <p className="text-xs font-mono text-destructive">Feed error: {error}</p>
-                <button onClick={refresh} className="text-xs text-primary hover:underline font-mono">Retry</button>
+                <p className="text-xs text-destructive">Feed error: {error}</p>
+                <button onClick={refresh} className="text-xs font-medium text-primary hover:underline">Retry</button>
               </div>
             </div>
           ) : feed ? (
@@ -107,11 +104,11 @@ const MaverickDashboard = () => {
         </div>
 
         <footer className="flex items-center justify-between px-4 py-1.5 border-t border-border/50 bg-card/50">
-          <span className="text-[9px] font-mono text-muted-foreground">
+          <span className="text-[9px] text-muted-foreground">
             Auto-refresh: 60s • Market data • Gap detection • Money flow analysis
           </span>
           {lastRefresh && (
-            <span className="text-[9px] font-mono text-muted-foreground">
+            <span className="text-[9px] text-muted-foreground">
               {lastRefresh.toLocaleTimeString()}
             </span>
           )}

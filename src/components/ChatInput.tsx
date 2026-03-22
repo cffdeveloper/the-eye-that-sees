@@ -56,7 +56,7 @@ export function ChatInput({
           onKeyDown={handleKeyDown}
           placeholder="Ask Maverick anything..."
           rows={1}
-          className="flex-1 bg-transparent resize-none text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none py-2 px-3 font-mono leading-relaxed"
+          className="flex-1 bg-transparent resize-none text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none py-2 px-3 leading-relaxed"
           style={{ minHeight: "2.5rem" }}
           disabled={isStreaming}
           autoFocus
@@ -83,10 +83,10 @@ export function ChatInput({
         </button>
       </div>
       <div className="flex items-center justify-between mt-1.5 px-1">
-        <p className="text-[10px] font-mono text-muted-foreground/30">
+        <p className="text-[10px] text-muted-foreground/30">
           Press Enter to send · Shift+Enter for new line
         </p>
-        <p className="text-[10px] font-mono text-muted-foreground/30">
+        <p className="text-[10px] text-muted-foreground/30">
           AI-generated · Verify important information
         </p>
       </div>

@@ -19,7 +19,7 @@ function ChangeCell({ value }: { value: number | null }) {
   const isUp = value > 0;
   const Icon = value > 0 ? TrendingUp : value < 0 ? TrendingDown : Minus;
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[11px] font-mono ${isUp ? "text-emerald-400" : value < 0 ? "text-destructive" : "text-muted-foreground"}`}>
+    <span className={`inline-flex items-center gap-0.5 text-[11px] ${isUp ? "text-emerald-400" : value < 0 ? "text-destructive" : "text-muted-foreground"}`}>
       <Icon className="w-3 h-3" />
       {Math.abs(value).toFixed(1)}%
     </span>
@@ -34,13 +34,13 @@ export function CryptoPanel({ data }: { data: CryptoAsset[] }) {
   return (
     <div className="glass-panel p-3 space-y-2 h-full overflow-hidden flex flex-col">
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Crypto Markets</h3>
-        <span className="text-[10px] font-mono text-primary">{formatMcap(totalMcap)} total</span>
+        <h3 className="text-[10px] uppercase tracking-widest text-muted-foreground">Crypto Markets</h3>
+        <span className="text-[10px] text-primary">{formatMcap(totalMcap)} total</span>
       </div>
       <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
         {data.slice(0, 15).map((c) => (
           <div key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/30 transition-colors group">
-            <span className="text-[9px] font-mono text-muted-foreground w-4">{c.rank}</span>
+            <span className="text-[9px] text-muted-foreground w-4">{c.rank}</span>
             {c.image && <img src={c.image} alt={c.symbol} className="w-4 h-4 rounded-full" />}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
@@ -49,7 +49,7 @@ export function CryptoPanel({ data }: { data: CryptoAsset[] }) {
               </div>
             </div>
             <div className="text-right space-y-0.5">
-              <div className="text-xs font-mono text-foreground">{formatPrice(c.price)}</div>
+              <div className="text-xs text-foreground">{formatPrice(c.price)}</div>
               <div className="flex gap-2 justify-end">
                 <ChangeCell value={c.change_1h} />
                 <ChangeCell value={c.change_24h} />
@@ -65,7 +65,7 @@ export function CryptoPanel({ data }: { data: CryptoAsset[] }) {
 function PanelEmpty({ label }: { label: string }) {
   return (
     <div className="glass-panel p-4 flex items-center justify-center">
-      <span className="text-xs text-muted-foreground font-mono">{label} — awaiting data</span>
+      <span className="text-xs text-muted-foreground">{label} — awaiting data</span>
     </div>
   );
 }

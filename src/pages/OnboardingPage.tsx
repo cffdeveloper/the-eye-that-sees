@@ -118,10 +118,10 @@ export default function OnboardingPage() {
       <div className="relative z-10 w-full max-w-2xl">
         <div className="flex flex-col items-center mb-6">
           <BrandHexMark size="lg" />
-          <h1 className="text-lg font-mono font-bold text-foreground mt-3">
+          <h1 className="text-lg font-bold text-foreground mt-3">
             <BrandWordmark />
           </h1>
-          <p className="text-[10px] font-mono text-muted-foreground mt-1">
+          <p className="text-[10px] text-muted-foreground mt-1">
             Let's personalize your intelligence experience
           </p>
         </div>
@@ -144,24 +144,24 @@ export default function OnboardingPage() {
           {step === 0 && (
             <div className="space-y-4 flex-1">
               <div className="text-center mb-4">
-                <h2 className="text-sm font-mono font-bold text-foreground">About You</h2>
-                <p className="text-[10px] font-mono text-muted-foreground">Tell us a bit about yourself</p>
+                <h2 className="text-sm font-bold text-foreground">About You</h2>
+                <p className="text-[10px] text-muted-foreground">Tell us a bit about yourself</p>
               </div>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-mono text-muted-foreground uppercase">Display Name *</Label>
-                  <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="How should we address you?" className="h-9 text-xs font-mono" />
+                  <Label className="text-[10px] text-muted-foreground uppercase">Display Name *</Label>
+                  <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="How should we address you?" className="h-9 text-xs" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-mono text-muted-foreground uppercase">Organization</Label>
-                  <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="Company or institution" className="h-9 text-xs font-mono" />
+                  <Label className="text-[10px] text-muted-foreground uppercase">Organization</Label>
+                  <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="Company or institution" className="h-9 text-xs" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-mono text-muted-foreground uppercase">Title / Position</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Head of Strategy" className="h-9 text-xs font-mono" />
+                  <Label className="text-[10px] text-muted-foreground uppercase">Title / Position</Label>
+                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Head of Strategy" className="h-9 text-xs" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-mono text-muted-foreground uppercase">Experience Level</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase">Experience Level</Label>
                   <div className="grid grid-cols-2 gap-1.5">
                     {EXPERIENCE.map((exp) => (
                       <button
@@ -169,7 +169,7 @@ export default function OnboardingPage() {
                         type="button"
                         onClick={() => setExperienceLevel(exp.value)}
                         className={cn(
-                          "p-2 rounded-md border text-left transition-all text-[10px] font-mono",
+                          "p-2 rounded-md border text-left transition-all text-[10px]",
                           experienceLevel === exp.value
                             ? "border-primary bg-primary/10 text-foreground"
                             : "border-border/40 bg-muted/10 text-muted-foreground hover:border-border"
@@ -182,8 +182,8 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-mono text-muted-foreground uppercase">Bio (optional)</Label>
-                <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Brief description of what you do and what intelligence you need..." className="min-h-[60px] text-xs font-mono" />
+                <Label className="text-[10px] text-muted-foreground uppercase">Bio (optional)</Label>
+                <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Brief description of what you do and what intelligence you need..." className="min-h-[60px] text-xs" />
               </div>
             </div>
           )}
@@ -192,8 +192,8 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-4 flex-1">
               <div className="text-center mb-4">
-                <h2 className="text-sm font-mono font-bold text-foreground">Your Role</h2>
-                <p className="text-[10px] font-mono text-muted-foreground">This helps us tailor intelligence depth and format</p>
+                <h2 className="text-sm font-bold text-foreground">Your Role</h2>
+                <p className="text-[10px] text-muted-foreground">This helps us tailor intelligence depth and format</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {ROLES.map((r) => (
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
                     )}
                   >
                     <span className="text-lg">{r.icon}</span>
-                    <p className="text-[10px] font-mono font-bold text-foreground mt-1">{r.label}</p>
+                    <p className="text-[10px] font-bold text-foreground mt-1">{r.label}</p>
                   </button>
                 ))}
               </div>
@@ -220,8 +220,8 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-4 flex-1">
               <div className="text-center mb-4">
-                <h2 className="text-sm font-mono font-bold text-foreground">Your Goals</h2>
-                <p className="text-[10px] font-mono text-muted-foreground">Select all that apply — we'll prioritize intel accordingly</p>
+                <h2 className="text-sm font-bold text-foreground">Your Goals</h2>
+                <p className="text-[10px] text-muted-foreground">Select all that apply — we'll prioritize intel accordingly</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {GOALS.map((g) => (
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                     )}
                   >
                     <span className="text-lg">{g.icon}</span>
-                    <span className="text-[10px] font-mono font-bold text-foreground">{g.label}</span>
+                    <span className="text-[10px] font-bold text-foreground">{g.label}</span>
                     {selectedGoals.includes(g.value) && <Check className="w-3 h-3 text-primary ml-auto" />}
                   </button>
                 ))}
@@ -249,8 +249,8 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-4 flex-1">
               <div className="text-center mb-4">
-                <h2 className="text-sm font-mono font-bold text-foreground">Industries of Interest</h2>
-                <p className="text-[10px] font-mono text-muted-foreground">Select industries you want to track — you can change these later</p>
+                <h2 className="text-sm font-bold text-foreground">Industries of Interest</h2>
+                <p className="text-[10px] text-muted-foreground">Select industries you want to track — you can change these later</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 max-h-[340px] overflow-y-auto pr-1">
                 {industries.map((ind) => (
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
                     )}
                   >
                     <span>{ind.icon}</span>
-                    <span className="text-[9px] font-mono font-bold text-foreground flex-1 truncate">{ind.name}</span>
+                    <span className="text-[9px] font-bold text-foreground flex-1 truncate">{ind.name}</span>
                     {selectedIndustries.includes(ind.slug) && <Check className="w-3 h-3 text-primary shrink-0" />}
                   </button>
                 ))}
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={() => setSelectedIndustries(industries.map((i) => i.slug))}
-                className="text-[9px] font-mono text-primary hover:underline"
+                className="text-[9px] text-primary hover:underline"
               >
                 Select all industries
               </button>
@@ -285,8 +285,8 @@ export default function OnboardingPage() {
           {step === 4 && (
             <div className="space-y-4 flex-1">
               <div className="text-center mb-4">
-                <h2 className="text-sm font-mono font-bold text-foreground">Priority Regions</h2>
-                <p className="text-[10px] font-mono text-muted-foreground">Optional — select regions to prioritize in your intel feed</p>
+                <h2 className="text-sm font-bold text-foreground">Priority Regions</h2>
+                <p className="text-[10px] text-muted-foreground">Optional — select regions to prioritize in your intel feed</p>
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 gap-1.5 max-h-[300px] overflow-y-auto pr-1">
                 {regions.map((r) => (
@@ -301,7 +301,7 @@ export default function OnboardingPage() {
                         : "border-border/40 bg-muted/10 hover:border-border"
                     )}
                   >
-                    <span className="text-[9px] font-mono font-bold text-foreground truncate block">{r.label}</span>
+                    <span className="text-[9px] font-bold text-foreground truncate block">{r.label}</span>
                     {selectedRegions.includes(r.value) && <Check className="w-3 h-3 text-primary mt-0.5" />}
                   </button>
                 ))}
@@ -316,12 +316,12 @@ export default function OnboardingPage() {
               size="sm"
               onClick={() => setStep((s) => s - 1)}
               disabled={step === 0}
-              className="text-[10px] font-mono gap-1"
+              className="text-[10px] gap-1"
             >
               <ArrowLeft className="w-3 h-3" /> Back
             </Button>
 
-            <span className="text-[9px] font-mono text-muted-foreground">
+            <span className="text-[9px] text-muted-foreground">
               {step + 1} / {totalSteps}
             </span>
 
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                 size="sm"
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canAdvance()}
-                className="text-[10px] font-mono gap-1"
+                className="text-[10px] gap-1"
               >
                 Next <ArrowRight className="w-3 h-3" />
               </Button>
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
                 size="sm"
                 onClick={handleFinish}
                 disabled={saving}
-                className="text-[10px] font-mono gap-1 bg-primary"
+                className="text-[10px] gap-1 bg-primary"
               >
                 {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                 Launch Intel GoldMine

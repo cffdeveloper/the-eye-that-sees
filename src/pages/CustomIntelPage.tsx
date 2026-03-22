@@ -218,7 +218,7 @@ Answer the user's follow-up with the same structured block style when analytical
     return (
       <div
         key={key}
-        className="flex items-center gap-1.5 flex-wrap px-2.5 py-1.5 rounded-md border border-border/40 bg-muted/20 text-[10px] font-mono"
+        className="flex items-center gap-1.5 flex-wrap px-2.5 py-1.5 rounded-md border border-border/40 bg-muted/20 text-[10px] font-medium"
       >
         <span className="text-muted-foreground truncate max-w-[140px]">{p.industryName}</span>
         <span className="text-foreground font-bold">{p.subFlow.shortName}</span>
@@ -272,11 +272,11 @@ Answer the user's follow-up with the same structured block style when analytical
               <Layers className="w-5 h-5 text-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg font-mono font-bold text-foreground tracking-tight">Custom Intel Lab</h1>
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mt-1">
+              <h1 className="text-lg font-bold text-foreground tracking-tight">Custom Intel Lab</h1>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
                 Scoped brief · primary vs secondary lanes · structured output
               </p>
-              <p className="text-xs font-mono text-muted-foreground mt-2 leading-relaxed max-w-3xl">
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
                 Pool sub-flows, promote to <span className="text-primary font-semibold">Primary</span>, route context to{" "}
                 <span className="text-accent font-semibold">Secondary</span>, then generate a brief and follow-ups from Maverick — same card
                 pipeline as Deep Dive.
@@ -284,8 +284,8 @@ Answer the user's follow-up with the same structured block style when analytical
             </div>
           </div>
           <div className="rounded-md border border-border/50 bg-muted/20 px-3 py-2 shrink-0">
-            <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">Region</p>
-            <p className="text-[11px] font-mono font-bold text-foreground">{isGlobal ? "Global" : geoString}</p>
+            <p className="text-[8px] text-muted-foreground uppercase tracking-wider">Region</p>
+            <p className="text-[11px] font-bold text-foreground">{isGlobal ? "Global" : geoString}</p>
           </div>
         </div>
       </div>
@@ -295,20 +295,20 @@ Answer the user's follow-up with the same structured block style when analytical
         <div className="grid lg:grid-cols-12 gap-4">
           <div className="lg:col-span-5 space-y-3">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-xs font-mono font-bold text-foreground flex items-center gap-1.5">
+              <h2 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <span className="text-[10px] text-primary">01</span> Build pool
               </h2>
-              <span className="text-[9px] font-mono text-muted-foreground">{pool.size} in pool</span>
+              <span className="text-[9px] text-muted-foreground">{pool.size} in pool</span>
             </div>
             <div className="space-y-2">
-              <Label className="text-[9px] font-mono text-muted-foreground uppercase tracking-wide">Industry</Label>
+              <Label className="text-[9px] text-muted-foreground uppercase tracking-wide">Industry</Label>
               <Select value={industrySlug} onValueChange={setIndustrySlug}>
-                <SelectTrigger className="h-9 text-xs font-mono bg-background/80 border-border/60">
+                <SelectTrigger className="h-9 text-xs bg-background/80 border-border/60">
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
                 <SelectContent>
                   {industries.map((ind) => (
-                    <SelectItem key={ind.slug} value={ind.slug} className="text-xs font-mono">
+                    <SelectItem key={ind.slug} value={ind.slug} className="text-xs">
                       {ind.icon} {ind.name}
                     </SelectItem>
                   ))}
@@ -316,7 +316,7 @@ Answer the user's follow-up with the same structured block style when analytical
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[9px] font-mono text-muted-foreground uppercase tracking-wide">Money flow</Label>
+              <Label className="text-[9px] text-muted-foreground uppercase tracking-wide">Money flow</Label>
               <Select
                 key={`${industrySlug}-${subOptions.length}`}
                 value={moneyFlowPick || undefined}
@@ -327,7 +327,7 @@ Answer the user's follow-up with the same structured block style when analytical
                   }
                 }}
               >
-                <SelectTrigger className="h-9 text-xs font-mono bg-background/80 border-border/60">
+                <SelectTrigger className="h-9 text-xs bg-background/80 border-border/60">
                   <SelectValue placeholder="Choose money flow…" />
                 </SelectTrigger>
                 <SelectContent>
@@ -335,7 +335,7 @@ Answer the user's follow-up with the same structured block style when analytical
                     <SelectItem
                       key={o.subFlow.id}
                       value={buildSubFlowKey(o.industrySlug, o.subFlow.id)}
-                      className="text-xs font-mono"
+                      className="text-xs"
                     >
                       {o.subFlow.shortName} — {o.subFlow.name}
                     </SelectItem>
@@ -344,13 +344,13 @@ Answer the user's follow-up with the same structured block style when analytical
               </Select>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button variant="outline" size="sm" className="h-8 text-[10px] font-mono" onClick={addToPool} type="button">
+              <Button variant="outline" size="sm" className="h-8 text-[10px] font-medium" onClick={addToPool} type="button">
                 Add first in industry
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
-                className="h-8 text-[10px] font-mono gap-1"
+                className="h-8 text-[10px] gap-1"
                 type="button"
                 onClick={shuffleRoles}
                 disabled={totalSelected === 0}
@@ -363,16 +363,16 @@ Answer the user's follow-up with the same structured block style when analytical
 
           <div className="lg:col-span-7 space-y-3">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-xs font-mono font-bold text-foreground flex items-center gap-1.5">
+              <h2 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <span className="text-[10px] text-primary">02</span> Text context
               </h2>
-              <span className="text-[9px] font-mono text-muted-foreground">Optional</span>
+              <span className="text-[9px] text-muted-foreground">Optional</span>
             </div>
             <Textarea
               value={freeText}
               onChange={(e) => setFreeText(e.target.value)}
               placeholder='e.g. solo dev stack, subcontractor niche, or macro scenario…'
-              className="min-h-[100px] text-xs font-mono bg-background/80 border-border/60"
+              className="min-h-[100px] text-xs bg-background/80 border-border/60"
             />
             <RadioGroup
               value={freeTextMode}
@@ -381,13 +381,13 @@ Answer the user's follow-up with the same structured block style when analytical
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="primary" id="ft-primary" className="border-border/60" />
-                <Label htmlFor="ft-primary" className="text-[10px] font-mono text-muted-foreground cursor-pointer font-normal">
+                <Label htmlFor="ft-primary" className="text-[10px] text-muted-foreground cursor-pointer font-normal">
                   Text is primary lens
                 </Label>
               </div>
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="generic" id="ft-generic" className="border-border/60" />
-                <Label htmlFor="ft-generic" className="text-[10px] font-mono text-muted-foreground cursor-pointer font-normal">
+                <Label htmlFor="ft-generic" className="text-[10px] text-muted-foreground cursor-pointer font-normal">
                   Text is generic context
                 </Label>
               </div>
@@ -396,34 +396,34 @@ Answer the user's follow-up with the same structured block style when analytical
         </div>
 
         <div className="border-t border-border/40 pt-5">
-          <h2 className="text-xs font-mono font-bold text-foreground flex items-center gap-1.5 mb-3">
+          <h2 className="text-xs font-bold text-foreground flex items-center gap-1.5 mb-3">
             <span className="text-[10px] text-primary">03</span> Role lanes
           </h2>
           <div className="grid md:grid-cols-3 gap-3">
             <div className="rounded-lg border border-border/40 bg-muted/10 p-3">
-              <p className="text-[10px] font-mono font-bold text-muted-foreground">Pool ({pool.size})</p>
-              <p className="text-[9px] font-mono text-muted-foreground/80 mb-2">Unprioritized</p>
+              <p className="text-[10px] font-bold text-muted-foreground">Pool ({pool.size})</p>
+              <p className="text-[9px] text-muted-foreground/80 mb-2">Unprioritized</p>
               <div className="flex flex-wrap gap-1.5 min-h-[48px]">
                 {[...pool].map((k) => chip(k))}
-                {pool.size === 0 && <span className="text-[10px] font-mono text-muted-foreground">—</span>}
+                {pool.size === 0 && <span className="text-[10px] text-muted-foreground">—</span>}
               </div>
             </div>
             <div className="rounded-lg border border-primary/35 bg-primary/5 p-3">
-              <p className="text-[10px] font-mono font-bold text-primary flex items-center gap-1">
+              <p className="text-[10px] font-bold text-primary flex items-center gap-1">
                 <ArrowRight className="w-3 h-3" /> Primary ({primary.size})
               </p>
-              <p className="text-[9px] font-mono text-primary/80 mb-2">Core lens</p>
+              <p className="text-[9px] text-primary/80 mb-2">Core lens</p>
               <div className="flex flex-wrap gap-1.5 min-h-[48px]">
                 {[...primary].map((k) => chip(k))}
-                {primary.size === 0 && <span className="text-[10px] font-mono text-muted-foreground">—</span>}
+                {primary.size === 0 && <span className="text-[10px] text-muted-foreground">—</span>}
               </div>
             </div>
             <div className="rounded-lg border border-accent/35 bg-accent/5 p-3">
-              <p className="text-[10px] font-mono font-bold text-accent">Secondary ({secondary.size})</p>
-              <p className="text-[9px] font-mono text-accent/80 mb-2">Supporting signals</p>
+              <p className="text-[10px] font-bold text-accent">Secondary ({secondary.size})</p>
+              <p className="text-[9px] text-accent/80 mb-2">Supporting signals</p>
               <div className="flex flex-wrap gap-1.5 min-h-[48px]">
                 {[...secondary].map((k) => chip(k))}
-                {secondary.size === 0 && <span className="text-[10px] font-mono text-muted-foreground">—</span>}
+                {secondary.size === 0 && <span className="text-[10px] text-muted-foreground">—</span>}
               </div>
             </div>
           </div>
@@ -434,22 +434,22 @@ Answer the user's follow-up with the same structured block style when analytical
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 text-[10px] font-mono"
+              className="h-8 text-[10px] font-medium"
               type="button"
               onClick={() => setScope({ pool: new Set(), primary: new Set(), secondary: new Set() })}
               disabled={totalSelected === 0}
             >
               Clear all
             </Button>
-            <span className="text-[9px] font-mono text-muted-foreground">{totalSelected} selected</span>
+            <span className="text-[9px] text-muted-foreground">{totalSelected} selected</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button className="h-9 text-xs font-mono gap-2 px-4" onClick={runIntel} disabled={loading} type="button">
+            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading} type="button">
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
               Run custom intel
             </Button>
             {report && (
-              <Button variant="outline" className="h-9 text-xs font-mono gap-1.5 px-3" type="button" onClick={runIntel} disabled={loading}>
+              <Button variant="outline" className="h-9 text-xs gap-1.5 px-3" type="button" onClick={runIntel} disabled={loading}>
                 <RefreshCw className="w-3 h-3" />
                 Refresh
               </Button>
@@ -458,15 +458,15 @@ Answer the user's follow-up with the same structured block style when analytical
         </div>
 
         {error && (
-          <p className="text-[11px] font-mono text-destructive border border-destructive/30 rounded-md px-3 py-2 bg-destructive/5">{error}</p>
+          <p className="text-[11px] text-destructive border border-destructive/30 rounded-md px-3 py-2 bg-destructive/5">{error}</p>
         )}
       </div>
 
       {loading && (
         <div className="glass-panel p-12 flex flex-col items-center gap-3 border border-border/40">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-xs font-mono font-bold text-foreground">Generating custom intelligence brief…</p>
-          <p className="text-[10px] font-mono text-muted-foreground text-center max-w-md">
+          <p className="text-xs font-bold text-foreground">Generating custom intelligence brief…</p>
+          <p className="text-[10px] text-muted-foreground text-center max-w-md">
             Cross-linking primary / secondary with your region scope.
           </p>
         </div>
@@ -474,7 +474,7 @@ Answer the user's follow-up with the same structured block style when analytical
 
       {!loading && segments.length > 0 && (
         <div className="glass-panel p-5 glow-border space-y-3">
-          <h2 className="text-xs font-mono font-bold text-primary flex items-center gap-1.5">
+          <h2 className="text-xs font-bold text-primary flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" /> BRIEF
           </h2>
           <BlockRenderer segments={segments} />
@@ -483,8 +483,8 @@ Answer the user's follow-up with the same structured block style when analytical
 
       {report && !loading && (
         <div className="glass-panel p-5 glow-border space-y-3">
-          <h2 className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-wide">Follow-up</h2>
-          <p className="text-[9px] font-mono text-muted-foreground -mt-1">Continue the session — answers use the same structured blocks when analytical.</p>
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Follow-up</h2>
+          <p className="text-[9px] text-muted-foreground -mt-1">Continue the session — answers use the same structured blocks when analytical.</p>
           <div className="space-y-2 max-h-[320px] overflow-y-auto">
             {chatMessages.map((m, i) => {
               const msgSegments = m.role === "assistant" ? parseBlocks(m.content) : null;
@@ -492,7 +492,7 @@ Answer the user's follow-up with the same structured block style when analytical
                 <div
                   key={i}
                   className={cn(
-                    "rounded-md px-3 py-2 text-[11px] font-mono leading-relaxed whitespace-pre-wrap border",
+                    "rounded-md px-3 py-2 text-[11px] leading-relaxed whitespace-pre-wrap border",
                     m.role === "user"
                       ? "bg-muted/25 border-border/40 text-foreground ml-2 md:ml-8"
                       : "bg-primary/5 border-primary/20 text-foreground mr-2 md:mr-6",
@@ -504,7 +504,7 @@ Answer the user's follow-up with the same structured block style when analytical
               );
             })}
             {chatStreaming && (
-              <div className="rounded-md px-3 py-2 text-[11px] font-mono whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
+              <div className="rounded-md px-3 py-2 text-[11px] whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
                 <span className="text-muted-foreground">Maverick · </span>
                 <BlockRenderer segments={parseBlocks(chatStreaming)} />
               </div>
@@ -515,7 +515,7 @@ Answer the user's follow-up with the same structured block style when analytical
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Deeper cut, challenge an assumption, or request another angle…"
-              className="min-h-[72px] text-xs font-mono flex-1 bg-background/80 border-border/60"
+              className="min-h-[72px] text-xs flex-1 bg-background/80 border-border/60"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -523,7 +523,7 @@ Answer the user's follow-up with the same structured block style when analytical
                 }
               }}
             />
-            <Button type="button" className="shrink-0 h-[72px] w-11 px-0 font-mono" onClick={sendFollowUp} disabled={!chatInput.trim()}>
+            <Button type="button" className="shrink-0 h-[72px] w-11 px-0 font-medium" onClick={sendFollowUp} disabled={!chatInput.trim()}>
               <Send className="w-4 h-4" />
             </Button>
           </div>

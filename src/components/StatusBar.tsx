@@ -23,8 +23,8 @@ export function StatusBar() {
           return (
             <div key={item.label} className="flex items-center gap-1.5">
               <Icon className={`w-3 h-3 ${item.accent ? "text-primary/70" : "text-muted-foreground/60"}`} />
-              <span className="text-[9px] font-mono text-muted-foreground/50 tracking-wider">{item.label}</span>
-              <span className={`text-[9px] font-mono font-medium tracking-wide ${item.accent ? "text-primary/80" : "text-muted-foreground/70"}`}>
+              <span className="text-[9px] text-muted-foreground/50 tracking-wider">{item.label}</span>
+              <span className={`text-[9px] font-medium tracking-wide ${item.accent ? "text-primary/80" : "text-muted-foreground/70"}`}>
                 {item.value}
               </span>
             </div>
@@ -34,11 +34,11 @@ export function StatusBar() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
           <Shield className="w-3 h-3" style={{ color: "hsl(155 70% 50% / 0.6)" }} />
-          <span className="text-[9px] font-mono tracking-wide" style={{ color: "hsl(155 70% 50% / 0.7)" }}>ENCRYPTED</span>
+          <span className="text-[9px] tracking-wide" style={{ color: "hsl(155 70% 50% / 0.7)" }}>ENCRYPTED</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Clock className="w-3 h-3 text-muted-foreground/40" />
-          <span className="text-[9px] font-mono text-muted-foreground/50 tabular-nums tracking-wide">
+          <span className="text-[9px] text-muted-foreground/50 tabular-nums tracking-wide">
             {time.toLocaleTimeString("en-US", { hour12: false })}
           </span>
         </div>

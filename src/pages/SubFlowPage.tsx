@@ -43,23 +43,23 @@ export default function SubFlowPage() {
   return (
     <div className="space-y-4 max-w-6xl mx-auto">
       {/* Breadcrumb + Header */}
-      <div className="glass-panel p-5 glow-border">
-        <Link to={`/industry/${industry.slug}`} className="inline-flex items-center gap-1 text-[10px] font-mono text-primary hover:underline mb-2">
-          <ArrowLeft className="w-3 h-3" /> {industry.icon} {industry.name}
+      <div className="glass-panel p-6 glow-border rounded-2xl">
+        <Link to={`/industry/${industry.slug}`} className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline mb-3 font-medium">
+          <ArrowLeft className="w-3.5 h-3.5" /> {industry.icon} {industry.name}
         </Link>
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <span className="text-[10px] font-mono text-primary">{subFlow.id}</span>
-            <h1 className="text-lg font-mono font-bold text-foreground">{subFlow.name}</h1>
-            <p className="text-xs font-mono text-muted-foreground mt-0.5">{subFlow.description}</p>
+            <span className="text-xs font-medium text-brand-orange">{subFlow.id}</span>
+            <h1 className="text-2xl font-semibold text-foreground tracking-tight mt-0.5">{subFlow.name}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{subFlow.description}</p>
           </div>
-          <button onClick={refresh} disabled={loading} className="p-1.5 rounded border border-border/50 hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50">
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          <button onClick={refresh} disabled={loading} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           </button>
         </div>
-        <div className="mt-3 p-3 rounded bg-muted/20 border border-border/30">
-          <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Money Flow</p>
-          <p className="text-[10px] font-mono text-foreground leading-relaxed">{subFlow.moneyFlow}</p>
+        <div className="mt-4 p-4 rounded-xl bg-muted/25 border border-border/50 border-l-4 border-l-brand-orange">
+          <p className="text-xs font-medium text-muted-foreground mb-1">Money flow</p>
+          <p className="text-sm text-foreground leading-relaxed">{subFlow.moneyFlow}</p>
         </div>
       </div>
 
@@ -73,35 +73,35 @@ export default function SubFlowPage() {
           className="glass-panel p-4 hover:glow-border transition-all"
         >
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xs font-mono font-bold text-primary flex items-center gap-1.5">
+            <h2 className="text-xs font-bold text-primary flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5" /> AI DEEP ANALYSIS
             </h2>
             <div className="flex items-center gap-2">
               {cachedReport?.created_at && (
-                <span className="text-[7px] font-mono text-muted-foreground flex items-center gap-1">
+                <span className="text-[7px] text-muted-foreground flex items-center gap-1">
                   <Database className="w-2.5 h-2.5" /> {new Date(cachedReport.created_at).toLocaleString()}
                 </span>
               )}
-              <span className="text-[8px] font-mono text-muted-foreground/50">Click for deep dive →</span>
+              <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
             </div>
           </div>
           {loading && !data && !cachedReport ? (
             <div className="flex items-center gap-2 py-6">
               <Loader2 className="w-4 h-4 text-primary animate-spin" />
-              <span className="text-xs font-mono text-muted-foreground">Analyzing {subFlow.name}...</span>
+              <span className="text-xs text-muted-foreground">Analyzing {subFlow.name}...</span>
             </div>
           ) : (data?.analysis || cachedReport?.summary) ? (
-            <div className="text-[11px] font-mono text-card-foreground leading-relaxed line-clamp-6">
+            <div className="text-[11px] text-card-foreground leading-relaxed line-clamp-6">
               <BlockMarkdown content={data?.analysis || cachedReport?.summary || ""} />
             </div>
           ) : (
-            <p className="text-xs font-mono text-muted-foreground">Auto-intel will generate report on next cycle.</p>
+            <p className="text-xs text-muted-foreground">Auto-intel will generate report on next cycle.</p>
           )}
         </ClickableItem>
 
         {/* Gaps & Opportunities */}
         <div className="glass-panel p-4">
-          <h2 className="text-xs font-mono font-bold text-accent mb-2 flex items-center gap-1.5">
+          <h2 className="text-xs font-bold text-accent mb-2 flex items-center gap-1.5">
             <Lightbulb className="w-3.5 h-3.5" /> GAPS & OPPORTUNITIES
           </h2>
           {data?.gaps && data.gaps.length > 0 ? (
@@ -115,8 +115,8 @@ export default function SubFlowPage() {
                   subFlowName={subFlow.name}
                   className="p-2 rounded bg-accent/5 border border-accent/20 hover:border-accent/50 transition-colors"
                 >
-                  <p className="text-[10px] font-mono font-bold text-accent">{gap.title}</p>
-                  <div className="text-[10px] font-mono text-muted-foreground mt-0.5">
+                  <p className="text-[10px] font-bold text-accent">{gap.title}</p>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">
                     <InlineMarkdown content={gap.detail || ""} />
                   </div>
                 </ClickableItem>
@@ -125,10 +125,10 @@ export default function SubFlowPage() {
           ) : loading ? (
             <div className="flex items-center gap-2 py-6">
               <Loader2 className="w-4 h-4 text-accent animate-spin" />
-              <span className="text-xs font-mono text-muted-foreground">Identifying gaps...</span>
+              <span className="text-xs text-muted-foreground">Identifying gaps...</span>
             </div>
           ) : (
-            <p className="text-xs font-mono text-muted-foreground">No gaps detected yet.</p>
+            <p className="text-xs text-muted-foreground">No gaps detected yet.</p>
           )}
         </div>
 
@@ -146,7 +146,7 @@ export default function SubFlowPage() {
 
         {/* Key Alerts */}
         <div className="glass-panel p-4">
-          <h2 className="text-xs font-mono font-bold text-destructive mb-2 flex items-center gap-1.5">
+          <h2 className="text-xs font-bold text-destructive mb-2 flex items-center gap-1.5">
             <AlertTriangle className="w-3.5 h-3.5" /> KEY ALERTS
           </h2>
           {data?.alerts && data.alerts.length > 0 ? (
@@ -160,15 +160,15 @@ export default function SubFlowPage() {
                   subFlowName={subFlow.name}
                   className={`p-2 rounded border hover:opacity-80 transition-opacity ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}
                 >
-                  <p className="text-[10px] font-mono font-bold text-foreground">{alert.title}</p>
-                  <div className="text-[10px] font-mono text-muted-foreground mt-0.5">
+                  <p className="text-[10px] font-bold text-foreground">{alert.title}</p>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">
                     <InlineMarkdown content={alert.detail || ""} />
                   </div>
                 </ClickableItem>
               ))}
             </div>
           ) : (
-            <p className="text-xs font-mono text-muted-foreground">No critical alerts.</p>
+            <p className="text-xs text-muted-foreground">No critical alerts.</p>
           )}
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function SubFlowPage() {
       {/* Live Data Section */}
       {data?.liveData && (
         <div className="glass-panel p-4">
-          <h2 className="text-xs font-mono font-bold text-foreground mb-3">LIVE DATA FEEDS</h2>
+          <h2 className="text-xs font-bold text-foreground mb-3">LIVE DATA FEEDS</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {Object.entries(data.liveData).map(([key, val]: [string, any]) => (
               <ClickableItem
@@ -186,8 +186,8 @@ export default function SubFlowPage() {
                 subFlowName={subFlow.name}
                 className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/30 transition-colors"
               >
-                <p className="text-[9px] font-mono text-muted-foreground uppercase">{key.replace(/_/g, ' ')}</p>
-                <p className="text-sm font-mono font-bold text-foreground">{typeof val === 'number' ? val.toLocaleString() : String(val)}</p>
+                <p className="text-[9px] text-muted-foreground uppercase">{key.replace(/_/g, ' ')}</p>
+                <p className="text-sm font-bold text-foreground">{typeof val === 'number' ? val.toLocaleString() : String(val)}</p>
               </ClickableItem>
             ))}
           </div>

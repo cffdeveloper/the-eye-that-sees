@@ -19,8 +19,8 @@ export function FrameworkBlockView({ data }: { data: FrameworkBlock["data"] }) {
     <div className="my-4">
       <div className="flex items-center gap-2 mb-3">
         <Layers className="w-4 h-4 text-primary/70" />
-        <h3 className="text-xs font-mono font-semibold text-foreground tracking-wide">{data.title}</h3>
-        <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary/70 border border-primary/15 uppercase tracking-widest">
+        <h3 className="text-xs font-semibold text-foreground tracking-wide">{data.title}</h3>
+        <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 text-primary/70 border border-primary/15 uppercase tracking-widest">
           {data.type}
         </span>
       </div>
@@ -34,7 +34,7 @@ export function FrameworkBlockView({ data }: { data: FrameworkBlock["data"] }) {
             >
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${colors.dot}`} />
-                <h4 className={`text-xs font-mono font-bold uppercase tracking-wider ${colors.text}`}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
                   {section.label}
                 </h4>
               </div>

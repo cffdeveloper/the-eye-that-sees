@@ -17,8 +17,8 @@ export function VCPanel({ data }: { data: VCSignal[] }) {
     <div className="glass-panel p-3 h-full">
       <div className="flex items-center gap-2 mb-3">
         <Rocket className="w-3.5 h-3.5 text-primary" />
-        <h3 className="text-[11px] font-mono font-bold text-foreground tracking-wider">VC / FUNDING SIGNALS</h3>
-        <span className="text-[9px] font-mono text-muted-foreground ml-auto">Capital flow trends</span>
+        <h3 className="text-[11px] font-bold text-foreground tracking-wider">VC / FUNDING SIGNALS</h3>
+        <span className="text-[9px] text-muted-foreground ml-auto">Capital flow trends</span>
       </div>
       <div className="space-y-1.5">
         {data.map((v, i) => {
@@ -26,13 +26,13 @@ export function VCPanel({ data }: { data: VCSignal[] }) {
           return (
             <div key={i} className="py-2 px-2.5 rounded bg-card/50 border border-border/20 hover:border-primary/30 transition-colors">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-mono font-bold text-foreground">{v.sector}</span>
-                <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase ${colorClass}`}>
+                <span className="text-[11px] font-bold text-foreground">{v.sector}</span>
+                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${colorClass}`}>
                   {v.trend}
                 </span>
               </div>
-              <p className="text-[10px] font-mono text-muted-foreground mb-1">{v.signal}</p>
-              <div className="flex items-center gap-1 text-[10px] font-mono text-primary">
+              <p className="text-[10px] text-muted-foreground mb-1">{v.signal}</p>
+              <div className="flex items-center gap-1 text-[10px] text-primary">
                 <ArrowRight className="w-3 h-3" />
                 <span className="font-semibold">{v.opportunity}</span>
               </div>

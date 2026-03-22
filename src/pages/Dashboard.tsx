@@ -24,6 +24,7 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -86,18 +87,15 @@ export default function Dashboard() {
       </div>
 
       {/* Hero */}
-      <section className="relative rounded-xl overflow-hidden border border-border/60 glow-border-strong">
+      <section className="relative rounded-2xl overflow-hidden border border-border/60 glow-border-strong">
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: [
-              "radial-gradient(ellipse 90% 70% at 50% -30%, hsl(185 90% 48% / 0.14) 0%, transparent 55%)",
-              "radial-gradient(ellipse 50% 50% at 100% 20%, hsl(265 82% 55% / 0.1) 0%, transparent 50%)",
-              "radial-gradient(ellipse 45% 45% at 0% 80%, hsl(210 100% 56% / 0.08) 0%, transparent 55%)",
-            ].join(", "),
+            background:
+              "radial-gradient(ellipse 95% 65% at 40% -25%, hsl(var(--primary) / 0.08) 0%, transparent 55%)",
           }}
         />
-        <div className="absolute inset-0 grid-bg opacity-[0.35] pointer-events-none" />
+        <div className="absolute inset-0 grid-bg opacity-[0.12] pointer-events-none" />
         <div className="relative px-5 py-8 sm:px-8 sm:py-10 md:py-12">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
             <div className="space-y-5 max-w-2xl">
@@ -107,27 +105,27 @@ export default function Dashboard() {
                   <span className="text-base sm:text-lg">
                     <BrandWordmark />
                   </span>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25 font-mono uppercase tracking-wider">
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-brand-orange/15 text-brand-orange border border-brand-orange/25 font-medium">
                     Maverick AI
                   </span>
-                  <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Live pipelines
                   </span>
                 </div>
               </div>
 
               <div>
-                <h1 className="font-brand text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
+                <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-semibold tracking-tight text-foreground leading-[1.12]">
                   {profile?.display_name ? (
                     <>
                       Welcome back,{" "}
-                      <span className="text-gradient-primary">{profile.display_name}</span>
+                      <span className="text-primary">{profile.display_name}</span>
                     </>
                   ) : (
                     <>
                       See every{" "}
-                      <span className="text-gradient-primary">money flow</span>
+                      <span className="text-brand-orange">money flow</span>
                       <br className="hidden sm:block" />
                       before the market does
                     </>
@@ -152,16 +150,16 @@ export default function Dashboard() {
                 </Link>
                 <Link
                   to="/cross-intel"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-border/80 bg-card/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-orange/35 bg-card/90 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-brand-orange/10 transition-colors"
                 >
-                  <Network className="w-4 h-4 text-primary" />
+                  <Network className="w-4 h-4 text-brand-orange" />
                   Cross-industry intel
                 </Link>
                 <Link
                   to="/custom-intel"
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-border/80 bg-card/80 px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
                 >
-                  <Layers className="w-4 h-4 text-accent" />
+                  <Layers className="w-4 h-4 text-primary" />
                   Intel Lab
                 </Link>
               </div>
@@ -169,10 +167,10 @@ export default function Dashboard() {
 
             {/* Pricing card */}
             <div className="w-full lg:w-[min(100%,320px)] shrink-0">
-              <div className="rounded-xl border border-primary/30 bg-gradient-to-b from-primary/10 via-card/90 to-card p-5 shadow-xl shadow-primary/5">
+              <div className="rounded-xl border border-border/70 bg-card p-6 shadow-lg border-t-4 border-t-primary">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary">Subscription</span>
-                  <Shield className="w-4 h-4 text-primary/70" />
+                  <span className="text-xs font-medium text-foreground">Subscription</span>
+                  <Shield className="w-4 h-4 text-brand-orange/80" />
                 </div>
                 <div className="mt-3 flex items-end gap-1">
                   <span className="text-4xl font-bold tabular-nums text-foreground">${SUBSCRIPTION_USD_MONTHLY}</span>
@@ -181,19 +179,19 @@ export default function Dashboard() {
                 <p className="mt-2 text-xs text-muted-foreground leading-snug">
                   Full Intel GoldMine access — Maverick powers briefs, chat, deep dives, cross-industry analysis, and Custom Intel Lab.
                 </p>
-                <ul className="mt-4 space-y-2 text-[11px] text-card-foreground">
+                <ul className="mt-4 space-y-2.5 text-sm text-card-foreground">
                   {[
                     "Structured AI reports & chat with Maverick",
                     "20 industries · 70+ money flows",
                     "Geo-scoped research & snapshots",
-                  ].map((line) => (
+                  ].map((line, i) => (
                     <li key={line} className="flex items-start gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <Sparkles className={`w-4 h-4 shrink-0 mt-0.5 ${i === 1 ? "text-brand-orange" : "text-primary"}`} />
                       <span>{line}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 text-[10px] font-mono text-muted-foreground/80 border-t border-border/50 pt-3">
+                <p className="mt-4 text-xs text-muted-foreground border-t border-border/50 pt-3 leading-relaxed">
                   Billing is handled by your workspace admin — contact support to activate or change plans.
                 </p>
               </div>
@@ -213,7 +211,7 @@ export default function Dashboard() {
               {alertsEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
               {alertsEnabled ? "Browser alerts on" : "Enable alerts"}
             </button>
-            <p className="text-[10px] font-mono text-muted-foreground max-w-md text-right">
+            <p className="text-xs text-muted-foreground max-w-md text-right">
               Intel GoldMine · Maverick AI · Money flows · Gaps · Signals
             </p>
           </div>
@@ -247,18 +245,18 @@ export default function Dashboard() {
             icon: Layers,
             href: "/custom-intel",
           },
-        ].map((f) => (
+        ].map((f, i) => (
           <Link
             key={f.href}
             to={f.href}
-            className="group glass-panel p-4 rounded-lg border border-border/50 hover:glow-border hover:border-primary/25 transition-all duration-300"
+            className="group glass-panel p-5 rounded-xl border border-border/60 hover:border-primary/20 hover:shadow-md transition-all duration-200"
           >
             <div className="flex items-start justify-between gap-2 mb-2">
-              <f.icon className="w-4 h-4 text-primary" />
-              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <f.icon className={cn("w-4 h-4", i % 2 === 0 ? "text-primary" : "text-brand-orange")} />
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-brand-orange transition-colors" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">{f.title}</h3>
-            <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">{f.desc}</p>
+            <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
           </Link>
         ))}
       </div>
@@ -266,19 +264,31 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
         {[
-          { label: "INDUSTRIES", value: industries.length, icon: BarChart3 },
-          { label: "MONEY FLOWS", value: totalFlows, icon: Activity },
-          { label: "DATA SOURCES", value: "11+", icon: Database, accent: true },
-          { label: "RAW DATA PTS", value: dbStats.rawData.toLocaleString(), icon: Database },
-          { label: "INSIGHTS", value: dbStats.insights.toLocaleString(), icon: Zap, accent: true },
-          { label: "MATCHES", value: dbStats.matches.toLocaleString(), icon: TrendingUp },
+          { label: "Industries", value: industries.length, icon: BarChart3 },
+          { label: "Money flows", value: totalFlows, icon: Activity },
+          { label: "Data sources", value: "11+", icon: Database, accent: true },
+          { label: "Raw data pts", value: dbStats.rawData.toLocaleString(), icon: Database },
+          { label: "Insights", value: dbStats.insights.toLocaleString(), icon: Zap, accent: true },
+          { label: "Matches", value: dbStats.matches.toLocaleString(), icon: TrendingUp },
         ].map((stat, i) => (
-          <div key={i} className="glass-panel p-2.5 rounded-lg">
-            <div className="flex items-center gap-1 mb-1">
-              <stat.icon className={`w-3 h-3 ${stat.accent ? "text-primary" : "text-muted-foreground"}`} />
-              <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+          <div key={i} className="glass-panel p-3 rounded-xl">
+            <div className="flex items-center gap-1.5 mb-1">
+              <stat.icon
+                className={cn(
+                  "w-3.5 h-3.5",
+                  stat.accent ? (i === 2 ? "text-primary" : "text-brand-orange") : "text-muted-foreground",
+                )}
+              />
+              <p className="text-[10px] text-muted-foreground font-medium">{stat.label}</p>
             </div>
-            <p className={`text-lg font-bold tabular-nums ${stat.accent ? "text-primary" : "text-foreground"}`}>{stat.value}</p>
+            <p
+              className={cn(
+                "text-lg font-semibold tabular-nums",
+                stat.accent ? (i === 2 ? "text-primary" : "text-brand-orange") : "text-foreground",
+              )}
+            >
+              {stat.value}
+            </p>
           </div>
         ))}
       </div>
@@ -286,9 +296,9 @@ export default function Dashboard() {
       {/* Map */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-0.5">
-          <MapPin className="w-3.5 h-3.5 text-primary" />
-          <span className="terminal-header text-[10px]">GLOBAL COVERAGE</span>
-          <span className="text-[9px] text-muted-foreground">Intel snapshots by region</span>
+          <MapPin className="w-4 h-4 text-brand-orange" />
+          <span className="text-sm font-semibold text-foreground">Global coverage</span>
+          <span className="text-xs text-muted-foreground">Intel snapshots by region</span>
         </div>
         <WorldMap />
       </div>
@@ -306,13 +316,13 @@ export default function Dashboard() {
             <Link
               key={ind.slug}
               to={`/industry/${ind.slug}`}
-              className="glass-panel p-3 rounded-lg hover:glow-border transition-all duration-200 group"
+              className="glass-panel p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all duration-200 group"
             >
               <div className="flex items-start justify-between mb-1.5">
                 <span className="text-xl">{ind.icon}</span>
-                <ArrowRight className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-brand-orange transition-colors" />
               </div>
-              <h3 className="text-[11px] font-bold text-foreground mb-0.5 leading-tight">{ind.name}</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-0.5 leading-tight">{ind.name}</h3>
               <p className="text-[9px] text-muted-foreground line-clamp-2 leading-relaxed">{ind.description}</p>
               <div className="mt-1.5 flex items-center gap-2">
                 <span className="text-[9px] text-primary font-semibold">{ind.subFlows.length} flows</span>

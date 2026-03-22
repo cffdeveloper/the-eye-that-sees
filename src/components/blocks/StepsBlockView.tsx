@@ -14,7 +14,7 @@ export function StepsBlockView({ data }: { data: StepsBlock["data"] }) {
     <div className="my-4">
       <div className="flex items-center gap-2 mb-3">
         <Route className="w-4 h-4 text-primary/70" />
-        <h3 className="text-xs font-mono font-semibold text-foreground tracking-wide">{data.title}</h3>
+        <h3 className="text-xs font-semibold text-foreground tracking-wide">{data.title}</h3>
       </div>
       <div className="space-y-0">
         {data.items.map((step, i) => {
@@ -32,8 +32,8 @@ export function StepsBlockView({ data }: { data: StepsBlock["data"] }) {
               </div>
               <div className={`flex-1 pb-5`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className={`text-xs font-mono font-bold ${config.color}`}>{step.phase}</h4>
-                  <span className="text-[9px] font-mono text-muted-foreground/60 px-1.5 py-0.5 rounded bg-muted/30 tracking-wide">
+                  <h4 className={`text-xs font-bold ${config.color}`}>{step.phase}</h4>
+                  <span className="text-[9px] text-muted-foreground/60 px-1.5 py-0.5 rounded bg-muted/30 tracking-wide">
                     {step.duration}
                   </span>
                 </div>

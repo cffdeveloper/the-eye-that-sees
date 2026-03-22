@@ -21,8 +21,8 @@ export function SupplyChainPanel({ data }: { data: SupplyChainRoute[] }) {
     <div className="glass-panel p-3 h-full">
       <div className="flex items-center gap-2 mb-3">
         <Ship className="w-3.5 h-3.5 text-primary" />
-        <h3 className="text-[11px] font-mono font-bold text-foreground tracking-wider">SUPPLY CHAIN ROUTES</h3>
-        <span className="text-[9px] font-mono text-muted-foreground ml-auto">Disruption = opportunity</span>
+        <h3 className="text-[11px] font-bold text-foreground tracking-wider">SUPPLY CHAIN ROUTES</h3>
+        <span className="text-[9px] text-muted-foreground ml-auto">Disruption = opportunity</span>
       </div>
       <div className="space-y-1.5">
         {data.map((r, i) => {
@@ -33,13 +33,13 @@ export function SupplyChainPanel({ data }: { data: SupplyChainRoute[] }) {
               <div className="flex items-center gap-2">
                 <Icon className="w-3.5 h-3.5" />
                 <div>
-                  <span className="text-[11px] font-mono font-semibold">{r.route}</span>
-                  <p className="text-[9px] font-mono opacity-70">{r.impact}</p>
+                  <span className="text-[11px] font-semibold">{r.route}</span>
+                  <p className="text-[9px] opacity-70">{r.impact}</p>
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-[10px] font-mono font-bold uppercase">{r.status}</span>
-                <p className="text-[9px] font-mono opacity-60">Risk: {r.risk}</p>
+                <span className="text-[10px] font-bold uppercase">{r.status}</span>
+                <p className="text-[9px] opacity-60">Risk: {r.risk}</p>
               </div>
             </div>
           );

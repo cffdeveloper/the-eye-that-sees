@@ -24,7 +24,7 @@ export function AlertsBanner({ alerts }: { alerts: Alert[] }) {
     <div className="space-y-1.5">
       <div className="flex items-center gap-2 px-1">
         <Radio className="w-3 h-3 text-destructive animate-pulse" />
-        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
           Priority Alerts — {alerts.length} active
         </span>
       </div>
@@ -46,7 +46,7 @@ export function AlertsBanner({ alerts }: { alerts: Alert[] }) {
                   <InlineMarkdown content={alert.detail || ""} />
                 </div>
               </div>
-              <span className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded ${cfg.bg} ${cfg.text} flex-shrink-0 border ${cfg.border}`}>
+              <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded ${cfg.bg} ${cfg.text} flex-shrink-0 border ${cfg.border}`}>
                 {alert.level}
               </span>
             </div>

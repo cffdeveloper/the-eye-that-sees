@@ -20,9 +20,9 @@ export function BlockRenderer({ segments }: { segments: ContentSegment[] }) {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h1: ({ children }) => <h1 className="text-base font-bold text-primary font-mono tracking-wide mt-5 mb-2">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-sm font-bold text-primary font-mono tracking-wide uppercase mt-4 mb-1.5">{children}</h2>,
-                    h3: ({ children }) => <h3 className="text-sm font-semibold text-foreground font-mono tracking-wide mt-3 mb-1">{children}</h3>,
+                    h1: ({ children }) => <h1 className="text-base font-semibold text-primary tracking-tight mt-5 mb-2">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-sm font-semibold text-primary tracking-wide uppercase mt-4 mb-1.5">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-sm font-medium text-foreground tracking-tight mt-3 mb-1">{children}</h3>,
                     strong: ({ children }) => <strong className="text-foreground font-semibold">{children}</strong>,
                     em: ({ children }) => <em className="text-card-foreground/90">{children}</em>,
                     code: ({ children, className }) => {

@@ -25,7 +25,7 @@ export function ModeSelector({
             key={m.id}
             onClick={() => onChange(m.id)}
             title={m.desc}
-            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-mono transition-all duration-200 ${
+            className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs transition-all duration-200 ${
               active
                 ? "bg-secondary text-primary shadow-sm glow-border"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"

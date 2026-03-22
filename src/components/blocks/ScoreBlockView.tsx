@@ -20,7 +20,7 @@ export function ScoreBlockView({ data }: { data: ScoreBlock["data"] }) {
     <div className="my-4 glass-panel p-5">
       <div className="flex items-center gap-2 mb-4">
         <Gauge className="w-4 h-4 text-primary/70" />
-        <h3 className="text-xs font-mono font-semibold text-foreground tracking-wide">{data.title}</h3>
+        <h3 className="text-xs font-semibold text-foreground tracking-wide">{data.title}</h3>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -39,15 +39,15 @@ export function ScoreBlockView({ data }: { data: ScoreBlock["data"] }) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`text-2xl font-bold font-mono ${colors.text}`}>{data.score}</span>
-            <span className="text-[9px] font-mono text-muted-foreground">/ {data.maxScore}</span>
+            <span className={`text-2xl font-bold ${colors.text}`}>{data.score}</span>
+            <span className="text-[9px] text-muted-foreground">/ {data.maxScore}</span>
           </div>
         </div>
 
         {/* Details */}
         <div className="flex-1 space-y-3">
           <div>
-            <span className={`inline-block text-[10px] font-mono px-2.5 py-1 rounded-full ${colors.bg} ${colors.text} font-semibold tracking-wider uppercase border border-current/20`}>
+            <span className={`inline-block text-[10px] px-2.5 py-1 rounded-full ${colors.bg} ${colors.text} font-semibold tracking-wider uppercase border border-current/20`}>
               {data.label}
             </span>
           </div>
@@ -61,8 +61,8 @@ export function ScoreBlockView({ data }: { data: ScoreBlock["data"] }) {
               return (
                 <div key={i} className="space-y-1">
                   <div className="flex justify-between">
-                    <span className="text-[10px] font-mono text-muted-foreground">{item.category}</span>
-                    <span className={`text-[10px] font-mono font-semibold ${barColors.text}`}>{item.score}/{data.maxScore}</span>
+                    <span className="text-[10px] text-muted-foreground">{item.category}</span>
+                    <span className={`text-[10px] font-semibold ${barColors.text}`}>{item.score}/{data.maxScore}</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-muted/30 overflow-hidden">
                     <div
