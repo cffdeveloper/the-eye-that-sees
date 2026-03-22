@@ -1,11 +1,30 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createHmac } from "https://deno.land/std@0.224.0/crypto/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-paystack-signature",
 };
+
+async function verifySignature(
+  body: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-512" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  const expected = Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return expected === signature;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -14,53 +33,47 @@ Deno.serve(async (req) => {
 
   try {
     const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
-    if (!PAYSTACK_SECRET_KEY) {
-      throw new Error("PAYSTACK_SECRET_KEY not configured");
-    }
+    if (!PAYSTACK_SECRET_KEY) throw new Error("PAYSTACK_SECRET_KEY not configured");
 
     const body = await req.text();
 
-    // Verify Paystack signature
+    // SECURITY: Verify Paystack HMAC signature
     const signature = req.headers.get("x-paystack-signature");
-    if (signature) {
-      const encoder = new TextEncoder();
-      const key = await crypto.subtle.importKey(
-        "raw",
-        encoder.encode(PAYSTACK_SECRET_KEY),
-        { name: "HMAC", hash: "SHA-512" },
-        false,
-        ["sign"]
-      );
-      const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
-      const expectedSig = Array.from(new Uint8Array(sig))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+    if (!signature) {
+      console.error("Missing x-paystack-signature header");
+      return new Response("Missing signature", { status: 401 });
+    }
 
-      if (expectedSig !== signature) {
-        console.error("Invalid Paystack signature");
-        return new Response("Invalid signature", { status: 401 });
-      }
+    const valid = await verifySignature(body, signature, PAYSTACK_SECRET_KEY);
+    if (!valid) {
+      console.error("Invalid Paystack webhook signature — rejecting");
+      return new Response("Invalid signature", { status: 401 });
     }
 
     const event = JSON.parse(body);
-    console.log("Paystack webhook event:", event.event);
+    console.log("Paystack webhook:", event.event);
 
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const getUserId = (data: any): string | null =>
+      data.metadata?.user_id ||
+      data.metadata?.custom_fields?.find((f: any) => f.variable_name === "user_id")?.value ||
+      null;
+
     switch (event.event) {
+      // ─── First charge & every recurring charge ───
       case "charge.success": {
         const data = event.data;
-        const userId = data.metadata?.user_id;
+        const userId = getUserId(data);
 
         if (!userId) {
-          console.error("No user_id in metadata");
+          console.error("charge.success: no user_id in metadata", data.metadata);
           break;
         }
 
-        // Calculate period end (30 days from now)
         const now = new Date();
         const periodEnd = new Date(now);
         periodEnd.setDate(periodEnd.getDate() + 30);
@@ -69,8 +82,9 @@ Deno.serve(async (req) => {
           {
             user_id: userId,
             paystack_customer_code: data.customer?.customer_code || null,
-            paystack_subscription_code: data.reference,
-            paystack_email: data.customer?.email || data.metadata?.email,
+            paystack_subscription_code: data.plan_object?.subscription_code || data.reference,
+            paystack_email: data.customer?.email,
+            plan_code: data.plan_object?.plan_code || data.plan || null,
             status: "active",
             amount: 3000,
             currency: "USD",
@@ -81,32 +95,25 @@ Deno.serve(async (req) => {
           { onConflict: "user_id" }
         );
 
-        console.log(`Subscription activated for user ${userId}`);
+        console.log(`✅ Subscription activated for user ${userId}`);
         break;
       }
 
+      // ─── Subscription lifecycle ───
       case "subscription.create": {
         const data = event.data;
         const customerCode = data.customer?.customer_code;
-
         if (customerCode) {
-          // Find subscription by customer code and update
-          const { data: subs } = await adminClient
+          await adminClient
             .from("subscriptions")
-            .select("*")
-            .eq("paystack_customer_code", customerCode)
-            .limit(1);
-
-          if (subs && subs.length > 0) {
-            await adminClient
-              .from("subscriptions")
-              .update({
-                paystack_subscription_code: data.subscription_code,
-                status: "active",
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", subs[0].id);
-          }
+            .update({
+              paystack_subscription_code: data.subscription_code,
+              plan_code: data.plan?.plan_code,
+              status: "active",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("paystack_customer_code", customerCode);
+          console.log(`✅ subscription.create for customer ${customerCode}`);
         }
         break;
       }
@@ -115,7 +122,6 @@ Deno.serve(async (req) => {
       case "subscription.disable": {
         const data = event.data;
         const customerCode = data.customer?.customer_code;
-
         if (customerCode) {
           await adminClient
             .from("subscriptions")
@@ -124,14 +130,15 @@ Deno.serve(async (req) => {
               updated_at: new Date().toISOString(),
             })
             .eq("paystack_customer_code", customerCode);
+          console.log(`⛔ Subscription cancelled for customer ${customerCode}`);
         }
         break;
       }
 
+      // ─── Charge failures (card declined on renewal) ───
       case "charge.failed": {
         const data = event.data;
-        const userId = data.metadata?.user_id;
-
+        const userId = getUserId(data);
         if (userId) {
           await adminClient
             .from("subscriptions")
@@ -140,7 +147,15 @@ Deno.serve(async (req) => {
               updated_at: new Date().toISOString(),
             })
             .eq("user_id", userId);
+          console.log(`⚠️ Charge failed for user ${userId}`);
         }
+        break;
+      }
+
+      // ─── Invoice events for renewal tracking ───
+      case "invoice.create":
+      case "invoice.update": {
+        console.log("Invoice event:", event.event, event.data?.invoice_code);
         break;
       }
 
@@ -149,6 +164,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ received: true }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
