@@ -467,6 +467,10 @@ Answer the user's follow-up with the same structured block style when analytical
         {error && (
           <p className="text-[11px] text-destructive border border-destructive/30 rounded-md px-3 py-2 bg-destructive/5">{error}</p>
         )}
+
+        {!isPro && (
+          <ProUpgradePrompt feature="Subscribe to Pro to generate custom intelligence reports with AI analysis." compact />
+        )}
       </div>
 
       {loading && (
