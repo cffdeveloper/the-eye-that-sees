@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const PLAN_NAME = "Intel GoldMine Pro Monthly";
-const PLAN_AMOUNT_CENTS = 3000; // $30.00
+const PLAN_AMOUNT_LOWEST = 3000; // $30.00 in cents (Paystack lowest denomination)
 const PLAN_CURRENCY = "USD";
 const PLAN_INTERVAL = "monthly";
 
@@ -23,7 +23,7 @@ async function ensurePlan(secretKey: string): Promise<string> {
     const existing = listData.data.find(
       (p: any) =>
         p.name === PLAN_NAME &&
-        p.amount === PLAN_AMOUNT_CENTS * 100 &&
+        p.amount === PLAN_AMOUNT_LOWEST &&
         p.interval === PLAN_INTERVAL
     );
     if (existing) return existing.plan_code;
@@ -38,7 +38,7 @@ async function ensurePlan(secretKey: string): Promise<string> {
     },
     body: JSON.stringify({
       name: PLAN_NAME,
-      amount: PLAN_AMOUNT_CENTS * 100, // Paystack uses lowest denomination
+      amount: PLAN_AMOUNT_LOWEST,
       interval: PLAN_INTERVAL,
       currency: PLAN_CURRENCY,
       description:
@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: PLAN_AMOUNT_CENTS * 100,
+          amount: PLAN_AMOUNT_LOWEST,
           currency: PLAN_CURRENCY,
           callback_url:
             callbackUrl || "https://intelgoldmine.onrender.com/dashboard?payment=verify",
