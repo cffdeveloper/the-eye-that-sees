@@ -149,7 +149,7 @@ Deno.serve(async (req) => {
         paystack_email: user.email,
         plan_code: planCode,
         status: "pending",
-        amount: PLAN_AMOUNT_CENTS,
+        amount: 3000,
         currency: PLAN_CURRENCY,
         updated_at: new Date().toISOString(),
       },
