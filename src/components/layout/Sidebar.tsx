@@ -18,30 +18,30 @@ export function Sidebar({ open }: { open: boolean }) {
   ];
 
   return (
-    <aside className="w-56 shrink-0 border-r border-border/60 bg-sidebar overflow-y-auto">
-      <div className="p-2 space-y-1">
+    <aside className="w-56 shrink-0 border-r border-border bg-sidebar overflow-y-auto">
+      <div className="p-2.5 space-y-1">
         {navItems.map((item) => (
           <Link
             key={item.to}
             to={item.to}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors border-l-2",
+              "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all",
               location.pathname === item.to
-                ? "border-primary bg-primary/5 text-foreground font-medium"
-                : "border-transparent text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent"
+                ? "bg-primary/8 text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            <item.icon className={cn("w-4 h-4 shrink-0", location.pathname === item.to ? "text-primary" : "text-muted-foreground")} />
+            <item.icon className={cn("w-4 h-4 shrink-0", location.pathname === item.to ? "text-primary" : "")} />
             {item.label}
           </Link>
         ))}
       </div>
 
-      <div className="px-3 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1">Industries</p>
+      <div className="px-3 py-2.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-1">Industries</p>
       </div>
 
-      <div className="px-1.5 space-y-0.5 pb-4">
+      <div className="px-2 space-y-0.5 pb-4">
         {industries.map((ind) => {
           const isActive = location.pathname.startsWith(`/industry/${ind.slug}`);
           const isExpanded = expanded === ind.slug || isActive;
@@ -51,23 +51,23 @@ export function Sidebar({ open }: { open: boolean }) {
               <button
                 onClick={() => setExpanded(isExpanded && !isActive ? null : ind.slug)}
                 className={cn(
-                  "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors text-left",
+                  "w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs transition-all text-left",
                   isActive
-                    ? "bg-brand-orange/10 text-foreground font-medium border-l-2 border-brand-orange -ml-px pl-[7px]"
-                    : "text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent border-l-2 border-transparent"
+                    ? "bg-brand-orange/8 text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                 )}
               >
                 <span className="text-sm">{ind.icon}</span>
                 <span className="flex-1 truncate">{ind.name}</span>
-                {isExpanded ? <ChevronDown className="w-2.5 h-2.5 shrink-0 opacity-50" /> : <ChevronRight className="w-2.5 h-2.5 shrink-0 opacity-50" />}
+                {isExpanded ? <ChevronDown className="w-3 h-3 shrink-0 opacity-40" /> : <ChevronRight className="w-3 h-3 shrink-0 opacity-40" />}
               </button>
 
               {isExpanded && (
-                <div className="ml-5 mt-0.5 space-y-0.5 border-l border-border/30 pl-1.5">
+                <div className="ml-6 mt-0.5 space-y-0.5 border-l border-border/50 pl-2">
                   <Link
                     to={`/industry/${ind.slug}`}
                     className={cn(
-                      "block px-2 py-1 rounded-md text-xs transition-colors",
+                      "block px-2.5 py-1.5 rounded-lg text-xs transition-colors",
                       location.pathname === `/industry/${ind.slug}`
                         ? "text-primary bg-primary/8 font-medium"
                         : "text-muted-foreground hover:text-foreground"
@@ -80,9 +80,9 @@ export function Sidebar({ open }: { open: boolean }) {
                       key={sf.id}
                       to={`/industry/${ind.slug}/${sf.id}`}
                       className={cn(
-                        "block px-2 py-1 rounded-md text-[11px] transition-colors truncate",
+                        "block px-2.5 py-1.5 rounded-lg text-[11px] transition-colors truncate",
                         location.pathname === `/industry/${ind.slug}/${sf.id}`
-                          ? "text-brand-orange font-medium bg-brand-orange/10"
+                          ? "text-brand-orange font-medium bg-brand-orange/8"
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >

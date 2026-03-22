@@ -1,28 +1,28 @@
-import { Hexagon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const sizeMap = {
-  sm: { box: "w-8 h-8", outer: "w-8 h-8", inner: "w-6 h-6", strokeOut: 2, strokeIn: 2.65, dot: "w-1.5 h-1.5" },
-  md: { box: "w-10 h-10", outer: "w-10 h-10", inner: "w-[2.125rem] h-[2.125rem]", strokeOut: 2.1, strokeIn: 2.8, dot: "w-2 h-2" },
-  lg: { box: "w-12 h-12", outer: "w-12 h-12", inner: "w-10 h-10", strokeOut: 2.15, strokeIn: 2.9, dot: "w-2.5 h-2.5" },
+  sm: { box: "w-7 h-7", icon: "text-sm" },
+  md: { box: "w-9 h-9", icon: "text-base" },
+  lg: { box: "w-11 h-11", icon: "text-lg" },
 } as const;
 
 type Size = keyof typeof sizeMap;
 
-/** High-contrast stacked hex — crisp strokes only, no glow or blur. */
+/** Friendly rounded brand mark — warm gradient background with a gold icon. */
 export function BrandHexMark({ size = "md", className }: { size?: Size; className?: string }) {
   const s = sizeMap[size];
 
   return (
     <div
-      className={cn("relative flex shrink-0 items-center justify-center", s.box, className)}
+      className={cn(
+        "relative flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md",
+        s.box,
+        className,
+      )}
       aria-hidden
     >
-      <Hexagon className={cn("absolute text-foreground", s.outer)} strokeWidth={s.strokeOut} />
-      <Hexagon className={cn("relative text-primary", s.inner)} strokeWidth={s.strokeIn} />
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className={cn("rounded-full bg-accent", s.dot)} />
-      </div>
+      <span className={cn("font-bold text-primary-foreground", s.icon)}>⬡</span>
+      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-brand-orange border-2 border-background" />
     </div>
   );
 }

@@ -49,44 +49,37 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-[0.08] pointer-events-none" />
-      <div
-        className="absolute inset-x-0 top-0 h-[min(45vh,420px)] pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 80% 90% at 50% 0%, hsl(var(--primary) / 0.07) 0%, transparent 65%)",
-        }}
-      />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md relative z-10"
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-md"
       >
         <div className="flex flex-col items-center mb-8">
           <BrandHexMark size="lg" />
-          <h1 className="text-xl font-semibold text-foreground mt-4 tracking-tight">Set new password</h1>
-          <p className="text-sm text-muted-foreground mt-2 text-center">Choose a strong password for your account.</p>
+          <h1 className="text-xl font-bold text-foreground mt-4 tracking-tight">Set new password</h1>
+          <p className="text-sm text-muted-foreground mt-1.5 text-center">Choose a strong password for your account.</p>
         </div>
-        <div className="glass-panel p-6 glow-border rounded-xl shadow-lg border border-border/50">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
           <form onSubmit={handleReset} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">New password</Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">New password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-9 h-10 text-sm"
+                  className="pl-10 h-11 text-sm rounded-xl"
                   required
                   minLength={6}
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full h-10 text-sm font-medium" disabled={loading}>
-              {loading && <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />}
+            <Button type="submit" className="w-full h-11 text-sm font-semibold rounded-xl" disabled={loading}>
+              {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Update Password
             </Button>
           </form>

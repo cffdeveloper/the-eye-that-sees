@@ -13,6 +13,7 @@ import { BrandWordmark } from "@/components/BrandWordmark";
 import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ROLES = [
   { value: "ceo", label: "CEO / Founder", icon: "👑" },
@@ -42,9 +43,17 @@ const GOALS = [
 
 const EXPERIENCE = [
   { value: "beginner", label: "Beginner", desc: "New to industry intelligence" },
-  { value: "intermediate", label: "Intermediate", desc: "Some experience with market analysis" },
-  { value: "advanced", label: "Advanced", desc: "Experienced analyst or decision maker" },
+  { value: "intermediate", label: "Intermediate", desc: "Some market analysis experience" },
+  { value: "advanced", label: "Advanced", desc: "Experienced decision maker" },
   { value: "expert", label: "Expert", desc: "Deep domain expertise" },
+];
+
+const STEP_TITLES = [
+  { title: "About you", subtitle: "Let's personalize your experience" },
+  { title: "Your role", subtitle: "This helps us tailor intel depth and format" },
+  { title: "Your goals", subtitle: "Select all that apply" },
+  { title: "Industries", subtitle: "Pick the sectors you want to track" },
+  { title: "Regions", subtitle: "Optional — prioritize regions in your feed" },
 ];
 
 export default function OnboardingPage() {
@@ -91,7 +100,7 @@ export default function OnboardingPage() {
         .eq("id", user.id);
       if (error) throw error;
       await refreshProfile();
-      toast.success("Welcome to Intel GoldMine! Maverick will personalize your intelligence.");
+      toast.success("Welcome to Intel GoldMine! 🎉");
       navigate("/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Failed to save profile");
@@ -111,238 +120,226 @@ export default function OnboardingPage() {
   const regions = COUNTRIES.slice(0, 30);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
-      <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
-
-      <div className="relative z-10 w-full max-w-2xl">
-        <div className="flex flex-col items-center mb-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-2xl">
+        {/* Header */}
+        <div className="flex flex-col items-center mb-8">
           <BrandHexMark size="lg" />
-          <h1 className="text-lg font-bold text-foreground mt-3">
+          <h1 className="text-lg font-bold text-foreground mt-4">
             <BrandWordmark />
           </h1>
-          <p className="text-[10px] text-muted-foreground mt-1">
-            Let's personalize your intelligence experience
+          <p className="text-sm text-muted-foreground mt-1">
+            Let's set up your intelligence experience
           </p>
         </div>
 
         {/* Progress */}
-        <div className="flex gap-1 mb-6 max-w-xs mx-auto">
+        <div className="flex gap-1.5 mb-2 max-w-xs mx-auto">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
               className={cn(
-                "h-1 flex-1 rounded-full transition-colors",
+                "h-1.5 flex-1 rounded-full transition-all duration-300",
                 i <= step ? "bg-primary" : "bg-border"
               )}
             />
           ))}
         </div>
+        <p className="text-xs text-muted-foreground text-center mb-6">
+          Step {step + 1} of {totalSteps}
+        </p>
 
-        <div className="glass-panel p-6 glow-border min-h-[400px] flex flex-col">
-          {/* Step 0: About You */}
-          {step === 0 && (
-            <div className="space-y-4 flex-1">
-              <div className="text-center mb-4">
-                <h2 className="text-sm font-bold text-foreground">About You</h2>
-                <p className="text-[10px] text-muted-foreground">Tell us a bit about yourself</p>
+        {/* Card */}
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-lg min-h-[420px] flex flex-col">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.25 }}
+              className="flex-1"
+            >
+              <div className="text-center mb-6">
+                <h2 className="text-lg font-bold text-foreground">{STEP_TITLES[step].title}</h2>
+                <p className="text-sm text-muted-foreground mt-1">{STEP_TITLES[step].subtitle}</p>
               </div>
-              <div className="grid md:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground uppercase">Display Name *</Label>
-                  <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="How should we address you?" className="h-9 text-xs" />
+
+              {/* Step 0: About You */}
+              {step === 0 && (
+                <div className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Display Name *</Label>
+                      <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="How should we call you?" className="h-11 rounded-xl" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Organization</Label>
+                      <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="Company or institution" className="h-11 rounded-xl" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Title / Position</Label>
+                      <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Head of Strategy" className="h-11 rounded-xl" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Experience Level</Label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {EXPERIENCE.map((exp) => (
+                          <button
+                            key={exp.value}
+                            type="button"
+                            onClick={() => setExperienceLevel(exp.value)}
+                            className={cn(
+                              "p-2.5 rounded-xl border text-left transition-all text-xs",
+                              experienceLevel === exp.value
+                                ? "border-primary bg-primary/8 text-foreground ring-1 ring-primary/20"
+                                : "border-border bg-background text-muted-foreground hover:border-primary/30"
+                            )}
+                          >
+                            <span className="font-semibold">{exp.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Bio (optional)</Label>
+                    <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Brief description of what you do..." className="min-h-[70px] text-sm rounded-xl" />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground uppercase">Organization</Label>
-                  <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="Company or institution" className="h-9 text-xs" />
+              )}
+
+              {/* Step 1: Role */}
+              {step === 1 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {ROLES.map((r) => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => setRole(r.value)}
+                      className={cn(
+                        "p-3.5 rounded-xl border text-left transition-all",
+                        role === r.value
+                          ? "border-primary bg-primary/8 ring-1 ring-primary/20"
+                          : "border-border bg-background hover:border-primary/30"
+                      )}
+                    >
+                      <span className="text-xl">{r.icon}</span>
+                      <p className="text-xs font-semibold text-foreground mt-1.5">{r.label}</p>
+                    </button>
+                  ))}
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground uppercase">Title / Position</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Head of Strategy" className="h-9 text-xs" />
+              )}
+
+              {/* Step 2: Goals */}
+              {step === 2 && (
+                <div className="grid grid-cols-2 gap-2.5">
+                  {GOALS.map((g) => (
+                    <button
+                      key={g.value}
+                      type="button"
+                      onClick={() => toggleItem(selectedGoals, g.value, setSelectedGoals)}
+                      className={cn(
+                        "p-3.5 rounded-xl border text-left transition-all flex items-center gap-2.5",
+                        selectedGoals.includes(g.value)
+                          ? "border-primary bg-primary/8 ring-1 ring-primary/20"
+                          : "border-border bg-background hover:border-primary/30"
+                      )}
+                    >
+                      <span className="text-xl">{g.icon}</span>
+                      <span className="text-xs font-semibold text-foreground flex-1">{g.label}</span>
+                      {selectedGoals.includes(g.value) && <Check className="w-4 h-4 text-primary shrink-0" />}
+                    </button>
+                  ))}
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground uppercase">Experience Level</Label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {EXPERIENCE.map((exp) => (
+              )}
+
+              {/* Step 3: Industries */}
+              {step === 3 && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
+                    {industries.map((ind) => (
                       <button
-                        key={exp.value}
+                        key={ind.slug}
                         type="button"
-                        onClick={() => setExperienceLevel(exp.value)}
+                        onClick={() => toggleItem(selectedIndustries, ind.slug, setSelectedIndustries)}
                         className={cn(
-                          "p-2 rounded-md border text-left transition-all text-[10px]",
-                          experienceLevel === exp.value
-                            ? "border-primary bg-primary/10 text-foreground"
-                            : "border-border/40 bg-muted/10 text-muted-foreground hover:border-border"
+                          "p-2.5 rounded-xl border text-left transition-all flex items-center gap-2",
+                          selectedIndustries.includes(ind.slug)
+                            ? "border-primary bg-primary/8 ring-1 ring-primary/20"
+                            : "border-border bg-background hover:border-primary/30"
                         )}
                       >
-                        <span className="font-bold">{exp.label}</span>
+                        <span>{ind.icon}</span>
+                        <span className="text-xs font-semibold text-foreground flex-1 truncate">{ind.name}</span>
+                        {selectedIndustries.includes(ind.slug) && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
                       </button>
                     ))}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIndustries(industries.map((i) => i.slug))}
+                    className="text-xs text-primary hover:underline font-medium"
+                  >
+                    Select all industries
+                  </button>
                 </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-[10px] text-muted-foreground uppercase">Bio (optional)</Label>
-                <Textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Brief description of what you do and what intelligence you need..." className="min-h-[60px] text-xs" />
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Step 1: Role */}
-          {step === 1 && (
-            <div className="space-y-4 flex-1">
-              <div className="text-center mb-4">
-                <h2 className="text-sm font-bold text-foreground">Your Role</h2>
-                <p className="text-[10px] text-muted-foreground">This helps us tailor intelligence depth and format</p>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {ROLES.map((r) => (
-                  <button
-                    key={r.value}
-                    type="button"
-                    onClick={() => setRole(r.value)}
-                    className={cn(
-                      "p-3 rounded-lg border text-left transition-all",
-                      role === r.value
-                        ? "border-primary bg-primary/10 glow-border"
-                        : "border-border/40 bg-muted/10 hover:border-border"
-                    )}
-                  >
-                    <span className="text-lg">{r.icon}</span>
-                    <p className="text-[10px] font-bold text-foreground mt-1">{r.label}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Goals */}
-          {step === 2 && (
-            <div className="space-y-4 flex-1">
-              <div className="text-center mb-4">
-                <h2 className="text-sm font-bold text-foreground">Your Goals</h2>
-                <p className="text-[10px] text-muted-foreground">Select all that apply — we'll prioritize intel accordingly</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {GOALS.map((g) => (
-                  <button
-                    key={g.value}
-                    type="button"
-                    onClick={() => toggleItem(selectedGoals, g.value, setSelectedGoals)}
-                    className={cn(
-                      "p-3 rounded-lg border text-left transition-all flex items-center gap-2",
-                      selectedGoals.includes(g.value)
-                        ? "border-primary bg-primary/10"
-                        : "border-border/40 bg-muted/10 hover:border-border"
-                    )}
-                  >
-                    <span className="text-lg">{g.icon}</span>
-                    <span className="text-[10px] font-bold text-foreground">{g.label}</span>
-                    {selectedGoals.includes(g.value) && <Check className="w-3 h-3 text-primary ml-auto" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Industries */}
-          {step === 3 && (
-            <div className="space-y-4 flex-1">
-              <div className="text-center mb-4">
-                <h2 className="text-sm font-bold text-foreground">Industries of Interest</h2>
-                <p className="text-[10px] text-muted-foreground">Select industries you want to track — you can change these later</p>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 max-h-[340px] overflow-y-auto pr-1">
-                {industries.map((ind) => (
-                  <button
-                    key={ind.slug}
-                    type="button"
-                    onClick={() => toggleItem(selectedIndustries, ind.slug, setSelectedIndustries)}
-                    className={cn(
-                      "p-2 rounded-md border text-left transition-all flex items-center gap-2",
-                      selectedIndustries.includes(ind.slug)
-                        ? "border-primary bg-primary/10"
-                        : "border-border/40 bg-muted/10 hover:border-border"
-                    )}
-                  >
-                    <span>{ind.icon}</span>
-                    <span className="text-[9px] font-bold text-foreground flex-1 truncate">{ind.name}</span>
-                    {selectedIndustries.includes(ind.slug) && <Check className="w-3 h-3 text-primary shrink-0" />}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedIndustries(industries.map((i) => i.slug))}
-                className="text-[9px] text-primary hover:underline"
-              >
-                Select all industries
-              </button>
-            </div>
-          )}
-
-          {/* Step 4: Regions */}
-          {step === 4 && (
-            <div className="space-y-4 flex-1">
-              <div className="text-center mb-4">
-                <h2 className="text-sm font-bold text-foreground">Priority Regions</h2>
-                <p className="text-[10px] text-muted-foreground">Optional — select regions to prioritize in your intel feed</p>
-              </div>
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-1.5 max-h-[300px] overflow-y-auto pr-1">
-                {regions.map((r) => (
-                  <button
-                    key={r.value}
-                    type="button"
-                    onClick={() => toggleItem(selectedRegions, r.value, setSelectedRegions)}
-                    className={cn(
-                      "p-2 rounded-md border text-left transition-all",
-                      selectedRegions.includes(r.value)
-                        ? "border-primary bg-primary/10"
-                        : "border-border/40 bg-muted/10 hover:border-border"
-                    )}
-                  >
-                    <span className="text-[9px] font-bold text-foreground truncate block">{r.label}</span>
-                    {selectedRegions.includes(r.value) && <Check className="w-3 h-3 text-primary mt-0.5" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+              {/* Step 4: Regions */}
+              {step === 4 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[320px] overflow-y-auto pr-1">
+                  {regions.map((r) => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => toggleItem(selectedRegions, r.value, setSelectedRegions)}
+                      className={cn(
+                        "p-2.5 rounded-xl border text-left transition-all",
+                        selectedRegions.includes(r.value)
+                          ? "border-primary bg-primary/8 ring-1 ring-primary/20"
+                          : "border-border bg-background hover:border-primary/30"
+                      )}
+                    >
+                      <span className="text-xs font-semibold text-foreground truncate block">{r.label}</span>
+                      {selectedRegions.includes(r.value) && <Check className="w-3.5 h-3.5 text-primary mt-0.5" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/40">
+          <div className="flex items-center justify-between mt-6 pt-5 border-t border-border">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setStep((s) => s - 1)}
               disabled={step === 0}
-              className="text-[10px] gap-1"
+              className="gap-1.5 rounded-xl"
             >
-              <ArrowLeft className="w-3 h-3" /> Back
+              <ArrowLeft className="w-4 h-4" /> Back
             </Button>
-
-            <span className="text-[9px] text-muted-foreground">
-              {step + 1} / {totalSteps}
-            </span>
 
             {step < totalSteps - 1 ? (
               <Button
                 size="sm"
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canAdvance()}
-                className="text-[10px] gap-1"
+                className="gap-1.5 rounded-xl px-6"
               >
-                Next <ArrowRight className="w-3 h-3" />
+                Next <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button
                 size="sm"
                 onClick={handleFinish}
                 disabled={saving}
-                className="text-[10px] gap-1 bg-primary"
+                className="gap-1.5 rounded-xl px-6"
               >
-                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                Launch Intel GoldMine
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                Launch Dashboard
               </Button>
             )}
           </div>
