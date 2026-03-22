@@ -13,6 +13,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
+import { crossIndustryIntelCopy } from "@/lib/pageIntelMessages";
 
 type CrossIntel = {
   cross_industry_players?: { name: string; industries: string[]; activity: string; strategy: string }[];
@@ -64,8 +65,8 @@ export default function CrossIntelPage() {
           <h1 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
             <Network className="w-5 h-5 text-brand-orange" /> Cross-industry intelligence
           </h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-            One AI pass across every mapped industry and flow — refresh after you change region
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">
+            Maverick runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
           </p>
         </div>
         <button onClick={fetchIntel} disabled={loading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
@@ -73,20 +74,20 @@ export default function CrossIntelPage() {
         </button>
       </div>
 
-      <PageIntro eyebrow="Strategic scan" title="When to use Cross-industry">
+      <PageIntro eyebrow={crossIndustryIntelCopy.eyebrow} title={crossIndustryIntelCopy.title}>
+        {crossIndustryIntelCopy.body.split("\n\n").map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
         <p>
-          Maverick compares all sectors and money flows to surface gaps, deals, connections, and alerts for your selected geography. For a single vertical, open an industry from the{" "}
+          For a single vertical, open an industry from the{" "}
           <Link to="/dashboard" className="text-primary font-medium hover:underline">
             Dashboard
-          </Link>{" "}
-          instead.
-        </p>
-        <p>
-          Pair with the{" "}
+          </Link>
+          . Pair with the{" "}
           <Link to="/intel" className="text-primary font-medium hover:underline">
             Live feed
           </Link>{" "}
-          for a market pulse and{" "}
+          for tempo and{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
             Intel Lab
           </Link>{" "}
@@ -96,12 +97,14 @@ export default function CrossIntelPage() {
 
       {!isPro ? (
         <div className="glass-panel p-6">
-          <ProUpgradePrompt feature="Upgrade for full access to cross-industry AI analysis — gaps, connections, and opportunities across all 20 industries." />
+          <ProUpgradePrompt feature={`Upgrade for full access to cross-industry AI analysis — gaps, connections, and opportunities across all ${industries.length} industries.`} />
         </div>
       ) : loading && !data ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-sm text-muted-foreground">Analyzing 20 industries and 70+ money flows…</p>
+          <p className="text-sm text-muted-foreground">
+            Analyzing {industries.length} industries and {industries.reduce((n, i) => n + i.subFlows.length, 0)} money flows…
+          </p>
         </div>
       ) : data ? (
         <>

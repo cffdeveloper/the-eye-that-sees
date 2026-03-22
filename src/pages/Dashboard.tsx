@@ -31,6 +31,7 @@ import { UpgradeButton, SubscriptionBadge } from "@/components/SubscriptionGate"
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { IntelWorkflowGuide } from "@/components/marketing/ProductWayfinding";
+import { dashboardIntelCopy } from "@/lib/pageIntelMessages";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -148,17 +149,10 @@ export default function Dashboard() {
                   </p>
                 )}
                 <p>
-                  <span className="font-semibold text-foreground">Coverage.</span>{" "}
-                  {industries.length} industries and {totalFlows}+ mapped money flows, with live inputs from 11+ sources
-                  (markets, macro, news, and social signals where configured).
+                  <span className="font-semibold text-foreground">Coverage.</span> {dashboardIntelCopy.coverage}
                 </p>
                 <p>
-                  <span className="font-semibold text-foreground">What you can do.</span>{" "}
-                  Use the <span className="text-foreground/90">Live feed</span> for real-time signals;{" "}
-                  <span className="text-foreground/90">Cross-industry</span> to connect sectors;{" "}
-                  <span className="text-foreground/90">Intel Lab</span> for custom briefs; open any{" "}
-                  <span className="text-foreground/90">industry or flow</span> for deep dives, gaps, and history; adjust
-                  geo, interests, and alerts in <span className="text-foreground/90">Profile</span>.
+                  <span className="font-semibold text-foreground">What you can do.</span> {dashboardIntelCopy.capabilities}
                 </p>
               </div>
             </div>
@@ -236,10 +230,10 @@ export default function Dashboard() {
       {/* Quick actions */}
       <motion.div variants={fadeIn} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { title: "Live intel feed", desc: "Real-time market signals across all sectors.", icon: Radio, href: "/intel", color: "text-primary", gradient: "from-primary/8 to-transparent" },
-          { title: "Cross-industry AI", desc: "Find connections across all 20 industries.", icon: Network, href: "/cross-intel", color: "text-brand-orange", gradient: "from-brand-orange/8 to-transparent" },
-          { title: "Deep dives", desc: "Pick any industry below — sector brief, then each money flow.", icon: TrendingUp, href: "/industry/technology", color: "text-signal-violet", gradient: "from-signal-violet/8 to-transparent" },
-          { title: "Intel Lab", desc: "Custom research with your own scope.", icon: Layers, href: "/custom-intel", color: "text-signal-emerald", gradient: "from-signal-emerald/8 to-transparent" },
+          { title: "Live intel feed", desc: "Crypto, FX, commodities, VC, supply chain & headlines—refreshed so you orient before you drill down.", icon: Radio, href: "/intel", color: "text-primary", gradient: "from-primary/8 to-transparent" },
+          { title: "Cross-industry AI", desc: "One pass across mapped sectors to surface gaps, deals, connections, and alerts for your region.", icon: Network, href: "/cross-intel", color: "text-brand-orange", gradient: "from-brand-orange/8 to-transparent" },
+          { title: "Deep dives", desc: "Sector briefs plus every money flow—tailored intel, news, and snapshots per lane.", icon: TrendingUp, href: "/industry/technology", color: "text-signal-violet", gradient: "from-signal-violet/8 to-transparent" },
+          { title: "Intel Lab", desc: "Scope primary vs secondary flows, add context, get structured briefs + follow-up chat.", icon: Layers, href: "/custom-intel", color: "text-signal-emerald", gradient: "from-signal-emerald/8 to-transparent" },
         ].map((f) => (
           <Link
             key={f.href}

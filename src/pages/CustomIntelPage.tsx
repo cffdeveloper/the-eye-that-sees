@@ -23,6 +23,7 @@ import {
 import { Link } from "react-router-dom";
 import { Loader2, Shuffle, ArrowRight, Send, RefreshCw, Layers, X, FileText } from "lucide-react";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
+import { intelLabIntelCopy } from "@/lib/pageIntelMessages";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -312,7 +313,7 @@ Answer the user's follow-up with the same structured block style when analytical
                 Scoped brief · primary vs secondary lanes · structured output
               </p>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
-                Build your scope in the builder below — same structured blocks as industry and money-flow deep dives, tuned to the flows you select.
+                Maverick builds on the same structured blocks as industry and money-flow pages—scoped to the flows you choose and the context you add—so outputs stay comparable and actionable.
               </p>
             </div>
           </div>

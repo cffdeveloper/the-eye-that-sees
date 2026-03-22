@@ -11,6 +11,7 @@ import { RefreshCw, Loader2, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
+import { liveFeedIntelCopy } from "@/lib/pageIntelMessages";
 
 export default function IntelDashboard() {
   const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
@@ -18,10 +19,10 @@ export default function IntelDashboard() {
 
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
-      <PageIntro eyebrow="Macro pulse" title="What this feed is for">
-        <p>
-          Scan cross-asset signals—crypto, FX, commodities, VC, supply chain, and headlines—in one place before you drill down. Refresh on demand; geography follows the top bar.
-        </p>
+      <PageIntro eyebrow={liveFeedIntelCopy.eyebrow} title={liveFeedIntelCopy.title}>
+        {liveFeedIntelCopy.body.split("\n\n").map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
         <p className="text-foreground/90">
           Next: choose a sector on the{" "}
           <Link to="/dashboard" className="text-primary font-medium hover:underline">

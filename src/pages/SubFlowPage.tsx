@@ -15,6 +15,7 @@ import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
+import { buildSubFlowIntelCopy } from "@/lib/pageIntelMessages";
 
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
@@ -66,10 +67,10 @@ export default function SubFlowPage() {
         </div>
       </div>
 
-      <PageIntro eyebrow="Money flow lane" title="What you can do on this page">
-        <p>
-          This flow is one revenue path inside {industry.name}. Use the AI block for structured analysis, news and social for live signal, and snapshots for how this lane evolved over time.
-        </p>
+      <PageIntro eyebrow={flowIntro.eyebrow} title={flowIntro.title}>
+        {flowIntro.body.split("\n\n").map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
         <p>
           <Link to={`/industry/${industry.slug}`} className="text-primary font-medium hover:underline">
             ← Back to {industry.name}

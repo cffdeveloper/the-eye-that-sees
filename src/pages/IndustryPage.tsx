@@ -15,6 +15,7 @@ import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
+import { getIndustryIntelCopy } from "@/lib/pageIntelMessages";
 
 export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -36,6 +37,13 @@ export default function IndustryPage() {
 
   if (!industry) return <Navigate to="/dashboard" replace />;
 
+  const sectorIntro =
+    getIndustryIntelCopy(industry.slug) ?? {
+      eyebrow: "Sector workspace",
+      title: `Why ${industry.name} intel here`,
+      body: `${industry.description} Maverick maps markets, news, and social layers to this sector so you can spot gaps, research angles, and timely updates as conditions change.\n\nOpen each money flow below for lane-specific analysis, alerts, and snapshot history.`,
+    };
+
   return (
     <div className="space-y-5 max-w-6xl mx-auto">
       {/* Header */}
@@ -52,13 +60,12 @@ export default function IndustryPage() {
         <p className="text-sm text-muted-foreground leading-relaxed">{industry.description}</p>
       </div>
 
-      <PageIntro eyebrow="Sector workspace" title={`How to use ${industry.name}`}>
+      <PageIntro eyebrow={sectorIntro.eyebrow} title={sectorIntro.title}>
+        {sectorIntro.body.split("\n\n").map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
         <p>
-          Read the AI industry brief for the whole sector, then scroll for auto-detected alerts, news, and social intel. Each{" "}
-          <span className="font-semibold text-foreground">money flow</span> below is its own lane—open it for flow-specific analysis, gaps, and snapshot history.
-        </p>
-        <p>
-          Want every sector at once? Use{" "}
+          Read the AI industry brief for the whole sector, then scroll for alerts, news, and social intel. Want every sector at once? Use{" "}
           <Link to="/cross-intel" className="text-primary font-medium hover:underline">
             Cross-industry
           </Link>
