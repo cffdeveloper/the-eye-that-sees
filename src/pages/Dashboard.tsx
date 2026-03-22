@@ -99,6 +99,14 @@ export default function Dashboard() {
 
   const totalFlows = industries.reduce((a, i) => a + i.subFlows.length, 0);
 
+  const roleTitle =
+    profile?.role && profile.role !== "explorer"
+      ? profile.role
+          .split("_")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ")
+      : null;
+
   return (
     <motion.div
       variants={stagger}
@@ -125,12 +133,33 @@ export default function Dashboard() {
                   <>Your intelligence dashboard</>
                 )}
               </h1>
-              <p className="mt-3 text-base text-muted-foreground leading-relaxed max-w-xl">
-                {profile?.role && profile.role !== "explorer"
-                  ? `Tuned for ${profile.role.replace(/_/g, " ")}${profile.organization ? ` at ${profile.organization}` : ""}. `
-                  : ""}
-                Track {industries.length} industries and {totalFlows}+ money flows with live signals from 11+ sources.
-              </p>
+              <div className="mt-3 space-y-2.5 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                {roleTitle && (
+                  <p>
+                    <span className="font-semibold text-foreground">{roleTitle}</span>
+                    {profile?.organization && (
+                      <span className="text-foreground/90"> · {profile.organization}</span>
+                    )}
+                    <span>
+                      {" "}
+                      — we use this to calibrate tone and depth (change anytime in Profile).
+                    </span>
+                  </p>
+                )}
+                <p>
+                  <span className="font-semibold text-foreground">Coverage.</span>{" "}
+                  {industries.length} industries and {totalFlows}+ mapped money flows, with live inputs from 11+ sources
+                  (markets, macro, news, and social signals where configured).
+                </p>
+                <p>
+                  <span className="font-semibold text-foreground">What you can do.</span>{" "}
+                  Use the <span className="text-foreground/90">Live feed</span> for real-time signals;{" "}
+                  <span className="text-foreground/90">Cross-industry</span> to connect sectors;{" "}
+                  <span className="text-foreground/90">Intel Lab</span> for custom briefs; open any{" "}
+                  <span className="text-foreground/90">industry or flow</span> for deep dives, gaps, and history; adjust
+                  geo, interests, and alerts in <span className="text-foreground/90">Profile</span>.
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
