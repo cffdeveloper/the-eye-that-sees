@@ -13,6 +13,7 @@ import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
+import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 
 export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -30,6 +31,7 @@ export default function IndustryPage() {
   );
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "", geoScopeId);
   const { report: cachedReport, loading: cacheLoading } = useCachedIntel("industry", industry?.name || "", geoScopeId);
+  const { isFree } = useIsFreeUser();
 
   if (!industry) return <Navigate to="/dashboard" replace />;
 
@@ -70,7 +72,9 @@ export default function IndustryPage() {
             <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
           </div>
         </div>
-        {(loading && cacheLoading) ? (
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to unlock AI-powered industry analysis and reports." compact />
+        ) : (loading && cacheLoading) ? (
           <div className="flex items-center gap-2 py-4">
             <Loader2 className="w-4 h-4 text-primary animate-spin" />
             <span className="text-xs text-muted-foreground">Analyzing {industry.name} landscape...</span>
@@ -85,11 +89,13 @@ export default function IndustryPage() {
       </ClickableItem>
 
       {/* Cached Alerts from auto-intel */}
-      {cachedReport?.alerts && cachedReport.alerts.length > 0 && (
-        <div className="glass-panel p-4">
-          <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-primary" /> AUTO-DETECTED ALERTS
-          </h2>
+      <div className="glass-panel p-4">
+        <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-primary" /> AUTO-DETECTED ALERTS
+        </h2>
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to see real-time alerts and critical market signals." compact />
+        ) : cachedReport?.alerts && cachedReport.alerts.length > 0 ? (
           <div className="space-y-2">
             {cachedReport.alerts.map((alert: any, i: number) => (
               <div key={i} className={`p-2.5 rounded border ${
@@ -104,15 +110,19 @@ export default function IndustryPage() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-xs text-muted-foreground">No alerts detected yet.</p>
+        )}
+      </div>
 
       {/* Cached Gaps/Opportunities */}
-      {cachedReport?.gaps && cachedReport.gaps.length > 0 && (
-        <div className="glass-panel p-4">
-          <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-primary" /> EXPLOITABLE GAPS (AUTO-DETECTED)
-          </h2>
+      <div className="glass-panel p-4">
+        <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
+          <TrendingUp className="w-3.5 h-3.5 text-primary" /> EXPLOITABLE GAPS
+        </h2>
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to discover exploitable market gaps and opportunities." compact />
+        ) : cachedReport?.gaps && cachedReport.gaps.length > 0 ? (
           <div className="space-y-2">
             {cachedReport.gaps.map((gap: any, i: number) => (
               <ClickableItem
@@ -139,15 +149,19 @@ export default function IndustryPage() {
               </ClickableItem>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-xs text-muted-foreground">No gaps detected yet.</p>
+        )}
+      </div>
 
       {/* Key Players */}
-      {data?.players && data.players.length > 0 && (
-        <div className="glass-panel p-4">
-          <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-primary" /> KEY PLAYERS
-          </h2>
+      <div className="glass-panel p-4">
+        <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
+          <Users className="w-3.5 h-3.5 text-primary" /> KEY PLAYERS
+        </h2>
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to see key industry players and their strategies." compact />
+        ) : data?.players && data.players.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {data.players.map((player: any, i: number) => (
               <ClickableItem
@@ -168,38 +182,10 @@ export default function IndustryPage() {
               </ClickableItem>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Recent Deals & Events */}
-      {data?.deals && data.deals.length > 0 && (
-        <div className="glass-panel p-4">
-          <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-            <Handshake className="w-3.5 h-3.5 text-primary" /> RECENT DEALS & EVENTS
-          </h2>
-          <div className="space-y-2">
-            {data.deals.map((deal: any, i: number) => (
-              <ClickableItem
-                key={i}
-                title={`${deal.type}: ${deal.parties}`}
-                detail={deal.significance}
-                industryName={industry.name}
-                className="p-2.5 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase">{deal.type}</span>
-                  <p className="text-xs text-foreground flex-1">{deal.parties}</p>
-                  {deal.value && <span className="text-[10px] text-primary font-bold">{deal.value}</span>}
-                </div>
-                <div className="text-[10px] text-muted-foreground mt-1">
-                  <InlineMarkdown content={deal.significance || ""} />
-                </div>
-                {deal.date && <p className="text-[9px] text-muted-foreground/50 mt-0.5">{deal.date}</p>}
-              </ClickableItem>
-            ))}
-          </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-xs text-muted-foreground">No player data available yet.</p>
+        )}
+      </div>
 
       {/* Social Intelligence */}
       <SocialIntelPanel
@@ -238,31 +224,17 @@ export default function IndustryPage() {
         </div>
       </div>
 
-      {/* News from AI analysis */}
-      {data?.news && data.news.length > 0 && (
-        <div className="glass-panel p-4">
-          <h2 className="text-xs font-bold text-foreground mb-3">AI-DETECTED DEVELOPMENTS</h2>
-          <div className="space-y-2">
-            {data.news.map((item: any, i: number) => (
-              <ClickableItem
-                key={i}
-                title={item.title}
-                detail={item.summary}
-                industryName={industry.name}
-                className="p-2 rounded bg-muted/20 border border-border/20 hover:border-primary/20 transition-colors"
-              >
-                <p className="text-xs text-foreground">{item.title}</p>
-                <div className="text-[10px] text-muted-foreground mt-0.5">
-                  <InlineMarkdown content={item.summary || ""} />
-                </div>
-              </ClickableItem>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Historical Snapshots */}
-      <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
+      <div className="glass-panel p-4">
+        <h2 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-primary" /> HISTORICAL SNAPSHOTS
+        </h2>
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to access historical analysis snapshots." compact />
+        ) : (
+          <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
+        )}
+      </div>
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { useAlertNotifications } from "@/hooks/useAlertNotifications";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 
 type CrossIntel = {
   cross_industry_players?: { name: string; industries: string[]; activity: string; strategy: string }[];
@@ -21,12 +23,14 @@ type CrossIntel = {
 
 export default function CrossIntelPage() {
   const [data, setData] = useState<CrossIntel | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { geoString, isGlobal, geoScopeId } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all", geoScopeId);
+  const { isPro } = useSubscription();
   useAlertNotifications(data?.alerts || [], true);
 
   const fetchIntel = useCallback(async () => {
+    if (!isPro) return;
     setLoading(true);
     try {
       const { data: result, error } = await supabase.functions.invoke("cross-intel", {
@@ -47,7 +51,7 @@ export default function CrossIntelPage() {
     } finally {
       setLoading(false);
     }
-  }, [geoString, geoScopeId]);
+  }, [geoString, geoScopeId, isPro]);
 
   useEffect(() => { fetchIntel(); }, [fetchIntel]);
 
@@ -62,19 +66,23 @@ export default function CrossIntelPage() {
             AI analyzes all 20 industries to find gaps, connections, and opportunities across sectors
           </p>
         </div>
-        <button onClick={fetchIntel} disabled={loading} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
+        <button onClick={fetchIntel} disabled={loading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
         </button>
       </div>
 
-      {loading && !data ? (
+      {!isPro ? (
+        <div className="glass-panel p-6">
+          <ProUpgradePrompt feature="Subscribe to Pro to unlock cross-industry AI analysis — find gaps, connections, and opportunities across all 20 industries." />
+        </div>
+      ) : loading && !data ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
           <p className="text-sm text-muted-foreground">Analyzing 20 industries and 70+ money flows…</p>
         </div>
       ) : data ? (
         <>
-          {/* Summary — clickable */}
+          {/* Summary */}
           <ClickableItem
             title="Cross-Industry Executive Intelligence Report"
             detail={data.summary}
@@ -89,10 +97,8 @@ export default function CrossIntelPage() {
             </div>
           </ClickableItem>
 
-          {/* World Map */}
           <WorldMap />
 
-          {/* Cross-Industry Players & Deals */}
           {(data.cross_industry_players?.length || data.deals?.length) ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {data.cross_industry_players && data.cross_industry_players.length > 0 && (
@@ -144,25 +150,16 @@ export default function CrossIntelPage() {
           ) : null}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Cross-Industry Gaps */}
             <div className="glass-panel p-4">
               <h2 className="text-xs font-bold text-accent mb-3 flex items-center gap-1.5">
                 <Lightbulb className="w-3.5 h-3.5 text-brand-orange" /> CROSS-INDUSTRY GAPS
               </h2>
               <div className="space-y-2">
                 {data.gaps?.map((gap, i) => (
-                  <ClickableItem
-                    key={i}
-                    title={gap.title}
-                    detail={gap.detail}
-                    className="p-2 rounded bg-accent/5 border border-accent/20 hover:border-accent/50 transition-colors"
-                  >
-                    <div className="text-[10px] font-bold text-accent min-w-0">
-                      <InlineMarkdown content={gap.title} />
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0">
-                      <BlockMarkdown content={gap.detail} />
-                    </div>
+                  <ClickableItem key={i} title={gap.title} detail={gap.detail}
+                    className="p-2 rounded bg-accent/5 border border-accent/20 hover:border-accent/50 transition-colors">
+                    <div className="text-[10px] font-bold text-accent min-w-0"><InlineMarkdown content={gap.title} /></div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0"><BlockMarkdown content={gap.detail} /></div>
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {gap.industries.map((ind, j) => (
                         <span key={j} className="text-[8px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">{ind}</span>
@@ -173,25 +170,16 @@ export default function CrossIntelPage() {
               </div>
             </div>
 
-            {/* Connections */}
             <div className="glass-panel p-4">
               <h2 className="text-xs font-bold text-primary mb-3 flex items-center gap-1.5">
                 <TrendingUp className="w-3.5 h-3.5" /> CROSS-INDUSTRY CONNECTIONS
               </h2>
               <div className="space-y-2">
                 {data.connections?.map((conn, i) => (
-                  <ClickableItem
-                    key={i}
-                    title={conn.title}
-                    detail={conn.detail}
-                    className="p-2 rounded bg-primary/5 border border-primary/20 hover:border-primary/40 transition-colors"
-                  >
-                    <div className="text-[10px] font-bold text-foreground min-w-0">
-                      <InlineMarkdown content={conn.title} />
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0">
-                      <BlockMarkdown content={conn.detail} />
-                    </div>
+                  <ClickableItem key={i} title={conn.title} detail={conn.detail}
+                    className="p-2 rounded bg-primary/5 border border-primary/20 hover:border-primary/40 transition-colors">
+                    <div className="text-[10px] font-bold text-foreground min-w-0"><InlineMarkdown content={conn.title} /></div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0"><BlockMarkdown content={conn.detail} /></div>
                     <div className="flex items-center gap-1 mt-1 text-[8px] text-primary">
                       <span className="px-1.5 py-0.5 rounded bg-primary/10">{conn.from}</span>
                       <span>→</span>
@@ -202,32 +190,22 @@ export default function CrossIntelPage() {
               </div>
             </div>
 
-            {/* Alerts */}
             <div className="glass-panel p-4 lg:col-span-2">
               <h2 className="text-xs font-bold text-destructive mb-3 flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5" /> PROACTIVE ALERTS
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {data.alerts?.map((alert, i) => (
-                  <ClickableItem
-                    key={i}
-                    title={alert.title}
-                    detail={alert.detail}
-                    className={`p-2 rounded border hover:opacity-80 transition-opacity ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}
-                  >
-                    <div className="text-[10px] font-bold text-foreground min-w-0">
-                      <InlineMarkdown content={alert.title} />
-                    </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0">
-                      <BlockMarkdown content={alert.detail} />
-                    </div>
+                  <ClickableItem key={i} title={alert.title} detail={alert.detail}
+                    className={`p-2 rounded border hover:opacity-80 transition-opacity ${alert.level === 'critical' ? 'bg-destructive/10 border-destructive/30' : alert.level === 'high' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-muted/20 border-border/20'}`}>
+                    <div className="text-[10px] font-bold text-foreground min-w-0"><InlineMarkdown content={alert.title} /></div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 min-w-0"><BlockMarkdown content={alert.detail} /></div>
                   </ClickableItem>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Historical Snapshots */}
           <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
         </>
       ) : (

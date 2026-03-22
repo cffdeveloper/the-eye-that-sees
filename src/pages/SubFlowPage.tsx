@@ -1,6 +1,6 @@
 import { useParams, Navigate, Link } from "react-router-dom";
 import { getSubFlow } from "@/lib/industryData";
-import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle, Database } from "lucide-react";
+import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle, Database, Clock } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSocialIntel } from "@/hooks/useSocialIntel";
@@ -13,6 +13,7 @@ import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
+import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
@@ -36,6 +37,7 @@ export default function SubFlowPage() {
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";
   const { snapshots, loading: snapsLoading } = useSnapshots("subflow", scopeKey, geoScopeId);
   const { report: cachedReport } = useCachedIntel("subflow", scopeKey, geoScopeId);
+  const { isFree } = useIsFreeUser();
 
   if (!result) return <Navigate to="/dashboard" replace />;
   const { industry, subFlow } = result;
@@ -53,7 +55,7 @@ export default function SubFlowPage() {
             <h1 className="text-2xl font-semibold text-foreground tracking-tight mt-0.5">{subFlow.name}</h1>
             <p className="text-sm text-muted-foreground mt-1">{subFlow.description}</p>
           </div>
-          <button onClick={refresh} disabled={loading} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
+          <button onClick={refresh} disabled={loading || isFree} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           </button>
         </div>
@@ -85,7 +87,9 @@ export default function SubFlowPage() {
               <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
             </div>
           </div>
-          {loading && !data && !cachedReport ? (
+          {isFree ? (
+            <ProUpgradePrompt feature="Subscribe to Pro to unlock AI deep analysis for this money flow." compact />
+          ) : loading && !data && !cachedReport ? (
             <div className="flex items-center gap-2 py-6">
               <Loader2 className="w-4 h-4 text-primary animate-spin" />
               <span className="text-xs text-muted-foreground">Analyzing {subFlow.name}...</span>
@@ -104,7 +108,9 @@ export default function SubFlowPage() {
           <h2 className="text-xs font-bold text-accent mb-2 flex items-center gap-1.5">
             <Lightbulb className="w-3.5 h-3.5" /> GAPS & OPPORTUNITIES
           </h2>
-          {data?.gaps && data.gaps.length > 0 ? (
+          {isFree ? (
+            <ProUpgradePrompt feature="Subscribe to Pro to discover gaps and opportunities in this flow." compact />
+          ) : data?.gaps && data.gaps.length > 0 ? (
             <div className="space-y-2">
               {data.gaps.map((gap: any, i: number) => (
                 <ClickableItem
@@ -149,7 +155,9 @@ export default function SubFlowPage() {
           <h2 className="text-xs font-bold text-destructive mb-2 flex items-center gap-1.5">
             <AlertTriangle className="w-3.5 h-3.5" /> KEY ALERTS
           </h2>
-          {data?.alerts && data.alerts.length > 0 ? (
+          {isFree ? (
+            <ProUpgradePrompt feature="Subscribe to Pro to receive critical market alerts." compact />
+          ) : data?.alerts && data.alerts.length > 0 ? (
             <div className="space-y-2">
               {data.alerts.map((alert: any, i: number) => (
                 <ClickableItem
@@ -174,7 +182,7 @@ export default function SubFlowPage() {
       </div>
 
       {/* Live Data Section */}
-      {data?.liveData && (
+      {!isFree && data?.liveData && (
         <div className="glass-panel p-4">
           <h2 className="text-xs font-bold text-foreground mb-3">LIVE DATA FEEDS</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -195,7 +203,16 @@ export default function SubFlowPage() {
       )}
 
       {/* Historical Snapshots */}
-      <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
+      <div className="glass-panel p-4">
+        <h2 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-primary" /> HISTORICAL SNAPSHOTS
+        </h2>
+        {isFree ? (
+          <ProUpgradePrompt feature="Subscribe to Pro to access historical snapshots and trend analysis." compact />
+        ) : (
+          <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
+        )}
+      </div>
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { useGeoContext } from "@/contexts/GeoContext";
 import { parseBlocks } from "@/lib/parseBlocks";
 import { BlockRenderer } from "@/components/BlockRenderer";
 import { Loader2, Search } from "lucide-react";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 
 interface DeepDiveDialogProps {
   open: boolean;
@@ -13,18 +15,18 @@ interface DeepDiveDialogProps {
   context?: string;
   industryName?: string;
   subFlowName?: string;
-  /** Recent live signal summary — woven into the deep-dive prompt for grounded research */
   socialIntelContext?: string;
 }
 
 export function DeepDiveDialog({ open, onClose, topic, context, industryName, subFlowName, socialIntelContext }: DeepDiveDialogProps) {
   const { geoString } = useGeoContext();
+  const { isPro } = useSubscription();
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
 
   const runDeepDive = useCallback(async () => {
-    if (started) return;
+    if (started || !isPro) return;
     setStarted(true);
     setLoading(true);
     setContent("");
@@ -48,10 +50,9 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
     } finally {
       setLoading(false);
     }
-  }, [topic, context, industryName, subFlowName, geoString, socialIntelContext, started]);
+  }, [topic, context, industryName, subFlowName, geoString, socialIntelContext, started, isPro]);
 
-  // Trigger on open
-  if (open && !started) {
+  if (open && !started && isPro) {
     runDeepDive();
   }
 
@@ -84,7 +85,9 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6">
-          {loading ? (
+          {!isPro ? (
+            <ProUpgradePrompt feature="Subscribe to Pro to generate deep-dive intelligence reports with structured analysis." />
+          ) : loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
               <p className="text-xs text-muted-foreground">

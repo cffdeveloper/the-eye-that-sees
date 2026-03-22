@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -43,7 +46,7 @@ function moveKey(key: string, scope: Scope, to: "pool" | "primary" | "secondary"
 
 export default function CustomIntelPage() {
   const { geoString, geoScopeId, isGlobal } = useGeoContext();
-
+  const { isPro } = useSubscription();
   const options = useMemo(() => allPickedOptions(), []);
   const byIndustry = useMemo(() => {
     const m = new Map<string, PickedSubFlow[]>();
@@ -117,6 +120,10 @@ export default function CustomIntelPage() {
   }, [pool, primary, secondary]);
 
   const runIntel = useCallback(async () => {
+    if (!isPro) {
+      toast.error("Custom Intel Lab requires a Pro subscription. Upgrade to generate reports.");
+      return;
+    }
     const selectedCount = pool.size + primary.size + secondary.size;
     if (!freeText.trim() && selectedCount === 0) {
       setError("Add subcategories to pool/primary/secondary or enter text context.");
@@ -158,7 +165,7 @@ export default function CustomIntelPage() {
     } finally {
       setLoading(false);
     }
-  }, [freeText, freeTextMode, pool, primary, secondary, geoString, geoScopeId, isGlobal]);
+  }, [freeText, freeTextMode, pool, primary, secondary, geoString, geoScopeId, isGlobal, isPro]);
 
   const sendFollowUp = useCallback(() => {
     const q = chatInput.trim();
@@ -444,9 +451,9 @@ Answer the user's follow-up with the same structured block style when analytical
             <span className="text-[9px] text-muted-foreground">{totalSelected} selected</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading} type="button">
+            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading || !isPro} type="button">
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-              Run custom intel
+              {isPro ? "Run custom intel" : "Pro required"}
             </Button>
             {report && (
               <Button variant="outline" className="h-9 text-xs gap-1.5 px-3" type="button" onClick={runIntel} disabled={loading}>
@@ -459,6 +466,10 @@ Answer the user's follow-up with the same structured block style when analytical
 
         {error && (
           <p className="text-[11px] text-destructive border border-destructive/30 rounded-md px-3 py-2 bg-destructive/5">{error}</p>
+        )}
+
+        {!isPro && (
+          <ProUpgradePrompt feature="Subscribe to Pro to generate custom intelligence reports with AI analysis." compact />
         )}
       </div>
 

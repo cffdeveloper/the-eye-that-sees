@@ -8,9 +8,11 @@ import { VCPanel } from "@/components/intel/VCPanel";
 import { MarketSignalsPanel } from "@/components/intel/MarketSignalsPanel";
 import { SourcesStatus } from "@/components/intel/SourcesStatus";
 import { RefreshCw, Loader2, Radio } from "lucide-react";
+import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
 
 export default function IntelDashboard() {
   const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
+  const { isFree } = useIsFreeUser();
 
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
@@ -23,13 +25,17 @@ export default function IntelDashboard() {
         </div>
         <div className="flex items-center gap-2">
           {feed?.sources_status && <SourcesStatus status={feed.sources_status} timestamp={feed.timestamp} />}
-          <button onClick={refresh} disabled={loading} className="p-1 rounded border border-border/50 hover:bg-muted/30 transition-colors text-muted-foreground disabled:opacity-50">
+          <button onClick={refresh} disabled={loading || isFree} className="p-1 rounded border border-border/50 hover:bg-muted/30 transition-colors text-muted-foreground disabled:opacity-50">
             {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
           </button>
         </div>
       </div>
 
-      {loading && !feed ? (
+      {isFree ? (
+        <div className="glass-panel p-6">
+          <ProUpgradePrompt feature="Subscribe to Pro to access real-time market data from 11+ sources including crypto, forex, commodities, VC signals, and supply chain intelligence." />
+        </div>
+      ) : loading && !feed ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 text-primary animate-spin" />
         </div>
