@@ -13,7 +13,7 @@ import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
-import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { buildSubFlowIntelCopy } from "@/lib/pageIntelMessages";
 
@@ -39,10 +39,11 @@ export default function SubFlowPage() {
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";
   const { snapshots, loading: snapsLoading } = useSnapshots("subflow", scopeKey, geoScopeId);
   const { report: cachedReport } = useCachedIntel("subflow", scopeKey, geoScopeId);
-  const { isFree } = useIsFreeUser();
+  const { isFree, subscriptionLoading } = useIsFreeUser();
 
   if (!result) return <Navigate to="/dashboard" replace />;
   const { industry, subFlow } = result;
+  const flowIntro = buildSubFlowIntelCopy(industry, subFlow);
 
   return (
     <div className="space-y-4 max-w-6xl mx-auto">
@@ -57,7 +58,7 @@ export default function SubFlowPage() {
             <h1 className="text-2xl font-semibold text-foreground tracking-tight mt-0.5">{subFlow.name}</h1>
             <p className="text-sm text-muted-foreground mt-1">{subFlow.description}</p>
           </div>
-          <button onClick={refresh} disabled={loading || isFree} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
+          <button onClick={refresh} disabled={loading || subscriptionLoading || isFree} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           </button>
         </div>
@@ -109,7 +110,9 @@ export default function SubFlowPage() {
               <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
             </div>
           </div>
-          {isFree ? (
+          {subscriptionLoading ? (
+            <ProGateLoading compact />
+          ) : isFree ? (
             <ProUpgradePrompt feature="Upgrade for full access to unlock AI deep analysis for this money flow." compact />
           ) : loading && !data && !cachedReport ? (
             <div className="flex items-center gap-2 py-6">
@@ -130,7 +133,9 @@ export default function SubFlowPage() {
           <h2 className="text-xs font-bold text-accent mb-2 flex items-center gap-1.5">
             <Lightbulb className="w-3.5 h-3.5" /> GAPS & OPPORTUNITIES
           </h2>
-          {isFree ? (
+          {subscriptionLoading ? (
+            <ProGateLoading compact />
+          ) : isFree ? (
             <ProUpgradePrompt feature="Upgrade for full access to discover gaps and opportunities in this flow." compact />
           ) : data?.gaps && data.gaps.length > 0 ? (
             <div className="space-y-2">
@@ -177,7 +182,9 @@ export default function SubFlowPage() {
           <h2 className="text-xs font-bold text-destructive mb-2 flex items-center gap-1.5">
             <AlertTriangle className="w-3.5 h-3.5" /> KEY ALERTS
           </h2>
-          {isFree ? (
+          {subscriptionLoading ? (
+            <ProGateLoading compact />
+          ) : isFree ? (
             <ProUpgradePrompt feature="Upgrade for full access to receive critical market alerts." compact />
           ) : data?.alerts && data.alerts.length > 0 ? (
             <div className="space-y-2">
@@ -204,7 +211,7 @@ export default function SubFlowPage() {
       </div>
 
       {/* Live Data Section */}
-      {!isFree && data?.liveData && (
+      {!subscriptionLoading && !isFree && data?.liveData && (
         <div className="glass-panel p-4">
           <h2 className="text-xs font-bold text-foreground mb-3">LIVE DATA FEEDS</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -229,7 +236,9 @@ export default function SubFlowPage() {
         <h2 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5 text-primary" /> HISTORICAL SNAPSHOTS
         </h2>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to access historical snapshots and trend analysis." compact />
         ) : (
           <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />

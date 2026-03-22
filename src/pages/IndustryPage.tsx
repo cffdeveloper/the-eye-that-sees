@@ -13,7 +13,7 @@ import { SocialIntelPanel } from "@/components/intel/SocialIntelPanel";
 import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
-import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { getIndustryIntelCopy } from "@/lib/pageIntelMessages";
 
@@ -33,7 +33,7 @@ export default function IndustryPage() {
   );
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "", geoScopeId);
   const { report: cachedReport, loading: cacheLoading } = useCachedIntel("industry", industry?.name || "", geoScopeId);
-  const { isFree } = useIsFreeUser();
+  const { isFree, subscriptionLoading } = useIsFreeUser();
 
   if (!industry) return <Navigate to="/dashboard" replace />;
 
@@ -102,7 +102,9 @@ export default function IndustryPage() {
             <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
           </div>
         </div>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to unlock AI-powered industry analysis and reports." compact />
         ) : (loading && cacheLoading) ? (
           <div className="flex items-center gap-2 py-4">
@@ -123,7 +125,9 @@ export default function IndustryPage() {
         <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5 text-primary" /> AUTO-DETECTED ALERTS
         </h2>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to see real-time alerts and critical market signals." compact />
         ) : cachedReport?.alerts && cachedReport.alerts.length > 0 ? (
           <div className="space-y-2">
@@ -150,7 +154,9 @@ export default function IndustryPage() {
         <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
           <TrendingUp className="w-3.5 h-3.5 text-primary" /> EXPLOITABLE GAPS
         </h2>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to discover exploitable market gaps and opportunities." compact />
         ) : cachedReport?.gaps && cachedReport.gaps.length > 0 ? (
           <div className="space-y-2">
@@ -189,7 +195,9 @@ export default function IndustryPage() {
         <h2 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
           <Users className="w-3.5 h-3.5 text-primary" /> KEY PLAYERS
         </h2>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to see key industry players and their strategies." compact />
         ) : data?.players && data.players.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -259,7 +267,9 @@ export default function IndustryPage() {
         <h2 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5 text-primary" /> HISTORICAL SNAPSHOTS
         </h2>
-        {isFree ? (
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to access historical analysis snapshots." compact />
         ) : (
           <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />

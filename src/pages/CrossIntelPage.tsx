@@ -29,7 +29,7 @@ export default function CrossIntelPage() {
   const [loading, setLoading] = useState(false);
   const { geoString, isGlobal, geoScopeId } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all", geoScopeId);
-  const { isPro } = useSubscription();
+  const { isPro, loading: subscriptionLoading } = useSubscription();
   useAlertNotifications(data?.alerts || [], true);
 
   const fetchIntel = useCallback(async () => {
@@ -69,7 +69,7 @@ export default function CrossIntelPage() {
             Maverick runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
           </p>
         </div>
-        <button onClick={fetchIntel} disabled={loading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
+        <button onClick={fetchIntel} disabled={loading || subscriptionLoading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
         </button>
       </div>
@@ -95,7 +95,12 @@ export default function CrossIntelPage() {
         </p>
       </PageIntro>
 
-      {!isPro ? (
+      {subscriptionLoading ? (
+        <div className="glass-panel p-6 flex flex-col items-center justify-center py-20 gap-3">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading access…</p>
+        </div>
+      ) : !isPro ? (
         <div className="glass-panel p-6">
           <ProUpgradePrompt feature={`Upgrade for full access to cross-industry AI analysis — gaps, connections, and opportunities across all ${industries.length} industries.`} />
         </div>

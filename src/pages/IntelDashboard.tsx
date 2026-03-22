@@ -9,13 +9,13 @@ import { MarketSignalsPanel } from "@/components/intel/MarketSignalsPanel";
 import { SourcesStatus } from "@/components/intel/SourcesStatus";
 import { RefreshCw, Loader2, Radio } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { liveFeedIntelCopy } from "@/lib/pageIntelMessages";
 
 export default function IntelDashboard() {
   const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
-  const { isFree } = useIsFreeUser();
+  const { isFree, subscriptionLoading } = useIsFreeUser();
 
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
@@ -54,7 +54,11 @@ export default function IntelDashboard() {
         </div>
       </div>
 
-      {isFree ? (
+      {subscriptionLoading ? (
+        <div className="glass-panel p-6 min-h-[240px] flex items-center justify-center">
+          <ProGateLoading />
+        </div>
+      ) : isFree ? (
         <div className="glass-panel p-6">
           <ProUpgradePrompt feature="Upgrade for full access to real-time market data from 11+ sources including crypto, forex, commodities, VC signals, and supply chain intelligence." />
         </div>

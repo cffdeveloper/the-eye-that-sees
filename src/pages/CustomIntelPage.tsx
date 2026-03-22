@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSubscription } from "@/hooks/useSubscription";
-import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
+import { ProUpgradePrompt, ProGateLoading } from "@/components/ProUpgradePrompt";
 import { toast } from "sonner";
 import {
   Select,
@@ -49,7 +49,7 @@ function moveKey(key: string, scope: Scope, to: "pool" | "primary" | "secondary"
 
 export default function CustomIntelPage() {
   const { geoString, geoScopeId, isGlobal } = useGeoContext();
-  const { isPro } = useSubscription();
+  const { isPro, loading: subscriptionLoading } = useSubscription();
   const options = useMemo(() => allPickedOptions(), []);
   const byIndustry = useMemo(() => {
     const m = new Map<string, PickedSubFlow[]>();
@@ -478,9 +478,9 @@ Answer the user's follow-up with the same structured block style when analytical
             <span className="text-[9px] text-muted-foreground">{totalSelected} selected</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading || !isPro} type="button">
+            <Button className="h-9 text-xs gap-2 px-4" onClick={runIntel} disabled={loading || subscriptionLoading || !isPro} type="button">
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              {isPro ? "Run custom intel" : "Pro required"}
+              {subscriptionLoading ? "Checking access…" : isPro ? "Run custom intel" : "Pro required"}
             </Button>
             {report && (
               <Button variant="outline" className="h-9 text-xs gap-1.5 px-3" type="button" onClick={runIntel} disabled={loading}>
@@ -495,8 +495,12 @@ Answer the user's follow-up with the same structured block style when analytical
           <p className="text-[11px] text-destructive border border-destructive/30 rounded-md px-3 py-2 bg-destructive/5">{error}</p>
         )}
 
-        {!isPro && (
-          <ProUpgradePrompt feature="Upgrade for full access to generate custom intelligence reports with AI analysis." compact />
+        {subscriptionLoading ? (
+          <ProGateLoading compact />
+        ) : (
+          !isPro && (
+            <ProUpgradePrompt feature="Upgrade for full access to generate custom intelligence reports with AI analysis." compact />
+          )
         )}
       </div>
 

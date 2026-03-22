@@ -1,6 +1,23 @@
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { UpgradeButton } from "@/components/SubscriptionGate";
 import { useSubscription } from "@/hooks/useSubscription";
+
+/** Shown while subscription tier is loading so we do not flash empty-state copy before upgrade prompts. */
+export function ProGateLoading({ compact, className }: { compact?: boolean; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center gap-2 text-muted-foreground",
+        compact ? "py-4" : "py-8",
+        className,
+      )}
+    >
+      <Loader2 className={cn("animate-spin text-primary", compact ? "h-4 w-4" : "h-5 w-5")} />
+      <span className={cn(compact ? "text-xs" : "text-sm")}>Loading access…</span>
+    </div>
+  );
+}
 
 interface ProUpgradePromptProps {
   /** Short description shown below the heading */
@@ -38,6 +55,11 @@ export function ProUpgradePrompt({ feature, compact, className }: ProUpgradeProm
  * Hook helper — returns true if the user is on free plan (i.e. should show upgrade prompts).
  */
 export function useIsFreeUser() {
-  const { isPro, loading } = useSubscription();
-  return { isFree: !loading && !isPro, loading };
+  const { isPro, loading: subscriptionLoading } = useSubscription();
+  return {
+    isFree: !subscriptionLoading && !isPro,
+    isPro: !subscriptionLoading && isPro,
+    subscriptionLoading,
+    loading: subscriptionLoading,
+  };
 }

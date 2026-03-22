@@ -6,7 +6,7 @@ import { parseBlocks } from "@/lib/parseBlocks";
 import { BlockRenderer } from "@/components/BlockRenderer";
 import { Loader2, Search } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
-import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
+import { ProUpgradePrompt, ProGateLoading } from "@/components/ProUpgradePrompt";
 
 interface DeepDiveDialogProps {
   open: boolean;
@@ -20,7 +20,7 @@ interface DeepDiveDialogProps {
 
 export function DeepDiveDialog({ open, onClose, topic, context, industryName, subFlowName, socialIntelContext }: DeepDiveDialogProps) {
   const { geoString } = useGeoContext();
-  const { isPro } = useSubscription();
+  const { isPro, loading: subscriptionLoading } = useSubscription();
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
@@ -52,7 +52,7 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
     }
   }, [topic, context, industryName, subFlowName, geoString, socialIntelContext, started, isPro]);
 
-  if (open && !started && isPro) {
+  if (open && !started && isPro && !subscriptionLoading) {
     runDeepDive();
   }
 
@@ -85,7 +85,9 @@ export function DeepDiveDialog({ open, onClose, topic, context, industryName, su
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6">
-          {!isPro ? (
+          {subscriptionLoading ? (
+            <ProGateLoading />
+          ) : !isPro ? (
             <ProUpgradePrompt feature="Upgrade for full access to generate deep-dive intelligence reports with structured analysis." />
           ) : loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
