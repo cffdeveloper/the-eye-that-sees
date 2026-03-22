@@ -310,9 +310,11 @@ export default function LandingPage() {
           >
             <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0">
               <p className="mb-3 flex flex-wrap items-start justify-start gap-x-3 gap-y-1.5 text-left text-[13px] font-medium text-muted-foreground sm:mb-4 sm:text-sm">
-                <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card/90 px-3 py-1.5 text-foreground shadow-sm backdrop-blur-sm">
-                  <Activity className="h-3.5 w-3.5 text-primary" />
-                  Private intelligence layer · global pipelines · live geo
+                <span className="inline-flex max-w-full items-start gap-2 rounded-2xl border border-primary/15 bg-card/90 px-3.5 py-2.5 text-foreground shadow-sm backdrop-blur-sm sm:max-w-4xl">
+                  <Activity className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="min-w-0 text-[13px] font-medium leading-snug sm:text-sm">
+                    An AI agent that continuously gathers news and intel from hundreds of sources, surfaces business gaps, research angles, and high-signal updates, then delivers them to you proactively—across every industry, 24/7.
+                  </span>
                 </span>
                 <span className="hidden text-border sm:inline">·</span>
                 <span className="max-w-md text-muted-foreground sm:max-w-none">
