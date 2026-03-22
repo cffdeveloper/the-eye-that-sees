@@ -372,7 +372,7 @@ export default function LandingPage() {
 
                   <motion.div
                     variants={fadeUp}
-                    className="mt-5 flex flex-wrap items-center justify-start gap-2.5 text-[13px] sm:text-sm"
+                    className="mt-5 grid grid-cols-6 gap-x-2 gap-y-2 sm:gap-x-2.5 sm:gap-y-2.5"
                   >
                     {[
                       { icon: Globe2, label: "Worldwide signal mesh", c: "text-brand-orange" },
@@ -381,34 +381,31 @@ export default function LandingPage() {
                     ].map(({ icon: Icon, label, c }) => (
                       <span
                         key={label}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-foreground/90"
+                        className="col-span-2 flex min-h-[2.75rem] items-center justify-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-1.5 py-1.5 text-center text-[10px] font-medium leading-tight text-foreground/90 sm:min-h-0 sm:gap-1.5 sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[13px] sm:font-normal md:text-sm"
                       >
-                        <Icon className={cn("w-3.5 h-3.5", c)} />
-                        {label}
+                        <Icon className={cn("h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5", c)} />
+                        <span className="min-w-0">{label}</span>
                       </span>
                     ))}
-                  </motion.div>
-
-                  <motion.div variants={fadeUp} className="mt-8 sm:mt-10 flex flex-wrap items-center justify-start gap-3 sm:gap-4">
                     <Button
                       size="lg"
-                      className="h-12 sm:h-14 px-8 sm:px-10 text-base font-bold gap-2 rounded-full shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
+                      className="col-span-3 h-11 min-h-11 w-full gap-1.5 rounded-full px-3 text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all sm:h-14 sm:gap-2 sm:px-8 sm:text-base"
                       asChild
                     >
                       <Link to="/auth?mode=signup">
                         Start free
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </Link>
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="h-12 sm:h-14 px-6 sm:px-8 text-base rounded-full border-border/70 bg-card/60 hover:bg-card"
+                      className="col-span-3 h-11 min-h-11 w-full rounded-full border-border/70 bg-card/60 px-2.5 text-sm hover:bg-card sm:h-14 sm:px-8 sm:text-base"
                       asChild
                     >
-                      <Link to="/auth" className="gap-2.5">
-                        <PlayCircle className="w-4 h-4 text-primary" />
-                        Sign in to explore
+                      <Link to="/auth" className="inline-flex items-center justify-center gap-1.5 sm:gap-2.5">
+                        <PlayCircle className="h-3.5 w-3.5 shrink-0 text-primary sm:h-4 sm:w-4" />
+                        <span className="min-w-0 leading-tight">Sign in to explore</span>
                       </Link>
                     </Button>
                   </motion.div>
