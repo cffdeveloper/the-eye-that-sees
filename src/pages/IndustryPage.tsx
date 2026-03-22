@@ -1,5 +1,5 @@
 import { useParams, Link, Navigate } from "react-router-dom";
-import { getIndustryBySlug } from "@/lib/industryData";
+import { getIndustryBySlug, subFlowIdToPathSegment } from "@/lib/industryData";
 import { ArrowRight, TrendingUp, Loader2, Users, Handshake, Database, Clock } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
@@ -243,7 +243,7 @@ export default function IndustryPage() {
           {industry.subFlows.map((sf) => (
             <Link
               key={sf.id}
-              to={`/industry/${industry.slug}/${sf.id}`}
+              to={`/industry/${industry.slug}/${subFlowIdToPathSegment(sf.id)}`}
               className="glass-panel p-4 hover:glow-border transition-all duration-300 group"
             >
               <div className="flex items-start justify-between mb-2">

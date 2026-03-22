@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { industries } from "@/lib/industryData";
+import { industries, subFlowIdToPathSegment } from "@/lib/industryData";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -73,21 +73,24 @@ export function Sidebar({ open, overlay, onNavigate }: SidebarProps) {
                   >
                     Overview
                   </Link>
-                  {ind.subFlows.map((sf) => (
+                  {ind.subFlows.map((sf) => {
+                    const flowPath = `/industry/${ind.slug}/${subFlowIdToPathSegment(sf.id)}`;
+                    return (
                     <Link
                       key={sf.id}
-                      to={`/industry/${ind.slug}/${sf.id}`}
+                      to={flowPath}
                       onClick={nav}
                       className={cn(
                         "block truncate rounded-xl px-3 py-2 text-xs transition-all duration-200",
-                        location.pathname === `/industry/${ind.slug}/${sf.id}`
+                        location.pathname === flowPath
                           ? "bg-brand-orange/[0.06] font-semibold text-brand-orange"
                           : "text-muted-foreground hover:text-foreground",
                       )}
                     >
                       {sf.shortName}
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -492,12 +492,38 @@ export const industries: Industry[] = [
 ];
 
 export function getIndustryBySlug(slug: string): Industry | undefined {
-  return industries.find((i) => i.slug === slug);
+  let s = slug;
+  try {
+    s = decodeURIComponent(slug);
+  } catch {
+    /* keep raw */
+  }
+  return industries.find((i) => i.slug === s);
 }
 
-export function getSubFlow(industrySlug: string, subFlowId: string): { industry: Industry; subFlow: SubFlow } | undefined {
+/** Use in links so path segments avoid dots (some static hosts mishandle dotted segments). */
+export function subFlowIdToPathSegment(id: string): string {
+  return id.replace(/\./g, "-");
+}
+
+/** Inverse of subFlowIdToPathSegment; also accepts legacy URLs that still use dots. */
+export function pathSegmentToSubFlowId(segment: string): string {
+  return segment.replace(/-/g, ".");
+}
+
+export function getSubFlow(
+  industrySlug: string,
+  subFlowSegment: string,
+): { industry: Industry; subFlow: SubFlow } | undefined {
   const industry = getIndustryBySlug(industrySlug);
   if (!industry) return undefined;
+  let seg = subFlowSegment;
+  try {
+    seg = decodeURIComponent(subFlowSegment);
+  } catch {
+    /* keep raw */
+  }
+  const subFlowId = pathSegmentToSubFlowId(seg);
   const subFlow = industry.subFlows.find((sf) => sf.id === subFlowId);
   if (!subFlow) return undefined;
   return { industry, subFlow };
