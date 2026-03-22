@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+
+const PROD_URL = "https://intelgoldmine.onrender.com";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +33,7 @@ export default function AuthPage() {
           password,
           options: {
             data: { full_name: fullName },
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: PROD_URL,
           },
         });
         if (error) throw error;
@@ -42,7 +44,7 @@ export default function AuthPage() {
         navigate("/");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${PROD_URL}/reset-password`,
         });
         if (error) throw error;
         toast.success("Password reset link sent to your email!");
@@ -56,7 +58,7 @@ export default function AuthPage() {
 
   const handleGoogleLogin = async () => {
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: PROD_URL,
     });
     if (error) toast.error("Google sign-in failed");
   };
