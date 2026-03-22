@@ -8,7 +8,9 @@ import { VCPanel } from "@/components/intel/VCPanel";
 import { MarketSignalsPanel } from "@/components/intel/MarketSignalsPanel";
 import { SourcesStatus } from "@/components/intel/SourcesStatus";
 import { RefreshCw, Loader2, Radio } from "lucide-react";
+import { Link } from "react-router-dom";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
 export default function IntelDashboard() {
   const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
@@ -16,6 +18,26 @@ export default function IntelDashboard() {
 
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
+      <PageIntro eyebrow="Macro pulse" title="What this feed is for">
+        <p>
+          Scan cross-asset signals—crypto, FX, commodities, VC, supply chain, and headlines—in one place before you drill down. Refresh on demand; geography follows the top bar.
+        </p>
+        <p className="text-foreground/90">
+          Next: choose a sector on the{" "}
+          <Link to="/dashboard" className="text-primary font-medium hover:underline">
+            Dashboard
+          </Link>
+          , run a{" "}
+          <Link to="/cross-intel" className="text-primary font-medium hover:underline">
+            Cross-industry
+          </Link>{" "}
+          scan, or compose a scoped brief in{" "}
+          <Link to="/custom-intel" className="text-primary font-medium hover:underline">
+            Intel Lab
+          </Link>
+          .
+        </p>
+      </PageIntro>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <Radio className="w-4 h-4 text-primary" />

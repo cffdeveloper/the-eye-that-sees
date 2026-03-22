@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
+import { Link } from "react-router-dom";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
 export default function ProfilePage() {
   const { user, profile, refreshProfile } = useAuth();
@@ -74,6 +76,31 @@ export default function ProfilePage() {
         <h1 className="text-2xl font-bold text-foreground font-display">My Profile</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your account details and subscription</p>
       </div>
+
+      <PageIntro eyebrow="Personalize Intel GoldMine" title="Why this page matters">
+        <p>
+          Role, organization, and industry picks tune how Maverick writes briefs and prioritizes what you see. Geography is set in the top bar and applies across the app.
+        </p>
+        <p className="text-foreground/90">
+          Back to{" "}
+          <Link to="/dashboard" className="text-primary font-medium hover:underline">
+            Dashboard
+          </Link>{" "}
+          for sectors,{" "}
+          <Link to="/intel" className="text-primary font-medium hover:underline">
+            Live feed
+          </Link>
+          ,{" "}
+          <Link to="/cross-intel" className="text-primary font-medium hover:underline">
+            Cross-industry
+          </Link>
+          , or{" "}
+          <Link to="/custom-intel" className="text-primary font-medium hover:underline">
+            Intel Lab
+          </Link>
+          .
+        </p>
+      </PageIntro>
 
       {/* Subscription Card */}
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">

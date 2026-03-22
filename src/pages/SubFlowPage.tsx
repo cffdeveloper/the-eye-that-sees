@@ -14,6 +14,7 @@ import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
@@ -64,6 +65,26 @@ export default function SubFlowPage() {
           <p className="text-sm text-foreground leading-relaxed">{subFlow.moneyFlow}</p>
         </div>
       </div>
+
+      <PageIntro eyebrow="Money flow lane" title="What you can do on this page">
+        <p>
+          This flow is one revenue path inside {industry.name}. Use the AI block for structured analysis, news and social for live signal, and snapshots for how this lane evolved over time.
+        </p>
+        <p>
+          <Link to={`/industry/${industry.slug}`} className="text-primary font-medium hover:underline">
+            ← Back to {industry.name}
+          </Link>{" "}
+          to compare other flows, or jump to{" "}
+          <Link to="/cross-intel" className="text-primary font-medium hover:underline">
+            Cross-industry
+          </Link>{" "}
+          /{" "}
+          <Link to="/custom-intel" className="text-primary font-medium hover:underline">
+            Intel Lab
+          </Link>{" "}
+          for multi-sector or custom briefs.
+        </p>
+      </PageIntro>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* AI Analysis */}

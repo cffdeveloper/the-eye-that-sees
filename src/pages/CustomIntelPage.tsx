@@ -20,7 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Link } from "react-router-dom";
 import { Loader2, Shuffle, ArrowRight, Send, RefreshCw, Layers, X, FileText } from "lucide-react";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -271,6 +273,32 @@ Answer the user's follow-up with the same structured block style when analytical
 
   return (
     <div className="space-y-5 max-w-6xl mx-auto pb-24">
+      <PageIntro eyebrow="Compose your brief" title="How Intel Lab works">
+        <ol className="list-decimal list-inside space-y-1.5 [&>li]:pl-0.5">
+          <li>
+            Pick industries and money flows below — promote lanes to <strong className="text-foreground">Primary</strong> (main thesis) and{" "}
+            <strong className="text-foreground">Secondary</strong> (context), or keep candidates in the pool.
+          </li>
+          <li>Add free-text context (deal, client, question) so Maverick aligns tone and depth.</li>
+          <li>Generate a structured brief, then use chat for follow-ups on the same scope.</li>
+        </ol>
+        <p>
+          Explore sectors from the{" "}
+          <Link to="/dashboard" className="text-primary font-medium hover:underline">
+            Dashboard
+          </Link>
+          , take a market pulse on the{" "}
+          <Link to="/intel" className="text-primary font-medium hover:underline">
+            Live feed
+          </Link>
+          , or scan all industries on{" "}
+          <Link to="/cross-intel" className="text-primary font-medium hover:underline">
+            Cross-industry
+          </Link>{" "}
+          before you scope a lab session.
+        </p>
+      </PageIntro>
+
       {/* Hero — matches Industry / SubFlow header pattern */}
       <div className="glass-panel p-5 glow-border">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -284,9 +312,7 @@ Answer the user's follow-up with the same structured block style when analytical
                 Scoped brief · primary vs secondary lanes · structured output
               </p>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
-                Pool sub-flows, promote to <span className="text-primary font-semibold">Primary</span>, route context to{" "}
-                <span className="text-accent font-semibold">Secondary</span>, then generate a brief and follow-ups from Maverick — same card
-                pipeline as Deep Dive.
+                Build your scope in the builder below — same structured blocks as industry and money-flow deep dives, tuned to the flows you select.
               </p>
             </div>
           </div>

@@ -14,6 +14,7 @@ import { SnapshotTimeline } from "@/components/intel/SnapshotTimeline";
 import { ClickableItem } from "@/components/intel/ClickableItem";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, useIsFreeUser } from "@/components/ProUpgradePrompt";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
 export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -50,6 +51,28 @@ export default function IndustryPage() {
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">{industry.description}</p>
       </div>
+
+      <PageIntro eyebrow="Sector workspace" title={`How to use ${industry.name}`}>
+        <p>
+          Read the AI industry brief for the whole sector, then scroll for auto-detected alerts, news, and social intel. Each{" "}
+          <span className="font-semibold text-foreground">money flow</span> below is its own lane—open it for flow-specific analysis, gaps, and snapshot history.
+        </p>
+        <p>
+          Want every sector at once? Use{" "}
+          <Link to="/cross-intel" className="text-primary font-medium hover:underline">
+            Cross-industry
+          </Link>
+          . For a macro pulse first, open the{" "}
+          <Link to="/intel" className="text-primary font-medium hover:underline">
+            Live feed
+          </Link>
+          ; for your own scoped brief,{" "}
+          <Link to="/custom-intel" className="text-primary font-medium hover:underline">
+            Intel Lab
+          </Link>
+          .
+        </p>
+      </PageIntro>
 
       {/* AI Industry Brief */}
       <ClickableItem

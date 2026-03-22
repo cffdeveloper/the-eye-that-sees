@@ -11,6 +11,8 @@ import { useGeoContext } from "@/contexts/GeoContext";
 import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { useSubscription } from "@/hooks/useSubscription";
 import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
+import { Link } from "react-router-dom";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
 type CrossIntel = {
   cross_industry_players?: { name: string; industries: string[]; activity: string; strategy: string }[];
@@ -63,13 +65,34 @@ export default function CrossIntelPage() {
             <Network className="w-5 h-5 text-brand-orange" /> Cross-industry intelligence
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-            AI analyzes all 20 industries to find gaps, connections, and opportunities across sectors
+            One AI pass across every mapped industry and flow — refresh after you change region
           </p>
         </div>
         <button onClick={fetchIntel} disabled={loading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
         </button>
       </div>
+
+      <PageIntro eyebrow="Strategic scan" title="When to use Cross-industry">
+        <p>
+          Maverick compares all sectors and money flows to surface gaps, deals, connections, and alerts for your selected geography. For a single vertical, open an industry from the{" "}
+          <Link to="/dashboard" className="text-primary font-medium hover:underline">
+            Dashboard
+          </Link>{" "}
+          instead.
+        </p>
+        <p>
+          Pair with the{" "}
+          <Link to="/intel" className="text-primary font-medium hover:underline">
+            Live feed
+          </Link>{" "}
+          for a market pulse and{" "}
+          <Link to="/custom-intel" className="text-primary font-medium hover:underline">
+            Intel Lab
+          </Link>{" "}
+          when you need a custom scoped brief.
+        </p>
+      </PageIntro>
 
       {!isPro ? (
         <div className="glass-panel p-6">

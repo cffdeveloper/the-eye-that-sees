@@ -30,6 +30,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeButton, SubscriptionBadge } from "@/components/SubscriptionGate";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { IntelWorkflowGuide } from "@/components/marketing/ProductWayfinding";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -228,12 +229,16 @@ export default function Dashboard() {
         </div>
       </motion.section>
 
+      <motion.section variants={fadeIn}>
+        <IntelWorkflowGuide />
+      </motion.section>
+
       {/* Quick actions */}
       <motion.div variants={fadeIn} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { title: "Live intel feed", desc: "Real-time market signals across all sectors.", icon: Radio, href: "/intel", color: "text-primary", gradient: "from-primary/8 to-transparent" },
           { title: "Cross-industry AI", desc: "Find connections across all 20 industries.", icon: Network, href: "/cross-intel", color: "text-brand-orange", gradient: "from-brand-orange/8 to-transparent" },
-          { title: "Deep dives", desc: "Structured AI reports on any thesis.", icon: TrendingUp, href: "/industry/technology", color: "text-signal-violet", gradient: "from-signal-violet/8 to-transparent" },
+          { title: "Deep dives", desc: "Pick any industry below — sector brief, then each money flow.", icon: TrendingUp, href: "/industry/technology", color: "text-signal-violet", gradient: "from-signal-violet/8 to-transparent" },
           { title: "Intel Lab", desc: "Custom research with your own scope.", icon: Layers, href: "/custom-intel", color: "text-signal-emerald", gradient: "from-signal-emerald/8 to-transparent" },
         ].map((f) => (
           <Link
@@ -309,7 +314,10 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-foreground">All Industries</h2>
-            <p className="text-sm text-muted-foreground mt-1">{industries.length} sectors · {totalFlows} flows</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+              {industries.length} sectors · {totalFlows} flows — each card opens the full sector workspace; open any{" "}
+              <span className="text-foreground/90 font-medium">money flow</span> for lane-specific AI, news, and history.
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
