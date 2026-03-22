@@ -61,6 +61,28 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // Verify Paystack payment on callback
+  useEffect(() => {
+    if (searchParams.get("payment") === "verify") {
+      const ref = localStorage.getItem("paystack_reference");
+      if (ref) {
+        verifyPayment(ref)
+          .then((result) => {
+            if (result?.verified) {
+              toast.success("Payment successful! Welcome to Pro 🎉");
+            } else {
+              toast.error("Payment verification failed. Please try again.");
+            }
+          })
+          .catch(() => toast.error("Could not verify payment"))
+          .finally(() => {
+            localStorage.removeItem("paystack_reference");
+            setSearchParams({}, { replace: true });
+          });
+      }
+    }
+  }, [searchParams]);
+
   const handleEnableNotifications = async () => {
     await requestNotificationPermission();
     setAlertsEnabled(true);
