@@ -113,12 +113,12 @@ export default function Dashboard() {
       variants={stagger}
       initial="hidden"
       animate="show"
-      className="space-y-8 max-w-[1400px] mx-auto pb-10"
+      className="mx-auto max-w-[1400px] space-y-6 pb-8 sm:space-y-8 sm:pb-10"
     >
       {/* Welcome hero */}
-      <motion.section variants={fadeIn} className="rounded-3xl border border-border/50 bg-card p-8 sm:p-10 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[400px] h-[300px] bg-gradient-to-bl from-brand-orange/[0.04] via-transparent to-transparent rounded-3xl" />
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10">
+      <motion.section variants={fadeIn} className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-4 shadow-sm sm:rounded-3xl sm:p-8 md:p-10">
+        <div className="absolute right-0 top-0 h-[200px] w-[min(100%,280px)] rounded-3xl bg-gradient-to-bl from-brand-orange/[0.04] via-transparent to-transparent sm:h-[300px] sm:w-[400px]" />
+        <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
           <div className="space-y-5 max-w-2xl">
             <div className="flex items-center gap-3 flex-wrap">
               <BrandHexMark size="md" />
@@ -163,26 +163,26 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
               <Link
                 to="/intel"
-                className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg sm:px-6"
               >
-                <Radio className="w-4 h-4" />
+                <Radio className="h-4 w-4 shrink-0" />
                 Live feed
               </Link>
               <Link
                 to="/cross-intel"
-                className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted/30 transition-all"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted/30"
               >
-                <Network className="w-4 h-4 text-brand-orange" />
+                <Network className="h-4 w-4 shrink-0 text-brand-orange" />
                 Cross-industry
               </Link>
               <Link
                 to="/custom-intel"
-                className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted/30 transition-all"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted/30"
               >
-                <Layers className="w-4 h-4 text-primary" />
+                <Layers className="h-4 w-4 shrink-0 text-primary" />
                 Intel Lab
               </Link>
             </div>
@@ -262,7 +262,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Stats */}
-      <motion.div variants={fadeIn} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <motion.div variants={fadeIn} className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
         {[
           { label: "Industries", value: industries.length, icon: BarChart3, color: "text-primary" },
           { label: "Money flows", value: totalFlows, icon: Activity, color: "text-foreground" },
@@ -271,7 +271,7 @@ export default function Dashboard() {
           { label: "Insights", value: dbStats.insights.toLocaleString(), icon: Zap, color: "text-brand-orange" },
           { label: "Matches", value: dbStats.matches.toLocaleString(), icon: TrendingUp, color: "text-primary" },
         ].map((stat, i) => (
-          <div key={i} className="rounded-2xl border border-border/50 bg-card p-5">
+          <div key={i} className="rounded-xl border border-border/50 bg-card p-3 sm:rounded-2xl sm:p-5">
             <div className="flex items-center gap-2 mb-2">
               <stat.icon className={cn("w-4 h-4", stat.color)} />
               <p className="text-xs text-muted-foreground font-semibold">{stat.label}</p>
@@ -282,12 +282,12 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Alerts toggle */}
-      <motion.div variants={fadeIn} className="flex items-center gap-3">
+      <motion.div variants={fadeIn} className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={alertsEnabled ? () => setAlertsEnabled(false) : handleEnableNotifications}
           className={cn(
-            "inline-flex items-center gap-2.5 rounded-full border px-5 py-3 text-sm font-semibold transition-all",
+            "inline-flex w-full items-center justify-center gap-2.5 rounded-full border px-5 py-3 text-sm font-semibold transition-all sm:w-auto",
             alertsEnabled
               ? "border-primary/20 bg-primary/[0.04] text-primary"
               : "border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -299,12 +299,12 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Map */}
-      <motion.div variants={fadeIn} className="space-y-4">
+      <motion.div variants={fadeIn} className="space-y-3 sm:space-y-4">
         <div className="flex items-center gap-2.5">
-          <MapPin className="w-5 h-5 text-brand-orange" />
-          <span className="text-lg font-bold text-foreground">Global coverage</span>
+          <MapPin className="h-5 w-5 shrink-0 text-brand-orange" />
+          <span className="text-base font-bold text-foreground sm:text-lg">Global coverage</span>
         </div>
-        <div className="rounded-3xl border border-border/50 overflow-hidden shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-border/50 shadow-sm sm:rounded-3xl">
           <WorldMap />
         </div>
       </motion.div>

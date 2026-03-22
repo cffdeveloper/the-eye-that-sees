@@ -71,9 +71,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="mx-auto max-w-3xl space-y-6 px-0 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground font-display">My Profile</h1>
+        <h1 className="font-display text-xl font-bold text-foreground sm:text-2xl">My Profile</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your account details and subscription</p>
       </div>
 
@@ -103,22 +103,22 @@ export default function ProfilePage() {
       </PageIntro>
 
       {/* Subscription Card */}
-      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Crown className="w-5 h-5 text-brand-orange" />
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
+        <div className="mb-6 flex items-center gap-3">
+          <Crown className="h-5 w-5 shrink-0 text-brand-orange" />
           <h2 className="text-lg font-bold text-foreground">Subscription</h2>
         </div>
 
         {subLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
             Loading…
           </div>
         ) : isPro ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold">
-                <Crown className="w-3.5 h-3.5" />
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                <Crown className="h-3.5 w-3.5" />
                 Pro Plan
               </span>
               <span className="text-sm text-muted-foreground">${SUBSCRIPTION_USD_MONTHLY}/month</span>
@@ -148,24 +148,24 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Details */}
-      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <User className="w-5 h-5 text-primary" />
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
+        <div className="mb-6 flex items-center gap-3">
+          <User className="h-5 w-5 shrink-0 text-primary" />
           <h2 className="text-lg font-bold text-foreground">Profile Details</h2>
         </div>
 
         <div className="space-y-5">
           {/* Avatar URL */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             {form.avatar_url ? (
-              <img src={form.avatar_url} alt="Avatar" className="w-16 h-16 rounded-full object-cover border-2 border-border" />
+              <img src={form.avatar_url} alt="Avatar" className="h-16 w-16 shrink-0 rounded-full border-2 border-border object-cover" />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-2 border-border">
-                <User className="w-7 h-7 text-muted-foreground" />
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-border bg-muted">
+                <User className="h-7 w-7 text-muted-foreground" />
               </div>
             )}
-            <div className="flex-1">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Avatar URL</label>
+            <div className="min-w-0 flex-1">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Avatar URL</label>
               <Input
                 value={form.avatar_url}
                 onChange={(e) => setForm({ ...form, avatar_url: e.target.value })}
@@ -239,8 +239,8 @@ export default function ProfilePage() {
             />
           </div>
 
-          <Button onClick={handleSave} disabled={saving} className="gap-2">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          <Button onClick={handleSave} disabled={saving} className="w-full gap-2 sm:w-auto">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {saving ? "Saving…" : "Save changes"}
           </Button>
         </div>

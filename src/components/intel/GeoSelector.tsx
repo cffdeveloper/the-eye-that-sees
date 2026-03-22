@@ -41,25 +41,26 @@ export function GeoSelector() {
   };
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative shrink-0" ref={ref}>
       {/* Trigger button */}
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-md border text-xs transition-all",
+          "flex max-w-[min(100vw-8rem,14rem)] items-center gap-1.5 rounded-md border px-2 py-1.5 text-xs transition-all sm:max-w-[200px] sm:gap-2 sm:px-3",
           selections.length > 0
             ? "border-primary/50 bg-primary/10 text-primary"
-            : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground hover:border-border"
+            : "border-border/50 bg-card/50 text-muted-foreground hover:border-border hover:text-foreground",
         )}
       >
-        <Globe className="w-3.5 h-3.5" />
-        <span className="max-w-[200px] truncate">{getGeoLabel(selections)}</span>
-        <ChevronDown className={cn("w-3 h-3 transition-transform", open && "rotate-180")} />
+        <Globe className="h-3.5 w-3.5 shrink-0" />
+        <span className="min-w-0 flex-1 truncate text-left">{getGeoLabel(selections)}</span>
+        <ChevronDown className={cn("h-3 w-3 shrink-0 transition-transform", open && "rotate-180")} />
       </button>
 
       {/* Selected tags */}
       {selections.length > 0 && !open && (
-        <div className="absolute top-full left-0 mt-1 flex flex-wrap gap-1 z-50">
+        <div className="absolute right-0 top-full z-50 mt-1 flex max-w-[min(100vw-0.5rem,18rem)] flex-wrap justify-end gap-1 sm:left-0 sm:right-auto sm:max-w-none sm:justify-start">
           {selections.slice(0, 5).map(s => (
             <span key={s.value} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] border border-primary/20">
               {s.label}
@@ -76,7 +77,7 @@ export function GeoSelector() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-full left-0 mt-1 w-80 max-h-[400px] bg-card border border-border rounded-lg shadow-2xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full z-50 mt-1 max-h-[min(70vh,400px)] w-[min(calc(100vw-1rem),20rem)] overflow-hidden rounded-lg border border-border bg-card shadow-2xl sm:left-0 sm:right-auto sm:w-80">
           {/* Search */}
           <div className="p-2 border-b border-border/50">
             <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-muted/30 border border-border/30">

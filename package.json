@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "remove-logo-bg": "node scripts/remove-logo-bg.mjs",
     "supabase:link": "supabase link --project-ref gtyzvmnqifwyccgmirym",
     "supabase:functions:deploy": "supabase functions deploy --project-ref gtyzvmnqifwyccgmirym"
   },
@@ -91,6 +92,7 @@
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
     "lovable-tagger": "^1.1.13",
+    "pngjs": "^7.0.0",
     "postcss": "^8.5.6",
     "supabase": "^2.83.0",
     "tailwindcss": "^3.4.17",

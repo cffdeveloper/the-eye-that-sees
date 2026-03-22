@@ -43,7 +43,7 @@ export function useAlertNotifications(alerts: any[], enabled: boolean = true) {
       const top = criticalAlerts[0];
       new Notification(`⚠️ Intel GoldMine · Maverick`, {
         body: `${top.title}\n${top.detail || ""}`,
-        icon: "/favicon.svg",
+        icon: "/favicon.png",
         tag: "maverick-alert",
       });
     }

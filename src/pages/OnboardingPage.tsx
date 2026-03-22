@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -120,7 +121,10 @@ export default function OnboardingPage() {
   const regions = COUNTRIES.slice(0, 30);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-8 relative">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle size="sm" />
+      </div>
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="flex flex-col items-center mb-10">

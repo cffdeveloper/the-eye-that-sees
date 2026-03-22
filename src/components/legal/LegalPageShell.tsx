@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { BrandHexMark } from "@/components/BrandHexMark";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ArrowLeft } from "lucide-react";
 
 type Props = {
@@ -24,7 +25,9 @@ export function LegalPageShell({ title, lastUpdated = "March 22, 2026", children
             <BrandHexMark size="sm" />
             <span className="font-semibold text-foreground truncate text-sm sm:text-base">{title}</span>
           </div>
-          <span className="justify-self-end" aria-hidden />
+          <div className="justify-self-end flex items-center justify-end">
+            <ThemeToggle size="sm" />
+          </div>
         </div>
       </header>
 

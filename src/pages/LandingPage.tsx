@@ -4,11 +4,21 @@ import { useRef } from "react";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { Button } from "@/components/ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { industries } from "@/lib/industryData";
+import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
 import {
   Activity,
   ArrowRight,
+  CheckCircle2,
+  ChevronDown,
   Cpu,
   Globe2,
   Layers,
@@ -16,8 +26,12 @@ import {
   TrendingUp,
   PlayCircle,
   FlaskConical,
+  Workflow,
+  CreditCard,
+  BadgePercent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const totalFlows = industries.reduce((a, i) => a + i.subFlows.length, 0);
 
@@ -43,21 +57,230 @@ export default function LandingPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="sticky top-0 z-50 border-b border-border/40 bg-background/75 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65"
+        className="sticky top-0 z-50 overflow-visible border-b border-border/40 bg-background/75 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-[64px] sm:h-[70px] flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 group">
-            <BrandHexMark size="md" className="transition-transform group-hover:scale-[1.03]" />
-            <BrandWordmark className="text-base sm:text-lg truncate" />
+        <div className="mx-auto flex h-14 max-w-7xl flex-wrap items-center justify-between gap-x-2 gap-y-2 px-3 sm:h-16 sm:gap-3 sm:px-8">
+          <Link
+            to="/"
+            className="relative z-[1] flex min-w-0 shrink items-center gap-2 sm:gap-2.5 group"
+          >
+            <span className="relative flex shrink-0 items-center justify-center overflow-visible">
+              <BrandHexMark size="header" className="transition-transform group-hover:scale-[1.03]" />
+            </span>
+            <BrandWordmark className="text-base sm:text-lg md:text-xl truncate leading-none" />
           </Link>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button variant="ghost" size="sm" className="text-sm font-semibold hidden sm:inline-flex" asChild>
+          <nav className="order-3 flex w-full min-w-0 items-center justify-center gap-0.5 text-[12px] font-semibold text-muted-foreground sm:order-none sm:w-auto sm:justify-start sm:text-[13px] md:flex-1 md:justify-center">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "group rounded-full px-2 sm:px-3 py-2 hover:text-foreground hover:bg-muted/70 transition-colors",
+                    "inline-flex items-center gap-1 max-w-[44vw] sm:max-w-none",
+                    "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  )}
+                >
+                  <Workflow className="w-3.5 h-3.5 shrink-0 text-primary/80 group-hover:text-primary transition-colors" />
+                  <span className="truncate">
+                    <span className="sm:hidden">How</span>
+                    <span className="hidden sm:inline">How it works</span>
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="center"
+                sideOffset={10}
+                className="w-[min(92vw,22rem)] sm:w-[26rem] p-0 overflow-hidden border-border/60 shadow-xl z-[100] bg-card/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+              >
+                <div className="border-b border-border/50 bg-gradient-to-r from-primary/8 via-transparent to-violet-500/10 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Flow</p>
+                  <p className="font-display text-base font-bold text-foreground tracking-tight">How it works</p>
+                </div>
+                <div className="max-h-[min(60vh,420px)] overflow-y-auto p-3">
+                  <Accordion type="single" collapsible defaultValue="hiw-1" className="space-y-2">
+                    {[
+                      {
+                        id: "hiw-1",
+                        title: "01 — Set your scope",
+                        body: (
+                          <p>
+                            Choose industries, regions, and what matters most in your profile. That scope carries into
+                            Maverick briefs, alerts, and geo filters so intel stays relevant — not generic.
+                          </p>
+                        ),
+                      },
+                      {
+                        id: "hiw-2",
+                        title: "02 — Maverick synthesizes",
+                        body: (
+                          <p>
+                            Data from 11+ sources is structured into clear outputs: frameworks, risks, opportunities, and
+                            scores — not a wall of headlines.
+                          </p>
+                        ),
+                      },
+                      {
+                        id: "hiw-3",
+                        title: "03 — Decide with proof",
+                        body: (
+                          <p>
+                            Use the live feed for pulse, industries and money flows for depth, cross-industry for
+                            connections, and Intel Lab when you need a custom brief with follow-ups.
+                          </p>
+                        ),
+                      },
+                    ].map((item) => (
+                      <AccordionItem
+                        key={item.id}
+                        value={item.id}
+                        className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
+                      >
+                        <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 [&[data-state=open]]:bg-muted/25 rounded-none gap-2">
+                          {item.title}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground text-sm leading-relaxed px-3 pb-3 pt-0 border-t border-border/40">
+                          {item.body}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "group rounded-full px-2 sm:px-3 py-2 hover:text-foreground hover:bg-muted/70 transition-colors",
+                    "inline-flex items-center gap-1 max-w-[44vw] sm:max-w-none",
+                    "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  )}
+                >
+                  <BadgePercent className="w-3.5 h-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
+                  <span className="truncate sm:max-w-none">Pricing</span>
+                  <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="center"
+                sideOffset={10}
+                className="w-[min(92vw,22rem)] sm:w-[26rem] p-0 overflow-hidden border-border/60 shadow-xl z-[100] bg-card/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+              >
+                <div className="border-b border-border/50 bg-gradient-to-r from-brand-orange/12 via-transparent to-amber-500/10 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange">Billing</p>
+                  <p className="font-display text-base font-bold text-foreground tracking-tight">Pricing</p>
+                </div>
+                <div className="max-h-[min(65vh,480px)] overflow-y-auto p-3">
+                  <Accordion type="single" collapsible defaultValue="price-1" className="space-y-2">
+                    <AccordionItem
+                      value="price-1"
+                      className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
+                    >
+                      <AccordionTrigger className="px-3 py-3 text-left hover:no-underline hover:bg-muted/40 [&[data-state=open]]:bg-muted/25 rounded-none gap-2">
+                        <span className="flex flex-col items-start gap-0.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Pro plan
+                          </span>
+                          <span className="text-sm font-bold text-foreground">
+                            ${SUBSCRIPTION_USD_MONTHLY}
+                            <span className="text-muted-foreground font-semibold">/month</span>
+                          </span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 space-y-3">
+                        <p>
+                          One Pro subscription unlocks the full product: live intel feed, AI industry and money-flow deep
+                          dives, cross-industry analysis, Intel Lab, and geo-scoped snapshots.
+                        </p>
+                        <p className="text-xs text-muted-foreground/90">
+                          Start with a free account; upgrade when you need unrestricted access.
+                        </p>
+                        <Button size="sm" className="w-full font-bold rounded-lg" asChild>
+                          <Link to="/auth?mode=signup">
+                            Get started
+                            <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                          </Link>
+                        </Button>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem
+                      value="price-2"
+                      className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
+                    >
+                      <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 gap-2">
+                        <span className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-signal-emerald shrink-0" />
+                          What&apos;s included in Pro
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
+                        <ul className="space-y-2 text-sm text-muted-foreground pt-2">
+                          {[
+                            "AI research & follow-up chat",
+                            `${industries.length} industries · ${totalFlows}+ money flows`,
+                            "Geo-scoped analysis & snapshots",
+                            "Cross-industry intelligence",
+                            "Custom Intel Lab sessions",
+                          ].map((line) => (
+                            <li key={line} className="flex gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-signal-emerald shrink-0 mt-0.5" />
+                              <span>{line}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    <AccordionItem
+                      value="price-3"
+                      className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
+                    >
+                      <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 gap-2">
+                        <span className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-primary shrink-0" />
+                          Payments &amp; security
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 leading-relaxed">
+                        <p className="pt-2">
+                          Subscriptions are billed monthly. Checkout runs through{" "}
+                          <span className="font-semibold text-foreground">Paystack</span> — the same flow you&apos;ll use
+                          after you sign in. You can manage billing from your profile once you&apos;re on Pro.
+                        </p>
+                        <p className="mt-2 text-xs">
+                          <Link to="/auth" className="text-primary font-semibold hover:underline">
+                            Sign in
+                          </Link>
+                          {" · "}
+                          <Link to="/privacy-policy" className="text-primary font-semibold hover:underline">
+                            Privacy
+                          </Link>
+                          {" · "}
+                          <Link to="/terms-of-service" className="text-primary font-semibold hover:underline">
+                            Terms
+                          </Link>
+                        </p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </nav>
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0 sm:gap-2">
+            <ThemeToggle />
+            <Button variant="ghost" size="sm" className="hidden text-sm font-semibold sm:inline-flex" asChild>
               <Link to="/auth">Sign in</Link>
             </Button>
-            <Button size="sm" className="text-sm font-bold gap-1.5 rounded-full px-4 sm:px-5 h-9 shadow-md" asChild>
+            <Button size="sm" className="h-9 gap-1 rounded-full px-3 text-sm font-bold shadow-md sm:px-5" asChild>
               <Link to="/auth?mode=signup">
-                Get started
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span className="sm:hidden">Start</span>
+                <span className="hidden sm:inline">Get started</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Button>
           </div>
@@ -65,15 +288,19 @@ export default function LandingPage() {
       </motion.header>
 
       <main className="relative z-10 flex-1">
-        {/* Hero — layered aurora + mesh (not flat navy) */}
-        <section ref={heroRef} className="relative overflow-hidden mesh-marketing landing-aurora text-foreground">
+        {/* Hero — full first viewport (below sticky header); next sections only after scroll */}
+        <section
+          ref={heroRef}
+          className="relative flex min-h-[calc(100svh-3.5rem)] flex-col overflow-hidden mesh-marketing landing-aurora text-foreground sm:min-h-[calc(100svh-4rem)]"
+        >
           <LandingBackdrop />
-          <div className="absolute inset-0 dot-pattern-fine opacity-[0.45] pointer-events-none" />
-          <div className="absolute inset-0 grid-bg opacity-25 pointer-events-none" />
 
-          <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative pb-10 sm:pb-14">
-            <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 sm:pt-12 lg:pt-14 pb-0">
-              <p className="text-center lg:text-left text-[13px] sm:text-sm text-muted-foreground font-medium mb-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5">
+          <motion.div
+            style={{ y: heroY, opacity: heroOpacity }}
+            className="relative z-10 flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8"
+          >
+            <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0">
+              <p className="text-center lg:text-left text-[13px] sm:text-sm text-muted-foreground font-medium mb-3 sm:mb-4 flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5">
                 <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-card/90 backdrop-blur-sm px-3 py-1.5 text-foreground shadow-sm">
                   <Activity className="w-3.5 h-3.5 text-primary" />
                   Maverick AI · live pipelines · geo snapshots
@@ -88,19 +315,19 @@ export default function LandingPage() {
                 variants={stagger}
                 initial="hidden"
                 animate="show"
-                className="grid lg:grid-cols-[1.08fr_0.92fr] gap-10 lg:gap-12 xl:gap-16 items-center"
+                className="grid lg:grid-cols-[1.08fr_0.92fr] gap-8 lg:gap-10 xl:gap-12 lg:items-stretch"
               >
-                <div className="text-center lg:text-left">
-                  <motion.div variants={fadeUp} className="mb-5 sm:mb-6 flex justify-center lg:justify-start">
+                <div className="text-center lg:text-left lg:flex lg:flex-col lg:justify-center">
+                  <motion.div variants={fadeUp} className="mb-3 sm:mb-4 flex justify-center lg:justify-start">
                     <div className="relative">
-                      <div className="absolute inset-0 rounded-3xl bg-primary/15 blur-3xl scale-125" />
-                      <BrandHexMark size="lg" className="relative w-[4.5rem] h-[4.5rem] sm:w-24 sm:h-24 drop-shadow-lg" />
+                      <div className="absolute inset-0 rounded-[2rem] bg-primary/16 blur-2xl scale-[1.25] sm:scale-[1.2]" />
+                      <BrandHexMark size="hero" className="relative drop-shadow-md" />
                     </div>
                   </motion.div>
 
                   <motion.div
                     variants={fadeUp}
-                    className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-md px-3.5 py-1.5 text-[13px] sm:text-sm text-muted-foreground mb-6 shadow-sm"
+                    className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-md px-3.5 py-1.5 text-[13px] sm:text-sm text-muted-foreground mb-5 sm:mb-6 shadow-sm"
                   >
                     <span className="relative flex h-2 w-2 shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-emerald/40" />
@@ -174,12 +401,12 @@ export default function LandingPage() {
                   </motion.div>
                 </div>
 
-                <motion.div variants={fadeUp} className="relative hidden lg:block">
+                <motion.div variants={fadeUp} className="relative hidden h-full min-h-0 lg:flex lg:flex-col">
                   <div className="absolute -inset-5 rounded-[2rem] bg-gradient-to-br from-primary/15 via-transparent to-brand-orange/15 blur-2xl" />
                   <motion.div
                     animate={{ y: [0, -5, 0] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="shine-border relative rounded-2xl border border-border/40 bg-card shadow-2xl overflow-hidden"
+                    className="shine-border relative flex h-full min-h-0 flex-col rounded-2xl border border-border/40 bg-card shadow-2xl overflow-hidden"
                   >
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/40">
                       <span className="flex gap-1.5">
@@ -193,11 +420,11 @@ export default function LandingPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="relative aspect-[16/10.5] bg-muted/30">
+                    <div className="relative min-h-[clamp(240px,44vh,580px)] flex-1 bg-muted/30">
                       <img
                         src="/hero-visual.png"
                         alt=""
-                        className="w-full h-full object-cover object-top"
+                        className="absolute inset-0 h-full w-full object-cover object-top"
                         loading="eager"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/35 via-transparent to-transparent pointer-events-none" />
@@ -225,28 +452,33 @@ export default function LandingPage() {
               variants={fadeUp}
               initial="hidden"
               animate="show"
-              className="max-w-6xl mx-auto px-4 sm:px-8 pt-10 pb-4 lg:hidden"
+              className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 pb-2 lg:hidden"
             >
-              <div className="shine-border relative rounded-2xl overflow-hidden border border-border/40 bg-card shadow-2xl">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-border/40 bg-muted/30">
+              <div className="shine-border relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-2xl">
+                <div className="flex items-center gap-2 border-b border-border/40 bg-muted/30 px-3 py-2">
                   <span className="h-2 w-2 rounded-full bg-red-400/90" />
                   <span className="h-2 w-2 rounded-full bg-amber-400/90" />
                   <span className="h-2 w-2 rounded-full bg-emerald-400/90" />
                 </div>
-                <img
-                  src="/hero-visual.png"
-                  alt="Intel GoldMine — market intelligence workspace"
-                  className="w-full h-auto"
-                  loading="eager"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
+                <div className="relative aspect-[16/10] w-full max-h-[min(52vh,420px)]">
+                  <img
+                    src="/hero-visual.png"
+                    alt="Intel GoldMine — market intelligence workspace"
+                    className="h-full w-full object-cover object-top"
+                    loading="eager"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+                </div>
               </div>
             </motion.div>
           </motion.div>
         </section>
 
         {/* Explore — warm sand band */}
-        <section id="explore" className="relative border-y border-amber-200/30 landing-band-sand">
+        <section
+          id="explore"
+          className="relative border-y border-amber-200/30 dark:border-amber-500/15 landing-band-sand"
+        >
           <div className="absolute inset-0 dot-pattern-fine opacity-[0.28] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-4 sm:px-8 py-14 sm:py-20 relative">
             <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
@@ -309,23 +541,23 @@ export default function LandingPage() {
         </section>
 
         {/* Marquee — amber ribbon (distinct from hero + footer) */}
-        <div className="border-y border-amber-300/35 bg-gradient-to-r from-amber-100/90 via-amber-50/95 to-orange-50/90 overflow-hidden">
-          <div className="flex animate-marquee whitespace-nowrap py-5 sm:py-6 gap-12 sm:gap-16 text-sm text-amber-950/70">
+        <div className="border-y border-amber-300/35 dark:border-amber-500/25 bg-gradient-to-r from-amber-100/90 via-amber-50/95 to-orange-50/90 dark:from-amber-950/50 dark:via-amber-950/35 dark:to-orange-950/45 overflow-hidden">
+          <div className="flex animate-marquee whitespace-nowrap py-5 sm:py-6 gap-12 sm:gap-16 text-sm text-amber-950/70 dark:text-amber-200/75">
             {marqueeItems.map((ind, i) => (
               <span key={`${ind.slug}-${i}`} className="inline-flex items-center gap-3 shrink-0">
                 <span className="text-xl">{ind.icon}</span>
-                <span className="font-semibold text-amber-950/85 tracking-tight">{ind.name}</span>
+                <span className="font-semibold text-amber-950/85 dark:text-amber-100/90 tracking-tight">{ind.name}</span>
               </span>
             ))}
           </div>
         </div>
       </main>
 
-      <footer className="relative z-10 border-t border-zinc-800 bg-zinc-950 text-zinc-300 py-14 sm:py-16">
+      <footer className="relative z-10 border-t border-zinc-800 dark:border-zinc-900 bg-zinc-950 dark:bg-black text-zinc-300 py-14 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <BrandHexMark size="sm" variant="onDark" />
+              <BrandHexMark size="footer" variant="onDark" />
               <BrandWordmark className="text-lg" variant="onDark" />
             </div>
             <p className="text-sm text-zinc-500 leading-relaxed max-w-sm">

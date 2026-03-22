@@ -69,7 +69,7 @@ export function PageIntro({
         <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1.5">{eyebrow}</p>
       )}
       <h2 className="text-sm sm:text-base font-bold text-foreground leading-snug">{title}</h2>
-      <div className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-2">{children}</div>
+      <div className="mt-2.5 space-y-2 break-words text-xs leading-relaxed text-muted-foreground sm:text-sm">{children}</div>
     </div>
   );
 }
