@@ -381,7 +381,160 @@ const COUNTRIES: CountryCfg[] = [
   { code: "SA", lang: "en", ceid: "SA:en", outlets: ["arabnews.com","saudigazette.com.sa","argaam.com"], yt: [], subs: [] },
   { code: "IL", lang: "en", ceid: "IL:en", outlets: ["calcalistech.com","geektime.com","globes.co.il","nocamels.com"], yt: [], subs: [] },
   { code: "QA", lang: "en", ceid: "QA:en", outlets: ["thepeninsulaqatar.com","gulf-times.com"], yt: [], subs: [] },
+  // ── ADDITIONAL AFRICA ──
+  { code: "CM", lang: "fr", ceid: "CM:fr", outlets: ["journalducameroun.com","cameroon-tribune.cm"], yt: [], subs: [] },
+  { code: "CD", lang: "fr", ceid: "CD:fr", outlets: ["actualite.cd","radiookapi.net","7sur7.cd"], yt: [], subs: [] },
+  { code: "ZW", lang: "en", ceid: "ZW:en", outlets: ["newsday.co.zw","herald.co.zw","techzim.co.zw"], yt: [], subs: ["Zimbabwe"] },
+  { code: "ZM", lang: "en", ceid: "ZM:en", outlets: ["diggers.news","lusakatimes.com","znbc.co.zm"], yt: [], subs: [] },
+  { code: "MZ", lang: "pt", ceid: "MZ:pt-419", outlets: ["cartamz.com","clubofmozambique.com"], yt: [], subs: [] },
+  { code: "AO", lang: "pt", ceid: "AO:pt-419", outlets: ["jornaldeangola.ao","expansao.co.ao"], yt: [], subs: [] },
+  { code: "BW", lang: "en", ceid: "BW:en", outlets: ["mmegi.bw","sundaystandard.info"], yt: [], subs: [] },
+  { code: "MU", lang: "en", ceid: "MU:en", outlets: ["lexpress.mu","defimedia.info"], yt: [], subs: [] },
+  // ── ADDITIONAL ASIA ──
+  { code: "MY", lang: "en", ceid: "MY:en", outlets: ["thestar.com.my","theedgemarkets.com","digitalnewsasia.com","freemalaysiatoday.com"], yt: [], subs: ["malaysia"] },
+  { code: "LK", lang: "en", ceid: "LK:en", outlets: ["ft.lk","dailymirror.lk","economynext.com"], yt: [], subs: [] },
+  { code: "MM", lang: "en", ceid: "MM:en", outlets: ["irrawaddy.com","mizzima.com","mmtimes.com"], yt: [], subs: [] },
+  { code: "KH", lang: "en", ceid: "KH:en", outlets: ["phnompenhpost.com","khmertimeskh.com"], yt: [], subs: [] },
+  { code: "NP", lang: "en", ceid: "NP:en", outlets: ["kathmandupost.com","onlinekhabar.com","nepalitimes.com"], yt: [], subs: [] },
+  { code: "TW", lang: "zh", ceid: "TW:zh-Hant", outlets: ["focustaiwan.tw","taiwannews.com.tw","bnext.com.tw"], yt: [], subs: ["taiwan"] },
+  // ── ADDITIONAL MIDDLE EAST ──
+  { code: "KW", lang: "en", ceid: "KW:en", outlets: ["arabtimesonline.com","kuwaittimes.com"], yt: [], subs: [] },
+  { code: "BH", lang: "en", ceid: "BH:en", outlets: ["gdnonline.com","newsofbahrain.com"], yt: [], subs: [] },
+  { code: "OM", lang: "en", ceid: "OM:en", outlets: ["timesofoman.com","muscatdaily.com"], yt: [], subs: [] },
+  { code: "JO", lang: "en", ceid: "JO:en", outlets: ["jordantimes.com","jordannews.jo"], yt: [], subs: [] },
+  { code: "LB", lang: "en", ceid: "LB:en", outlets: ["dailystar.com.lb","lorientlejour.com","annahar.com"], yt: [], subs: [] },
+  { code: "IQ", lang: "en", ceid: "IQ:en", outlets: ["rudaw.net","iraqinews.com","shafaq.com"], yt: [], subs: [] },
+  // ── ADDITIONAL AMERICAS ──
+  { code: "PE", lang: "es", ceid: "PE:es-419", outlets: ["gestion.pe","elcomercio.pe","rpp.pe"], yt: [], subs: [] },
+  { code: "EC", lang: "es", ceid: "EC:es-419", outlets: ["eluniverso.com","elcomercio.com","primicias.ec"], yt: [], subs: [] },
+  { code: "UY", lang: "es", ceid: "UY:es-419", outlets: ["elobservador.com.uy","elpais.com.uy"], yt: [], subs: [] },
+  { code: "CR", lang: "es", ceid: "CR:es-419", outlets: ["nacion.com","ticotimes.net"], yt: [], subs: [] },
+  { code: "PA", lang: "es", ceid: "PA:es-419", outlets: ["prensa.com","laestrella.com.pa"], yt: [], subs: [] },
+  { code: "DO", lang: "es", ceid: "DO:es-419", outlets: ["listin.com.do","diariolibre.com"], yt: [], subs: [] },
+  { code: "TT", lang: "en", ceid: "TT:en", outlets: ["guardian.co.tt","newsday.co.tt","trinidadexpress.com"], yt: [], subs: [] },
+  { code: "JM", lang: "en", ceid: "JM:en", outlets: ["jamaicaobserver.com","jamaicagleaner.com"], yt: [], subs: [] },
+  // ── ADDITIONAL EUROPE ──
+  { code: "PT", lang: "pt", ceid: "PT:pt-150", outlets: ["jornaldenegocios.pt","dinheirovivo.pt","eco.sapo.pt"], yt: [], subs: [] },
+  { code: "NO", lang: "no", ceid: "NO:no", outlets: ["dn.no","e24.no","shifter.no"], yt: [], subs: [] },
+  { code: "DK", lang: "da", ceid: "DK:da", outlets: ["borsen.dk","finans.dk","version2.dk"], yt: [], subs: [] },
+  { code: "FI", lang: "fi", ceid: "FI:fi", outlets: ["kauppalehti.fi","hs.fi","yle.fi"], yt: [], subs: [] },
+  { code: "AT", lang: "de", ceid: "AT:de", outlets: ["diepresse.com","derstandard.at","trending.at"], yt: [], subs: [] },
+  { code: "BE", lang: "fr", ceid: "BE:fr", outlets: ["lecho.be","lesoir.be","standaard.be"], yt: [], subs: [] },
+  { code: "CZ", lang: "cs", ceid: "CZ:cs", outlets: ["e15.cz","ekonom.cz","lupa.cz"], yt: [], subs: [] },
+  { code: "RO", lang: "ro", ceid: "RO:ro", outlets: ["profit.ro","startupcafe.ro","zf.ro"], yt: [], subs: [] },
+  { code: "HU", lang: "hu", ceid: "HU:hu", outlets: ["portfolio.hu","hvg.hu","index.hu"], yt: [], subs: [] },
+  { code: "GR", lang: "el", ceid: "GR:el", outlets: ["naftemporiki.gr","capital.gr","kathimerini.gr"], yt: [], subs: [] },
+  { code: "UA", lang: "uk", ceid: "UA:uk", outlets: ["epravda.com.ua","ain.ua","liga.net"], yt: [], subs: ["ukraine"] },
+  { code: "RS", lang: "sr", ceid: "RS:sr", outlets: ["b92.net","blic.rs","startit.rs"], yt: [], subs: [] },
+  { code: "HR", lang: "hr", ceid: "HR:hr", outlets: ["jutarnji.hr","poslovni.hr","netokracija.com"], yt: [], subs: [] },
+  { code: "BG", lang: "bg", ceid: "BG:bg", outlets: ["capital.bg","dnevnik.bg","economy.bg"], yt: [], subs: [] },
+  // ── CENTRAL ASIA ──
+  { code: "KZ", lang: "en", ceid: "KZ:en", outlets: ["inform.kz","astanатimes.com","kapital.kz"], yt: [], subs: [] },
+  { code: "UZ", lang: "en", ceid: "UZ:en", outlets: ["gazeta.uz","spot.uz"], yt: [], subs: [] },
 ];
+
+// ═══════════════════════════════════════════════════════════════════
+// GLOBAL TIER-1 NEWS RSS FEEDS — Direct from BBC, CNN, Al Jazeera,
+// Reuters, AP, Guardian, NYT, DW, France24, NHK, etc.
+// These are ALWAYS fetched on every run for maximum freshness.
+// ═══════════════════════════════════════════════════════════════════
+
+interface GlobalRSSSource {
+  name: string;
+  feeds: string[];
+  geo: string;
+  tags: string[];
+}
+
+const GLOBAL_NEWS_RSS: GlobalRSSSource[] = [
+  // ── ENGLISH LANGUAGE ──
+  { name: "BBC News", feeds: ["https://feeds.bbci.co.uk/news/rss.xml","https://feeds.bbci.co.uk/news/world/rss.xml","https://feeds.bbci.co.uk/news/business/rss.xml","https://feeds.bbci.co.uk/news/technology/rss.xml","https://feeds.bbci.co.uk/news/science_and_environment/rss.xml","https://feeds.bbci.co.uk/news/world/africa/rss.xml","https://feeds.bbci.co.uk/news/world/asia/rss.xml","https://feeds.bbci.co.uk/news/world/europe/rss.xml","https://feeds.bbci.co.uk/news/world/latin_america/rss.xml","https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"], geo: "global", tags: ["bbc","tier1"] },
+  { name: "CNN", feeds: ["http://rss.cnn.com/rss/edition.rss","http://rss.cnn.com/rss/edition_world.rss","http://rss.cnn.com/rss/money_news_international.rss","http://rss.cnn.com/rss/edition_technology.rss","http://rss.cnn.com/rss/edition_africa.rss","http://rss.cnn.com/rss/edition_americas.rss","http://rss.cnn.com/rss/edition_asia.rss","http://rss.cnn.com/rss/edition_europe.rss","http://rss.cnn.com/rss/edition_meast.rss"], geo: "global", tags: ["cnn","tier1"] },
+  { name: "Al Jazeera", feeds: ["https://www.aljazeera.com/xml/rss/all.xml"], geo: "global", tags: ["aljazeera","tier1"] },
+  { name: "Reuters", feeds: ["https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best","https://www.reutersagency.com/feed/?best-topics=tech&post_type=best","https://www.reutersagency.com/feed/?taxonomy=best-regions&post_type=best"], geo: "global", tags: ["reuters","tier1"] },
+  { name: "AP News", feeds: ["https://rsshub.app/apnews/topics/apf-topnews","https://rsshub.app/apnews/topics/apf-business","https://rsshub.app/apnews/topics/apf-technology"], geo: "global", tags: ["ap","tier1"] },
+  { name: "The Guardian", feeds: ["https://www.theguardian.com/world/rss","https://www.theguardian.com/business/rss","https://www.theguardian.com/technology/rss","https://www.theguardian.com/environment/rss","https://www.theguardian.com/global-development/rss"], geo: "GB", tags: ["guardian","tier1"] },
+  { name: "NPR", feeds: ["https://feeds.npr.org/1001/rss.xml","https://feeds.npr.org/1006/rss.xml","https://feeds.npr.org/1019/rss.xml"], geo: "US", tags: ["npr","tier1"] },
+  { name: "ABC News AU", feeds: ["https://www.abc.net.au/news/feed/51120/rss.xml"], geo: "AU", tags: ["abc-au","tier1"] },
+  { name: "CBC Canada", feeds: ["https://rss.cbc.ca/lineup/topstories.xml","https://rss.cbc.ca/lineup/business.xml","https://rss.cbc.ca/lineup/technology.xml"], geo: "CA", tags: ["cbc","tier1"] },
+  { name: "Sky News", feeds: ["https://feeds.skynews.com/feeds/rss/world.xml","https://feeds.skynews.com/feeds/rss/business.xml","https://feeds.skynews.com/feeds/rss/technology.xml"], geo: "GB", tags: ["skynews","tier1"] },
+  { name: "India Today", feeds: ["https://www.indiatoday.in/rss/home","https://www.indiatoday.in/rss/1206514"], geo: "IN", tags: ["indiatoday","tier1"] },
+  { name: "Times of India", feeds: ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms","https://timesofindia.indiatimes.com/rssfeeds/1898055.cms"], geo: "IN", tags: ["toi","tier1"] },
+  { name: "South China Morning Post", feeds: ["https://www.scmp.com/rss/91/feed"], geo: "CN", tags: ["scmp","tier1"] },
+  { name: "Japan Times", feeds: ["https://www.japantimes.co.jp/feed/"], geo: "JP", tags: ["japantimes","tier1"] },
+  // ── AFRICAN ──
+  { name: "Africa News", feeds: ["https://www.africanews.com/feed/"], geo: "AF", tags: ["africanews","africa"] },
+  { name: "The East African", feeds: ["https://www.theeastafrican.co.ke/tea/rss"], geo: "EA", tags: ["eastafrican","africa"] },
+  { name: "Daily Maverick", feeds: ["https://www.dailymaverick.co.za/rss/"], geo: "ZA", tags: ["dailymaverick","africa"] },
+  // ── MIDDLE EAST ──
+  { name: "Al Monitor", feeds: ["https://www.al-monitor.com/rss"], geo: "ME", tags: ["almonitor","mideast"] },
+  { name: "Middle East Eye", feeds: ["https://www.middleeasteye.net/rss"], geo: "ME", tags: ["mee","mideast"] },
+  { name: "Arab News", feeds: ["https://www.arabnews.com/rss.xml"], geo: "SA", tags: ["arabnews","mideast"] },
+  { name: "Gulf News", feeds: ["https://gulfnews.com/rss"], geo: "AE", tags: ["gulfnews","mideast"] },
+  // ── WIRE SERVICES & SPECIALIZED ──
+  { name: "DW (Deutsche Welle)", feeds: ["https://rss.dw.com/rdf/rss-en-all","https://rss.dw.com/rdf/rss-en-bus","https://rss.dw.com/rdf/rss-en-sci"], geo: "DE", tags: ["dw","tier1"] },
+  { name: "France24", feeds: ["https://www.france24.com/en/rss","https://www.france24.com/en/africa/rss","https://www.france24.com/en/middle-east/rss"], geo: "FR", tags: ["france24","tier1"] },
+  { name: "NHK World", feeds: ["https://www3.nhk.or.jp/nhkworld/en/news/rss/index.xml"], geo: "JP", tags: ["nhk","tier1"] },
+  { name: "Xinhua", feeds: ["http://www.news.cn/english/rss/worldrss.xml"], geo: "CN", tags: ["xinhua","tier1"] },
+  { name: "TASS", feeds: ["https://tass.com/rss/v2.xml"], geo: "RU", tags: ["tass","tier1"] },
+  // ── BUSINESS / MARKETS ──
+  { name: "Financial Times", feeds: ["https://www.ft.com/rss/home"], geo: "GB", tags: ["ft","business"] },
+  { name: "Bloomberg", feeds: ["https://feeds.bloomberg.com/markets/news.rss","https://feeds.bloomberg.com/technology/news.rss"], geo: "US", tags: ["bloomberg","business"] },
+  { name: "CNBC", feeds: ["https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114","https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10001147","https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=19854910"], geo: "US", tags: ["cnbc","business"] },
+  { name: "MarketWatch", feeds: ["http://feeds.marketwatch.com/marketwatch/topstories/","http://feeds.marketwatch.com/marketwatch/marketpulse/"], geo: "US", tags: ["marketwatch","business"] },
+  { name: "Wall Street Journal", feeds: ["https://feeds.a.dj.com/rss/RSSWorldNews.xml","https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml","https://feeds.a.dj.com/rss/RSSWSJD.xml"], geo: "US", tags: ["wsj","business"] },
+  { name: "The Economist", feeds: ["https://www.economist.com/international/rss.xml","https://www.economist.com/finance-and-economics/rss.xml","https://www.economist.com/business/rss.xml","https://www.economist.com/science-and-technology/rss.xml"], geo: "global", tags: ["economist","business"] },
+  // ── TECH ──
+  { name: "TechCrunch", feeds: ["https://techcrunch.com/feed/"], geo: "US", tags: ["techcrunch","tech"] },
+  { name: "The Verge", feeds: ["https://www.theverge.com/rss/index.xml"], geo: "US", tags: ["verge","tech"] },
+  { name: "Ars Technica", feeds: ["https://feeds.arstechnica.com/arstechnica/index"], geo: "US", tags: ["arstechnica","tech"] },
+  { name: "Wired", feeds: ["https://www.wired.com/feed/rss"], geo: "US", tags: ["wired","tech"] },
+  { name: "VentureBeat", feeds: ["https://venturebeat.com/feed/"], geo: "US", tags: ["venturebeat","tech"] },
+  { name: "TechCabal (Africa)", feeds: ["https://techcabal.com/feed/"], geo: "AF", tags: ["techcabal","tech","africa"] },
+  { name: "Rest of World", feeds: ["https://restofworld.org/feed/"], geo: "global", tags: ["restofworld","tech"] },
+  // ── ENERGY & ENVIRONMENT ──
+  { name: "Carbon Brief", feeds: ["https://www.carbonbrief.org/feed/"], geo: "global", tags: ["carbonbrief","climate"] },
+  { name: "Climate Home", feeds: ["https://www.climatechangenews.com/feed/"], geo: "global", tags: ["climatehome","climate"] },
+  // ── DEVELOPMENT ──
+  { name: "Devex", feeds: ["https://www.devex.com/news/rss"], geo: "global", tags: ["devex","development"] },
+  { name: "The New Humanitarian", feeds: ["https://www.thenewhumanitarian.org/rss"], geo: "global", tags: ["newhumanitarian","development"] },
+];
+
+async function collectGlobalNewsRSS(): Promise<any[]> {
+  const rows: any[] = [];
+  // Process all feeds in batches of 10
+  const allFeeds = GLOBAL_NEWS_RSS.flatMap(src =>
+    src.feeds.map(feed => ({ feed, name: src.name, geo: src.geo, tags: src.tags }))
+  );
+  for (let i = 0; i < allFeeds.length; i += 10) {
+    const batch = allFeeds.slice(i, i + 10);
+    const promises = batch.map(async ({ feed, name, geo, tags }) => {
+      const xml = await safeTextFetch(feed, 8000);
+      if (!xml) return [];
+      const feedRows: any[] = [];
+      const items = xml.split("<item>").slice(1, 8);
+      for (const item of items) {
+        const title = item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/)?.[1]?.replace(/(<!\[CDATA\[|\]\]>)/g, "").trim() || "";
+        const link = item.match(/<link>(.*?)<\/link>/)?.[1]?.trim() || item.match(/<link[^>]*href="([^"]+)"/)?.[1] || "";
+        const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || item.match(/<dc:date>(.*?)<\/dc:date>/)?.[1] || "";
+        const description = item.match(/<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/)?.[1]?.replace(/<[^>]+>/g, "").substring(0, 300) || "";
+        if (title && title.length > 10) {
+          feedRows.push({
+            source: `rss-${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
+            data_type: "global_news",
+            geo_scope: geo,
+            payload: { title, url: link, date: pubDate, source: name, description },
+            tags: ["news", "rss", "global", ...tags],
+          });
+        }
+      }
+      return feedRows;
+    });
+    const results = await Promise.all(promises);
+    rows.push(...results.flat());
+  }
+  return rows;
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // CORE COLLECTORS (Financial Data)
@@ -805,6 +958,9 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const sb = createClient(supabaseUrl, serviceKey);
 
+    // Wave 0: Global Tier-1 news RSS (BBC, CNN, Al Jazeera, Reuters, etc.)
+    const [globalRSS] = await Promise.all([collectGlobalNewsRSS()]);
+
     // Wave 1: Fast financial data
     const [crypto, forex, sentiment] = await Promise.all([
       collectCrypto(), collectForex(), collectSentiment(),
@@ -835,6 +991,7 @@ serve(async (req) => {
     const [worldbank] = await Promise.all([collectWorldBank()]);
 
     const allRows = [
+      ...globalRSS,
       ...crypto, ...forex, ...sentiment,
       ...globalTopicNews, ...hackerNews, ...devTo, ...github, ...twitterSignals,
       ...industryGDELT, ...industryYT, ...industryReddit,
@@ -859,6 +1016,9 @@ serve(async (req) => {
     const sourceStats = calculateSourcesPerIndustry();
 
     const sources = {
+      globalRSS: globalRSS.length,
+      globalRSS_sources: GLOBAL_NEWS_RSS.length,
+      globalRSS_feeds: GLOBAL_NEWS_RSS.reduce((s, r) => s + r.feeds.length, 0),
       crypto: crypto.length, forex: forex.length, sentiment: sentiment.length,
       globalTopicNews: globalTopicNews.length,
       hackerNews: hackerNews.length, devTo: devTo.length, github: github.length,
