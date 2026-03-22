@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
-        mono: ["IBM Plex Mono", "JetBrains Mono", "ui-monospace", "monospace"],
-        brand: ["Chakra Petch", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["DM Sans", "Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        brand: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -91,8 +91,8 @@ export default {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 8px hsl(var(--primary) / 0.2)" },
-          "50%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.35), 0 0 4px hsl(var(--primary) / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 8px hsl(var(--primary) / 0.15)" },
+          "50%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.25)" },
         },
         "float": {
           "0%, 100%": { transform: "translateY(0)" },
@@ -109,12 +109,6 @@ export default {
         "hero-float": {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-8px)" },
-        },
-        "ai-shimmer-sweep": {
-          "0%": { transform: "translateX(-120%)", opacity: "0" },
-          "20%": { opacity: "0.4" },
-          "80%": { opacity: "0.4" },
-          "100%": { transform: "translateX(120%)", opacity: "0" },
         },
         marquee: {
           "0%": { transform: "translateX(0)" },
@@ -134,7 +128,6 @@ export default {
         "shimmer": "shimmer 3s ease-in-out infinite",
         "hero-rise": "hero-rise 0.7s ease-out forwards",
         "hero-float": "hero-float 9s ease-in-out infinite",
-        "ai-shimmer-sweep": "ai-shimmer-sweep 3.5s ease-in-out infinite",
         marquee: "marquee 45s linear infinite",
         "spin-slow": "spin-slow 28s linear infinite",
       },
