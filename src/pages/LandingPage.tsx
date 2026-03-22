@@ -88,6 +88,10 @@ export default function LandingPage() {
           <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative">
             <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-20 sm:pt-32 pb-12">
               <motion.div variants={stagger} initial="hidden" animate="show" className="text-center max-w-4xl mx-auto">
+                <motion.div variants={fadeUp} className="mb-10">
+                  <BrandHexMark size="lg" className="mx-auto w-20 h-20 sm:w-24 sm:h-24 drop-shadow-xl" />
+                </motion.div>
+
                 <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-4 py-2 text-sm text-muted-foreground mb-10 shadow-sm">
                   <span className="relative flex h-2 w-2 shrink-0">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-emerald/50 opacity-75" />
@@ -100,7 +104,7 @@ export default function LandingPage() {
 
                 <motion.h1
                   variants={fadeUp}
-                  className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]"
+                  className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] text-foreground"
                 >
                   Market intelligence,{" "}
                   <span className="text-gradient-gold">simplified</span>
