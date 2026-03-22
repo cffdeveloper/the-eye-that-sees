@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
-import { Loader2, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Shield, Zap, KeyRound } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2, Shield, Zap, KeyRound, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -104,22 +105,70 @@ export default function AuthPage() {
     }
   };
 
+  const formStagger = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
+  };
+  const formItem = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+  };
+
   return (
-    <div className="min-h-screen bg-background flex relative overflow-hidden mesh-marketing">
-      <div className="absolute inset-0 dot-pattern-fine opacity-40 pointer-events-none" />
-      <div className="absolute top-[-20%] right-[-10%] w-[min(80vw,480px)] h-[min(80vw,480px)] rounded-full bg-primary/12 blur-[100px] pointer-events-none" />
+    <div className="min-h-screen min-h-[100dvh] bg-background flex flex-col md:flex-row relative overflow-hidden mesh-marketing">
+      <LandingBackdrop />
+      <div className="absolute inset-0 dot-pattern-fine opacity-50 pointer-events-none" />
+      <div className="absolute top-[-20%] right-[-10%] w-[min(80vw,480px)] h-[min(80vw,480px)] rounded-full bg-primary/12 blur-[100px] pointer-events-none opacity-90" />
       <div className="absolute bottom-[-15%] left-[-5%] w-[min(70vw,400px)] h-[min(70vw,400px)] rounded-full bg-brand-orange/10 blur-[90px] pointer-events-none" />
 
       <Link
         to="/"
-        className="absolute top-5 left-5 sm:top-6 sm:left-6 z-30 inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/80 backdrop-blur-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors font-medium shadow-sm"
+        className="absolute top-4 left-4 sm:top-5 sm:left-5 z-30 inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/85 backdrop-blur-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors font-medium shadow-md"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </Link>
 
-      {/* Left panel — cinematic */}
-      <div className="hidden lg:flex lg:w-[46%] xl:w-[48%] relative min-h-screen flex-col justify-between overflow-hidden border-r border-white/10">
+      {/* Mobile — cinematic strip (no empty white above form) */}
+      <div className="relative md:hidden h-[min(42vh,320px)] w-full shrink-0 overflow-hidden">
+        <img src="/hero-visual.png" alt="" className="absolute inset-0 h-full w-full object-cover scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/88 via-primary/72 to-brand-navy/93" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
+        <div className="absolute inset-0 opacity-25 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 flex h-full flex-col justify-end p-6 pt-24"
+        >
+          <div className="flex items-center gap-2.5 mb-3">
+            <div className="rounded-xl bg-white/15 p-2 backdrop-blur-md border border-white/20">
+              <BrandHexMark size="sm" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white tracking-tight">Intel GoldMine</p>
+              <p className="text-[10px] text-white/70 font-medium">Maverick AI</p>
+            </div>
+          </div>
+          <p className="font-display text-2xl font-bold text-white leading-tight max-w-sm">
+            Intelligence that helps you decide faster.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {["20+ industries", "11+ sources", "Geo-scoped"].map((t) => (
+              <span
+                key={t}
+                className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/95 backdrop-blur-sm"
+              >
+                <Sparkles className="w-3 h-3 text-amber-200" />
+                {t}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Left panel — tablet+ */}
+      <div className="hidden md:flex md:w-[44%] lg:w-[46%] xl:w-[48%] relative min-h-[100dvh] flex-col justify-between overflow-hidden border-r border-white/10">
         <div className="absolute inset-0">
           <img src="/hero-visual.png" alt="" className="w-full h-full object-cover scale-105" />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/88 via-primary/75 to-brand-navy/92" />
@@ -128,20 +177,30 @@ export default function AuthPage() {
         </div>
 
         {/* Floating stat cards */}
-        <div className="absolute top-28 right-8 xl:right-12 z-[5] w-56 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-4 shadow-2xl hidden xl:block">
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.35, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute top-24 right-6 lg:right-10 z-[5] w-52 lg:w-56 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-4 shadow-2xl hidden md:block"
+        >
           <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">Live snapshot</p>
           <p className="mt-2 font-display text-2xl font-bold text-white tabular-nums">20+</p>
           <p className="text-xs text-white/70">Industries tracked</p>
-        </div>
-        <div className="absolute bottom-32 right-10 z-[5] w-52 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-4 shadow-2xl hidden xl:block animate-float">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute bottom-28 lg:bottom-32 right-8 lg:right-10 z-[5] w-48 lg:w-52 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-4 shadow-2xl hidden md:block animate-float"
+        >
           <div className="flex items-center gap-2 text-amber-200">
             <Zap className="w-4 h-4" />
             <span className="text-xs font-semibold">Maverick AI</span>
           </div>
           <p className="mt-2 text-sm text-white/85 leading-snug">Structured briefs & follow-ups on demand.</p>
-        </div>
+        </motion.div>
 
-        <div className="relative z-10 flex flex-col h-full p-12 xl:p-16">
+        <div className="relative z-10 flex flex-col h-full p-8 lg:p-12 xl:p-16">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl bg-white/12 p-3 backdrop-blur-md border border-white/15 shadow-lg">
               <BrandHexMark size="sm" />
@@ -177,24 +236,32 @@ export default function AuthPage() {
       </div>
 
       {/* Form column */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-12 xl:p-16 relative min-h-screen">
+      <div className="flex-1 flex items-center justify-center px-5 py-8 sm:p-10 lg:p-12 xl:p-16 relative min-h-0 md:min-h-[100dvh]">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          variants={formStagger}
+          initial="hidden"
+          animate="show"
           className="relative z-10 w-full max-w-[440px]"
         >
-          <div className="lg:hidden mb-8 rounded-2xl border border-border/50 bg-gradient-to-br from-primary/[0.06] to-brand-orange/[0.04] p-6 text-center shadow-sm">
-            <BrandHexMark size="lg" className="mx-auto" />
-            <h1 className="text-2xl font-bold text-foreground mt-4">
+          <div className="pointer-events-none absolute -inset-px rounded-[1.35rem] bg-gradient-to-r from-primary/25 via-brand-orange/20 to-primary/25 opacity-70 blur-xl md:opacity-90" />
+          <motion.div
+            variants={formItem}
+            className="md:hidden mb-6 rounded-2xl border border-border/50 bg-gradient-to-br from-primary/[0.08] to-brand-orange/[0.06] p-5 text-center shadow-md relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent_40%,hsl(var(--primary)/0.08)_50%,transparent_60%)] bg-[length:200%_100%] animate-shimmer" />
+            <BrandHexMark size="md" className="mx-auto relative" />
+            <h1 className="text-xl font-bold text-foreground mt-3 relative">
               <BrandWordmark />
             </h1>
-            <p className="text-sm text-muted-foreground mt-2">AI-powered market intelligence</p>
-          </div>
+            <p className="text-xs text-muted-foreground mt-1.5 relative">AI-powered market intelligence</p>
+          </motion.div>
 
-          <div className="relative rounded-3xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-2xl shadow-black/[0.06] overflow-hidden">
-            <div className="h-1.5 w-full bg-gradient-to-r from-primary via-brand-orange to-primary" />
-            <div className="p-8 sm:p-10 space-y-7">
+          <motion.div
+            variants={formItem}
+            className="relative rounded-3xl border border-border/50 bg-card/95 backdrop-blur-md shadow-2xl shadow-black/[0.08] overflow-hidden ring-1 ring-primary/5"
+          >
+            <div className="h-1.5 w-full bg-gradient-to-r from-primary via-brand-orange to-primary bg-[length:200%_100%] animate-shimmer" />
+            <div className="p-7 sm:p-9 space-y-6">
               <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 border border-border/50 px-2.5 py-1 font-medium">
                   <Shield className="w-3.5 h-3.5 text-signal-emerald" />
@@ -212,7 +279,7 @@ export default function AuthPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.25 }}
-                className="text-center"
+                className="text-center motion-reduce:transition-none"
               >
                 <h2 className="font-display text-2xl font-bold text-foreground">
                   {mode === "login" ? "Welcome back" : mode === "signup" ? "Create your account" : "Reset password"}
@@ -358,7 +425,7 @@ export default function AuthPage() {
               </Link>
             </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

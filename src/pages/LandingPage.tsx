@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { industries } from "@/lib/industryData";
 import { Reveal } from "@/components/motion/Reveal";
+import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
 import {
   Activity,
   ArrowRight,
@@ -99,7 +100,8 @@ export default function LandingPage() {
       </motion.header>
 
       {/* Sub-nav strip — product context */}
-      <div className="relative z-20 border-b border-border/40 bg-gradient-to-r from-muted/40 via-background to-muted/40">
+      <div className="relative z-20 border-b border-primary/10 bg-gradient-to-r from-primary/[0.04] via-muted/35 to-brand-orange/[0.05]">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.04] px-3 py-1 font-medium text-foreground shadow-sm">
             <Activity className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -115,21 +117,22 @@ export default function LandingPage() {
       <main className="relative z-10 flex-1">
         {/* Hero */}
         <section ref={heroRef} className="relative overflow-hidden mesh-marketing">
+          <LandingBackdrop />
           <div className="absolute inset-0 dot-pattern-fine opacity-50 pointer-events-none" />
           <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[min(100vw,900px)] h-[600px] rounded-full bg-brand-orange/[0.06] blur-[120px] pointer-events-none" />
 
           <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative">
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 lg:pt-24 pb-8 lg:pb-12">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 lg:pt-20 pb-8 lg:pb-12">
               <motion.div
                 variants={stagger}
                 initial="hidden"
                 animate="show"
-                className="grid xl:grid-cols-[1.05fr_0.95fr] gap-12 xl:gap-16 items-center"
+                className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 xl:gap-16 items-center"
               >
-                <div className="text-center xl:text-left">
-                  <motion.div variants={fadeUp} className="mb-8 flex justify-center xl:justify-start">
+                <div className="text-center lg:text-left">
+                  <motion.div variants={fadeUp} className="mb-6 sm:mb-8 flex justify-center lg:justify-start">
                     <div className="relative">
                       <div className="absolute inset-0 rounded-3xl bg-primary/20 blur-2xl scale-110" />
                       <BrandHexMark size="lg" className="relative w-20 h-20 sm:w-24 sm:h-24 drop-shadow-xl" />
@@ -138,7 +141,7 @@ export default function LandingPage() {
 
                   <motion.div
                     variants={fadeUp}
-                    className="inline-flex flex-wrap items-center justify-center xl:justify-start gap-2 rounded-full border border-border/60 bg-card/90 backdrop-blur-md px-4 py-2 text-sm text-muted-foreground mb-8 shadow-md"
+                    className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2 rounded-full border border-border/60 bg-card/90 backdrop-blur-md px-4 py-2 text-sm text-muted-foreground mb-6 sm:mb-8 shadow-md"
                   >
                     <span className="relative flex h-2 w-2 shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-signal-emerald/50 opacity-75" />
@@ -159,7 +162,7 @@ export default function LandingPage() {
 
                   <motion.p
                     variants={fadeUp}
-                    className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto xl:mx-0 leading-relaxed"
+                    className="mt-5 sm:mt-6 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed"
                   >
                     Track <span className="font-semibold text-foreground"> {industries.length} industries</span> and{" "}
                     <span className="font-semibold text-foreground">{totalFlows}+ money flows</span> with AI — structured
@@ -168,7 +171,7 @@ export default function LandingPage() {
 
                   <motion.div
                     variants={fadeUp}
-                    className="mt-6 flex flex-wrap items-center justify-center xl:justify-start gap-3 text-sm text-muted-foreground"
+                    className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-3 text-sm text-muted-foreground"
                   >
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 border border-border/50">
                       <TrendingUp className="w-3.5 h-3.5 text-signal-emerald" />
@@ -184,7 +187,7 @@ export default function LandingPage() {
                     </span>
                   </motion.div>
 
-                  <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center xl:justify-start gap-4">
+                  <motion.div variants={fadeUp} className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                     <Button
                       size="lg"
                       className="h-14 px-10 text-base font-semibold gap-2.5 rounded-full shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
@@ -210,7 +213,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Product preview — browser chrome */}
-                <motion.div variants={fadeUp} className="relative hidden xl:block">
+                <motion.div variants={fadeUp} className="relative hidden lg:block animate-hero-float">
                   <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/10 via-transparent to-brand-orange/10 blur-2xl opacity-80" />
                   <div className="shine-border relative rounded-2xl border border-border/40 bg-card shadow-2xl overflow-hidden">
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/30">
@@ -253,12 +256,12 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Hero image — mobile / tablet */}
+            {/* Hero image — mobile / tablet (hidden when side-by-side preview shows) */}
             <motion.div
               variants={fadeUp}
               initial="hidden"
               animate="show"
-              className="max-w-6xl mx-auto px-5 sm:px-8 pb-12 xl:hidden"
+              className="max-w-6xl mx-auto px-5 sm:px-8 pb-10 lg:hidden"
             >
               <div className="shine-border relative rounded-2xl overflow-hidden shadow-2xl border border-border/40 bg-card">
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-border/40 bg-muted/30">
@@ -376,6 +379,57 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
+
+        {/* Visual break — product imagery */}
+        <section className="relative border-y border-border/50 bg-gradient-to-br from-muted/30 via-background to-primary/[0.03] overflow-hidden">
+          <div className="absolute inset-0 dot-pattern-fine opacity-40 pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-16 lg:py-20 relative z-10">
+            <div className="grid lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">Inside the product</p>
+                <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+                  Rich visuals, structured intel — not a blank spreadsheet
+                </h2>
+                <p className="mt-4 text-muted-foreground leading-relaxed text-base sm:text-lg">
+                  Every industry and money flow opens into Maverick-powered briefs, live feeds, and snapshots. Your geo and role travel with you across the app.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {["Live dashboards", "Intel Lab", "Cross-industry"].map((label) => (
+                    <span
+                      key={label}
+                      className="inline-flex items-center rounded-full border border-border/60 bg-card/80 px-4 py-2 text-sm font-semibold text-foreground shadow-sm"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+                className="relative"
+              >
+                <div className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-primary/20 via-brand-orange/15 to-transparent blur-2xl opacity-90" />
+                <div className="shine-border relative rounded-2xl border border-border/50 bg-card overflow-hidden shadow-2xl">
+                  <img
+                    src="/og-image.png"
+                    alt="Intel GoldMine — market intelligence workspace preview"
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
         {/* Features — bento */}
         <section id="features" className="bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
