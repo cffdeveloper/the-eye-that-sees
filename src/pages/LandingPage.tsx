@@ -631,97 +631,63 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Pricing — neutral slate strip */}
+        {/* Pricing — compact billing-style card */}
         <section id="pricing" className="bg-slate-50/90 border-y border-slate-200/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24 lg:py-28">
-            <Reveal className="text-center max-w-2xl mx-auto mb-12 sm:mb-14">
-              <p className="text-sm font-semibold text-brand-orange tracking-[0.2em] uppercase mb-3">Pricing</p>
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground tracking-tight">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
+            <Reveal className="text-center max-w-xl mx-auto mb-8 sm:mb-10">
+              <p className="text-xs font-semibold text-brand-orange tracking-[0.2em] uppercase mb-2">Pricing</p>
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight">
                 One Pro tier. Everything unlocked.
               </h2>
-              <p className="mt-5 text-lg text-muted-foreground">
-                Start free. Upgrade when you want full depth across every workflow.
+              <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                Start free. Upgrade when you need full depth.
               </p>
             </Reveal>
 
-            <Reveal className="max-w-lg mx-auto">
-              <div className="rounded-[1.5rem] border-2 border-primary/20 bg-card p-9 sm:p-11 text-center shadow-2xl relative overflow-hidden ring-4 ring-primary/[0.06]">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-brand-orange to-primary" />
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-orange/12 mb-5 border border-brand-orange/20">
-                  <BadgeCheck className="w-7 h-7 text-brand-orange" />
-                </div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Pro</p>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="font-display text-6xl sm:text-7xl font-bold tabular-nums text-foreground">
-                    ${SUBSCRIPTION_USD_MONTHLY}
-                  </span>
-                  <span className="text-xl text-muted-foreground font-medium">/mo</span>
-                </div>
-                <p className="mt-6 text-muted-foreground leading-relaxed text-base">
-                  Full access — live feeds, AI deep dives, cross-industry analysis, Intel Lab, and geo-scoped snapshots.
-                </p>
+            <Reveal className="max-w-[420px] mx-auto">
+              <div className="rounded-xl border border-slate-200/90 bg-card text-left shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-primary via-brand-orange to-primary" />
+                <div className="p-5 sm:p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Pro plan</p>
+                      <p className="mt-1 font-display text-3xl sm:text-4xl font-bold tabular-nums text-foreground tracking-tight">
+                        ${SUBSCRIPTION_USD_MONTHLY}
+                        <span className="text-base sm:text-lg font-semibold text-muted-foreground font-sans">/mo</span>
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">Billed monthly · cancel anytime</p>
+                    </div>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/8 border border-primary/10">
+                      <BadgeCheck className="w-4 h-4 text-primary" />
+                    </div>
+                  </div>
 
-                <ul className="mt-8 space-y-3.5 text-left max-w-sm mx-auto">
-                  {[
-                    "AI research & follow-up chat",
-                    `${industries.length} industries · ${totalFlows}+ money flows`,
-                    "Geo-scoped analysis & snapshots",
-                    "Cross-industry intelligence",
-                    "Custom Intel Lab sessions",
-                  ].map((line) => (
-                    <li key={line} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-signal-emerald shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground font-medium leading-snug">{line}</span>
-                    </li>
-                  ))}
-                </ul>
+                  <ul className="mt-5 pt-5 border-t border-border/60 space-y-2">
+                    {[
+                      "AI research & chat",
+                      `${industries.length} industries · ${totalFlows}+ flows`,
+                      "Geo & cross-industry intel",
+                      "Intel Lab",
+                    ].map((line) => (
+                      <li key={line} className="flex items-center gap-2 text-[13px] text-foreground/90 leading-snug">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-signal-emerald shrink-0" />
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
 
-                <Button size="lg" className="mt-10 w-full h-12 sm:h-14 text-base font-bold rounded-full shadow-lg" asChild>
-                  <Link to="/auth?mode=signup">
-                    Get started
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
-                </Button>
-                <p className="mt-5 text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link to="/auth" className="text-primary hover:underline font-semibold">
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* Final CTA — single rich gradient (navy → violet → amber), not repeated elsewhere */}
-        <section className="relative py-16 sm:py-24 overflow-hidden landing-band-cta text-white">
-          <div className="absolute inset-0 landing-dot-light opacity-30 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_20%,rgba(255,255,255,0.12),transparent)] pointer-events-none" />
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
-            <Reveal>
-              <div className="text-center max-w-3xl mx-auto">
-                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] text-white drop-shadow-sm">
-                  Your markets won&apos;t wait for a quarterly PDF.
-                </h2>
-                <p className="mt-6 text-lg text-white/80 leading-relaxed max-w-xl mx-auto">
-                  Get a workspace that looks as serious as the decisions you make.
-                </p>
-                <div className="mt-10 flex flex-wrap justify-center gap-4">
-                  <Button
-                    size="lg"
-                    className="h-12 sm:h-14 px-10 text-base font-bold rounded-full bg-amber-400 text-amber-950 hover:bg-amber-300 shadow-xl border border-white/20"
-                    asChild
-                  >
-                    <Link to="/auth?mode=signup">Create free account</Link>
+                  <Button className="mt-6 w-full h-10 text-sm font-semibold rounded-lg" asChild>
+                    <Link to="/auth?mode=signup">
+                      Get started
+                      <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    </Link>
                   </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-12 sm:h-14 px-8 text-base rounded-full border-white/40 bg-white/[0.08] text-white hover:bg-white/[0.15] hover:text-white"
-                    asChild
-                  >
-                    <Link to="/auth">Sign in</Link>
-                  </Button>
+                  <p className="mt-3 text-center text-[11px] text-muted-foreground leading-relaxed">
+                    <Link to="/auth" className="text-primary font-medium hover:underline">
+                      Sign in
+                    </Link>
+                    {" · "}Payments processed securely via Paystack
+                  </p>
                 </div>
               </div>
             </Reveal>
