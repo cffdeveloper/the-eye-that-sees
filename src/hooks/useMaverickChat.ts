@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { streamChat } from "@/lib/streaming";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
 
 export type Message = {
   id: string;
@@ -16,9 +18,16 @@ export function useMaverickChat() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<AnalysisMode>("general");
   const abortRef = useRef(false);
+  const { isPro } = useSubscription();
 
   const send = useCallback(async (input: string) => {
     if (!input.trim() || isStreaming) return;
+
+    if (!isPro) {
+      toast.error("Maverick AI is available to Pro subscribers. Upgrade to use this feature.");
+      return;
+    }
+
     setError(null);
 
     const userMsg: Message = {
@@ -65,7 +74,7 @@ export function useMaverickChat() {
       setError("Connection failed. Please try again.");
       setIsStreaming(false);
     }
-  }, [messages, isStreaming, mode]);
+  }, [messages, isStreaming, mode, isPro]);
 
   const clear = useCallback(() => {
     abortRef.current = true;

@@ -1,19 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export function useSocialIntel(
   industry: string,
   subFlow: string | null,
   keywords: string[],
   geoContext?: string,
-  /** ISO-style scope from GeoContext (e.g. KE, KE+NG) — required for correct country-scoped scraping */
   geoScopeId?: string,
 ) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { isPro } = useSubscription();
 
   const fetch_ = useCallback(async () => {
     if (!industry && !keywords.length) return;
+    if (!isPro) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const { data: result, error } = await supabase.functions.invoke("social-intel", {
@@ -32,13 +37,14 @@ export function useSocialIntel(
     } finally {
       setLoading(false);
     }
-  }, [industry, subFlow, keywords.join(","), geoContext, geoScopeId]);
+  }, [industry, subFlow, keywords.join(","), geoContext, geoScopeId, isPro]);
 
   useEffect(() => {
     fetch_();
-    const id = setInterval(fetch_, 120_000); // 2 min refresh
+    if (!isPro) return;
+    const id = setInterval(fetch_, 120_000);
     return () => clearInterval(id);
-  }, [fetch_]);
+  }, [fetch_, isPro]);
 
   return { data, loading, refresh: fetch_ };
 }

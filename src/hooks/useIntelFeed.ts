@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 import type { IntelFeed } from "@/lib/intelTypes";
 
-const REFRESH_INTERVAL = 60_000; // 60 seconds
+const REFRESH_INTERVAL = 60_000;
 
 export function useIntelFeed() {
   const [feed, setFeed] = useState<IntelFeed | null>(null);
@@ -10,8 +11,13 @@ export function useIntelFeed() {
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const { isPro } = useSubscription();
 
   const fetchFeed = useCallback(async () => {
+    if (!isPro) {
+      setLoading(false);
+      return;
+    }
     try {
       setError(null);
       const { data, error: fnError } = await supabase.functions.invoke("intel-feed");
@@ -23,15 +29,16 @@ export function useIntelFeed() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isPro]);
 
   useEffect(() => {
     fetchFeed();
+    if (!isPro) return;
     intervalRef.current = setInterval(fetchFeed, REFRESH_INTERVAL);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [fetchFeed]);
+  }, [fetchFeed, isPro]);
 
   return { feed, loading, error, lastRefresh, refresh: fetchFeed };
 }

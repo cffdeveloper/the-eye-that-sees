@@ -1,12 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export function useIndustryNews(keywords: string[]) {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isPro } = useSubscription();
 
   const fetch_ = useCallback(async () => {
     if (!keywords.length) return;
+    if (!isPro) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("industry-news", {
@@ -19,13 +25,14 @@ export function useIndustryNews(keywords: string[]) {
     } finally {
       setLoading(false);
     }
-  }, [keywords.join(",")]);
+  }, [keywords.join(","), isPro]);
 
   useEffect(() => {
     fetch_();
-    const id = setInterval(fetch_, 300_000); // 5 min
+    if (!isPro) return;
+    const id = setInterval(fetch_, 300_000);
     return () => clearInterval(id);
-  }, [fetch_]);
+  }, [fetch_, isPro]);
 
   return { articles, loading, refresh: fetch_ };
 }
