@@ -261,7 +261,9 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
                 <span className="font-bold">Showcase brief</span>
                 <span className="text-muted-foreground"> — tailored to your profile and scope</span>
               </div>
-              <BlockRenderer segments={segments} />
+              <div id="trial-report-content">
+                <BlockRenderer segments={segments} />
+              </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-end pt-2">
                 <Button
                   type="button"
