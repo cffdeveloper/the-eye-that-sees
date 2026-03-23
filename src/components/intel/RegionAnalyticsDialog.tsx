@@ -25,6 +25,8 @@ import {
   type MapFlow,
 } from "@/lib/mapRegionData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
+import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
 import { toast } from "sonner";
 import {
   incrementTrialIntelPromptCount,
@@ -429,8 +431,30 @@ export function RegionAnalyticsDialog({ open, onClose, scope }: RegionAnalyticsD
                 </p>
               </div>
             ) : reportSegments.length > 0 ? (
-              <div className="glass-panel p-4 min-w-0 max-w-full border border-border/40">
-                <BlockRenderer segments={reportSegments} />
+              <div className="space-y-2">
+                <div className="flex flex-wrap justify-end gap-2">
+                  <DownloadIntelPdfButton
+                    contentRootId="region-analytics-ai-report"
+                    documentTitle={`${displayTitle} — regional briefing`}
+                    size="sm"
+                    className="h-8 text-[10px]"
+                  />
+                  <SaveIntelButton
+                    title={`${displayTitle} — regional briefing`}
+                    subtitle="AI regional briefing (structured)"
+                    source="region_analytics"
+                    sourceDetail={displayTitle}
+                    getBody={() => aiReport}
+                    size="sm"
+                    className="h-8 text-[10px]"
+                  />
+                </div>
+                <div
+                  id="region-analytics-ai-report"
+                  className="glass-panel p-4 min-w-0 max-w-full border border-border/40"
+                >
+                  <BlockRenderer segments={reportSegments} />
+                </div>
               </div>
             ) : (
               <p className="text-[10px] text-muted-foreground text-center py-8 rounded-lg border border-border/30 bg-muted/5">

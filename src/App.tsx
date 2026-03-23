@@ -17,6 +17,7 @@ import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
+import SavedLibraryPage from "./pages/SavedLibraryPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -94,6 +95,7 @@ const AppRoutes = () => (
       <Route path="/industry/:slug" element={<IndustryPage />} />
       <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/saved" element={<SavedLibraryPage />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>

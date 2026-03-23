@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { useAuth } from "@/contexts/AuthContext";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -24,6 +25,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface PaymentModalProps {
   open: boolean;
@@ -38,13 +40,31 @@ const FEATURES = [
   { icon: Zap, text: "Infinity Lab — unlimited custom questions" },
 ];
 
+function billingEmailForUser(user: User | null): string {
+  if (!user) return "";
+  if (user.email) return user.email;
+  const meta = user.user_metadata as { email?: string } | undefined;
+  if (meta?.email) return meta.email;
+  for (const id of user.identities ?? []) {
+    const data = id.identity_data as { email?: string } | undefined;
+    if (data?.email) return data.email;
+  }
+  return "";
+}
+
 export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
+  const billingEmail = billingEmailForUser(user);
+
   const handlePayment = async () => {
-    if (!user?.email) {
-      toast.error("Please sign in first");
+    if (!user) {
+      toast.error("Please sign in to subscribe.");
+      return;
+    }
+    if (!billingEmail?.trim()) {
+      toast.error("Add an email in Profile so we can bill your subscription.");
       return;
     }
 
@@ -71,7 +91,10 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 overflow-hidden gap-0 rounded-2xl border-border/60">
+      <DialogContent
+        overlayClassName="z-[10060]"
+        className="z-[10060] max-w-md p-0 overflow-hidden gap-0 rounded-2xl border-border/60"
+      >
         {/* Header with branding */}
         <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent px-6 pt-6 pb-4">
           <DialogHeader className="space-y-3 text-left">
@@ -114,10 +137,12 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
           </div>
 
           {/* Billing info */}
-          <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1.5">
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1.5">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Billed to</span>
-              <span className="font-medium text-foreground truncate max-w-[200px]">{user?.email}</span>
+              <span className="font-medium text-foreground truncate max-w-[200px]">
+                {billingEmail || "—"}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Billing cycle</span>
@@ -130,9 +155,20 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
           </div>
 
           {/* CTA */}
+          {!billingEmail && user && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 text-center leading-snug">
+              No email on this account.{" "}
+              <Link to="/profile" className="font-semibold underline underline-offset-2" onClick={() => onOpenChange(false)}>
+                Add one in Profile
+              </Link>{" "}
+              to continue checkout.
+            </p>
+          )}
+
           <Button
+            type="button"
             onClick={handlePayment}
-            disabled={loading}
+            disabled={loading || !user || !billingEmail?.trim()}
             className="w-full h-12 rounded-xl font-bold text-base gap-2 shadow-lg shadow-primary/20"
           >
             {loading ? (

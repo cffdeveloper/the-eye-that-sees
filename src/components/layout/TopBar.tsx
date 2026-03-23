@@ -10,13 +10,21 @@ import { BrandWordmark } from "@/components/BrandWordmark";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { IndustryNavList } from "@/components/layout/IndustryNavList";
-import { APP_NAV_ITEMS, appNavIconClass, appNavLinkClass, isAppNavActive } from "@/components/layout/appNavConfig";
+import {
+  getAppNavItems,
+  appNavIconClass,
+  appNavLinkClass,
+  isAppNavActive,
+} from "@/components/layout/appNavConfig";
+import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import { getGeoNavLabel } from "@/lib/geoData";
 
 export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const { isGlobal, geoString, selections } = useGeoContext();
   const { profile, signOut } = useAuth();
+  const { isPro } = useSubscription();
+  const navItems = getAppNavItems(isPro);
   const location = useLocation();
   const [industriesOpen, setIndustriesOpen] = useState(false);
 
@@ -66,7 +74,7 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
         className="hidden min-w-0 flex-1 items-center justify-center gap-1 px-1 md:flex lg:gap-1.5 lg:px-2"
         aria-label="Main navigation"
       >
-        {APP_NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const active = isAppNavActive(location.pathname, item.to);
           return (
             <Link

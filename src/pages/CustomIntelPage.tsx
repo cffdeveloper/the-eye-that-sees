@@ -1,4 +1,4 @@
-﻿import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { industries } from "@/lib/industryData";
@@ -25,6 +25,8 @@ import { Loader2, Shuffle, ArrowRight, Send, RefreshCw, Layers, X, FileText } fr
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { intelLabIntelCopy } from "@/lib/pageIntelMessages";
 import { cn } from "@/lib/utils";
+import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
+import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -220,6 +222,22 @@ Answer the user's follow-up with the same structured block style when analytical
   }, [chatInput, report, isGlobal, geoString, primary, secondary, freeText, freeTextMode]);
 
   const segments = report ? parseBlocks(report) : [];
+  const buildIntelSnapshot = useCallback(() => {
+    const parts: string[] = [];
+    if (report.trim()) parts.push(report);
+    const chatLines = [...chatMessages];
+    if (chatStreaming.trim()) {
+      chatLines.push({ role: "assistant", content: chatStreaming });
+    }
+    if (chatLines.length > 0) {
+      parts.push(
+        chatLines
+          .map((m) => `### ${m.role === "user" ? "You" : "Infinitygap"}\n\n${m.content}`)
+          .join("\n\n"),
+      );
+    }
+    return parts.join("\n\n---\n\n");
+  }, [report, chatMessages, chatStreaming]);
   const totalSelected = pool.size + primary.size + secondary.size;
 
   const chip = (key: string) => {
@@ -514,60 +532,78 @@ Answer the user's follow-up with the same structured block style when analytical
         </div>
       )}
 
-      {!loading && segments.length > 0 && (
-        <div className="glass-panel p-5 glow-border space-y-3">
-          <h2 className="text-xs font-bold text-primary flex items-center gap-1.5">
-            <FileText className="w-3.5 h-3.5" /> BRIEF
-          </h2>
-          <BlockRenderer segments={segments} />
-        </div>
-      )}
-
       {report && !loading && (
-        <div className="glass-panel p-5 glow-border space-y-3">
-          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Follow-up</h2>
-          <p className="text-[9px] text-muted-foreground -mt-1">Continue the session — answers use the same structured blocks when analytical.</p>
-          <div className="space-y-2 max-h-[320px] overflow-y-auto">
-            {chatMessages.map((m, i) => {
-              const msgSegments = m.role === "assistant" ? parseBlocks(m.content) : null;
-              return (
-                <div
-                  key={i}
-                  className={cn(
-                    "rounded-md px-3 py-2 text-[11px] leading-relaxed whitespace-pre-wrap border",
-                    m.role === "user"
-                      ? "bg-muted/25 border-border/40 text-foreground ml-2 md:ml-8"
-                      : "bg-primary/5 border-primary/20 text-foreground mr-2 md:mr-6",
-                  )}
-                >
-                  <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Infinitygap · "}</span>
-                  {msgSegments ? <BlockRenderer segments={msgSegments} /> : m.content}
-                </div>
-              );
-            })}
-            {chatStreaming && (
-              <div className="rounded-md px-3 py-2 text-[11px] whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
-                <span className="text-muted-foreground">Infinitygap · </span>
-                <BlockRenderer segments={parseBlocks(chatStreaming)} />
+        <div className="space-y-3">
+          <div className="flex flex-wrap justify-end gap-2">
+            <DownloadIntelPdfButton
+              contentRootId="custom-intel-export-root"
+              documentTitle="Infinity Lab brief"
+              className="h-9 text-xs"
+            />
+            <SaveIntelButton
+              title="Infinity Lab session"
+              subtitle={isGlobal ? "Global scope" : geoString}
+              source="custom_intel"
+              getBody={buildIntelSnapshot}
+              className="h-9 text-xs"
+            />
+          </div>
+          <div id="custom-intel-export-root" className="space-y-4">
+            {segments.length > 0 && (
+              <div className="glass-panel p-5 glow-border space-y-3">
+                <h2 className="text-xs font-bold text-primary flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" /> BRIEF
+                </h2>
+                <BlockRenderer segments={segments} />
               </div>
             )}
-          </div>
-          <div className="flex gap-2 items-end pt-1">
-            <Textarea
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Deeper cut, challenge an assumption, or request another angle…"
-              className="min-h-[72px] text-xs flex-1 bg-background/80 border-border/60"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendFollowUp();
-                }
-              }}
-            />
-            <Button type="button" className="shrink-0 h-[72px] w-11 px-0 font-medium" onClick={sendFollowUp} disabled={!chatInput.trim()}>
-              <Send className="w-4 h-4" />
-            </Button>
+
+            <div className="glass-panel p-5 glow-border space-y-3">
+              <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Follow-up</h2>
+              <p className="text-[9px] text-muted-foreground -mt-1">Continue the session — answers use the same structured blocks when analytical.</p>
+              <div className="space-y-2 max-h-[320px] overflow-y-auto">
+                {chatMessages.map((m, i) => {
+                  const msgSegments = m.role === "assistant" ? parseBlocks(m.content) : null;
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "rounded-md px-3 py-2 text-[11px] leading-relaxed whitespace-pre-wrap border",
+                        m.role === "user"
+                          ? "bg-muted/25 border-border/40 text-foreground ml-2 md:ml-8"
+                          : "bg-primary/5 border-primary/20 text-foreground mr-2 md:mr-6",
+                      )}
+                    >
+                      <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Infinitygap · "}</span>
+                      {msgSegments ? <BlockRenderer segments={msgSegments} /> : m.content}
+                    </div>
+                  );
+                })}
+                {chatStreaming && (
+                  <div className="rounded-md px-3 py-2 text-[11px] whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
+                    <span className="text-muted-foreground">Infinitygap · </span>
+                    <BlockRenderer segments={parseBlocks(chatStreaming)} />
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 items-end pt-1">
+                <Textarea
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Deeper cut, challenge an assumption, or request another angle…"
+                  className="min-h-[72px] text-xs flex-1 bg-background/80 border-border/60"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendFollowUp();
+                    }
+                  }}
+                />
+                <Button type="button" className="shrink-0 h-[72px] w-11 px-0 font-medium" onClick={sendFollowUp} disabled={!chatInput.trim()}>
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

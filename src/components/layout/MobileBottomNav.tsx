@@ -1,10 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { APP_NAV_ITEMS, isAppNavActive } from "@/components/layout/appNavConfig";
+import { getAppNavItems, isAppNavActive } from "@/components/layout/appNavConfig";
+import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 
 /** Mobile-only: primary app destinations in one row (laptop nav stays in TopBar). */
 export function MobileBottomNav() {
   const location = useLocation();
+  const { isPro } = useSubscription();
+  const navItems = getAppNavItems(isPro);
+  const cols = navItems.length;
 
   return (
     <nav
@@ -12,8 +16,10 @@ export function MobileBottomNav() {
       style={{ paddingBottom: "max(0.35rem, env(safe-area-inset-bottom))" }}
       aria-label="Main navigation"
     >
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-0 px-0.5 pt-1">
-        {APP_NAV_ITEMS.map((item) => {
+      <div
+        className={`mx-auto grid max-w-lg gap-0 px-0.5 pt-1 ${cols >= 6 ? "grid-cols-6" : "grid-cols-5"}`}
+      >
+        {navItems.map((item) => {
           const active = isAppNavActive(location.pathname, item.to);
           return (
             <Link

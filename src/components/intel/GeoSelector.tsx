@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { PaymentModal } from "@/components/PaymentModal";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -20,6 +20,7 @@ export function GeoSelector() {
   const { isPro, loading: subscriptionLoading } = useSubscription();
   const isSm = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"continent" | "country" | "sub">("country");
 
@@ -62,6 +63,7 @@ export function GeoSelector() {
   };
 
   return (
+    <>
     <Popover open={open} onOpenChange={handleOpenChange} modal={!isSm}>
       <PopoverTrigger asChild>
         <button
@@ -134,9 +136,16 @@ export function GeoSelector() {
           ) : (
             <p className="text-[11px] leading-snug text-muted-foreground">
               Free plan — regions still apply to your view.{" "}
-              <Link to="/profile" className="font-semibold text-primary underline-offset-2 hover:underline" onClick={() => setOpen(false)}>
+              <button
+                type="button"
+                className="font-semibold text-primary underline-offset-2 hover:underline"
+                onClick={() => {
+                  setOpen(false);
+                  setPaymentOpen(true);
+                }}
+              >
                 Upgrade to Pro
-              </Link>{" "}
+              </button>{" "}
               for news, social intel, and deep analysis.
             </p>
           )}
@@ -322,5 +331,7 @@ export function GeoSelector() {
         </div>
       </PopoverContent>
     </Popover>
+    <PaymentModal open={paymentOpen} onOpenChange={setPaymentOpen} />
+    </>
   );
 }

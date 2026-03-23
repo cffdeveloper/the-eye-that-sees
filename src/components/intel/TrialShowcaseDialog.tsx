@@ -19,6 +19,7 @@ import type { GeoOption } from "@/lib/geoData";
 import { CONTINENTS, COUNTRIES, getGeoContextString } from "@/lib/geoData";
 import { parseBlocks } from "@/lib/parseBlocks";
 import { BlockRenderer } from "@/components/BlockRenderer";
+import { UpgradeButton } from "@/components/SubscriptionGate";
 import {
   getTrialIntelPromptCount,
   incrementTrialIntelPromptCount,
@@ -26,8 +27,10 @@ import {
   TRIAL_INTEL_MAX_PROMPTS,
 } from "@/lib/trialIntelStorage";
 import { cn } from "@/lib/utils";
+import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
+import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
 import { toast } from "sonner";
-import { Loader2, Presentation, ChevronRight, ChevronLeft, Globe2, Sparkles, FileDown } from "lucide-react";
+import { Loader2, Presentation, ChevronRight, ChevronLeft, Globe2, BadgeCheck } from "lucide-react";
 
 const GEO_POOL: GeoOption[] = [...CONTINENTS, ...COUNTRIES];
 
@@ -206,12 +209,36 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
         <div className="shrink-0 border-b border-border/60 px-5 py-4 sm:px-6">
           <DialogHeader className="space-y-1 text-left">
             <DialogTitle className="flex items-center gap-2 text-lg font-bold">
-              <Sparkles className="h-5 w-5 text-primary shrink-0" />
-              Try Infinitygap — free showcase
+              {report ? (
+                <>
+                  <BadgeCheck className="h-5 w-5 text-primary shrink-0" aria-hidden />
+                  Showcase brief ready
+                </>
+              ) : loading ? (
+                <>
+                  <Loader2 className="h-5 w-5 text-primary shrink-0 animate-spin" aria-hidden />
+                  Generating your brief…
+                </>
+              ) : (
+                <>
+                  <Presentation className="h-5 w-5 text-primary shrink-0" aria-hidden />
+                  Try Infinitygap — free showcase
+                </>
+              )}
             </DialogTitle>
             <DialogDescription className="text-xs sm:text-sm leading-relaxed">
-              One guided question on us. We calibrate to who you are, where you care about, and what you want tested — then
-              return the same structured brief style as Pro (metrics, cards, frameworks).
+              {report ? (
+                <>
+                  Your tailored intel is below — export, start over, or upgrade for unlimited questions.
+                </>
+              ) : loading ? (
+                <>Large models can take a minute — status messages rotate so you can see the pipeline working.</>
+              ) : (
+                <>
+                  One guided question on us. We calibrate to who you are, where you care about, and what you want tested — then
+                  return the same structured brief style as Pro (metrics, cards, frameworks).
+                </>
+              )}
             </DialogDescription>
             <p className="text-[11px] font-semibold text-muted-foreground pt-1">
               {remaining === 0 ? (
@@ -264,54 +291,31 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
               <div id="trial-report-content">
                 <BlockRenderer segments={segments} />
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end pt-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end pt-2">
+                <DownloadIntelPdfButton
+                  contentRootId="trial-report-content"
+                  documentTitle="Intelligence Brief"
+                  className="w-full sm:w-auto"
+                />
+                <SaveIntelButton
+                  title="Showcase intelligence brief"
+                  subtitle="Try Infinitygap — free showcase"
+                  source="trial_showcase"
+                  sourceDetail={specialization.trim().slice(0, 120) || undefined}
+                  getBody={() => report ?? ""}
+                  className="w-full sm:w-auto"
+                />
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-xl gap-2"
-                  onClick={() => {
-                    const el = document.getElementById("trial-report-content");
-                    if (!el) return;
-                    const printWin = window.open("", "_blank");
-                    if (!printWin) { toast.error("Allow pop-ups to export PDF"); return; }
-                    printWin.document.write(`<!DOCTYPE html><html><head><title>Infinitygap Intelligence Brief</title><style>
-                      body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:40px auto;padding:0 24px;color:#1a1a1a;line-height:1.6}
-                      img.brand-logo{height:36px;margin-bottom:16px}
-                      h1,h2,h3{margin-top:1.5em}
-                      table{border-collapse:collapse;width:100%;margin:1em 0}
-                      td,th{border:1px solid #ddd;padding:8px 12px;text-align:left}
-                      th{background:#f5f5f5}
-                      .report-header{display:flex;align-items:center;gap:12px;border-bottom:2px solid #2a4a8a;padding-bottom:16px;margin-bottom:24px}
-                      .report-footer{margin-top:40px;padding-top:16px;border-top:1px solid #ddd;text-align:center;color:#888;font-size:12px}
-                      @media print{body{margin:20px}}
-                    </style></head><body>
-                    <div class="report-header">
-                      <img class="brand-logo" src="${window.location.origin}/Final Logo.png" alt="Infinitygap" />
-                      <div><strong style="font-size:18px">Intelligence Brief</strong><br/><span style="color:#666;font-size:13px">${new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</span></div>
-                    </div>
-                    ${el.innerHTML}
-                    <div class="report-footer">Generated by Infinitygap · infinitygap.app · Confidential</div>
-                    </body></html>`);
-                    printWin.document.close();
-                    setTimeout(() => { printWin.print(); }, 600);
-                  }}
-                >
-                  <FileDown className="h-4 w-4" />
-                  Export PDF
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="rounded-xl"
+                  className="rounded-xl w-full sm:w-auto"
                   onClick={() => {
                     resetForNewSession();
                   }}
                 >
                   Start over
                 </Button>
-                <Button type="button" className="rounded-xl font-bold" asChild>
-                  <a href="/auth?mode=signup">Upgrade to Pro</a>
-                </Button>
+                <UpgradeButton className="rounded-xl font-bold w-full sm:w-auto" />
               </div>
             </div>
           )}
@@ -319,9 +323,9 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
           {!loading && !report && remaining === 0 && step === 1 && (
             <div className="text-center py-10 space-y-3">
               <p className="text-sm text-muted-foreground">You’ve used all trial questions on this device.</p>
-              <Button className="rounded-xl font-bold" asChild>
-                <a href="/auth?mode=signup">Upgrade to Pro</a>
-              </Button>
+              <div className="flex justify-center">
+                <UpgradeButton className="rounded-xl font-bold" />
+              </div>
             </div>
           )}
 

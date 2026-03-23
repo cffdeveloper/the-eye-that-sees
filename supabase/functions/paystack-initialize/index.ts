@@ -92,6 +92,26 @@ Deno.serve(async (req) => {
       });
     }
 
+    const billingEmail = (() => {
+      if (user.email) return user.email;
+      const meta = user.user_metadata as { email?: string } | undefined;
+      if (meta?.email) return meta.email;
+      for (const id of user.identities ?? []) {
+        const data = id.identity_data as { email?: string } | undefined;
+        if (data?.email) return data.email;
+      }
+      return "";
+    })();
+
+    if (!billingEmail?.trim()) {
+      return new Response(
+        JSON.stringify({
+          error: "Add an email to your account in Profile before subscribing.",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { callbackUrl } = await req.json();
 
     // Ensure the recurring plan exists on Paystack
@@ -108,7 +128,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: user.email,
+          email: billingEmail,
           amount: PLAN_AMOUNT_LOWEST,
           currency: PLAN_CURRENCY,
           callback_url:
@@ -146,7 +166,7 @@ Deno.serve(async (req) => {
     await adminClient.from("subscriptions").upsert(
       {
         user_id: user.id,
-        paystack_email: user.email,
+        paystack_email: billingEmail,
         plan_code: planCode,
         status: "pending",
         amount: 3000,

@@ -75,7 +75,12 @@ export function UpgradeButton({
   return (
     <>
       <button
-        onClick={() => setModalOpen(true)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setModalOpen(true);
+        }}
         className={`inline-flex items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors ${sizeClasses} ${className}`}
       >
         <ArrowUpRight className={size === "sm" ? "w-3.5 h-3.5" : "w-4 h-4"} />
