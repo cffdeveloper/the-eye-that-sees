@@ -10,7 +10,9 @@ function googleSiteVerificationPlugin(mode: string): Plugin {
   return {
     name: "google-site-verification",
     transformIndexHtml(html) {
-      const token = loadEnv(mode, process.cwd(), "").VITE_GOOGLE_SITE_VERIFICATION?.trim();
+      const env = loadEnv(mode, process.cwd(), "");
+      const token =
+        env.VITE_GOOGLE_SITE_VERIFICATION?.trim() || env.GOOGLE_SITE_VERIFICATION?.trim();
       if (!token) return html;
       const meta = `    <meta name="google-site-verification" content="${escapeHtmlAttr(token)}" />\n`;
       return html.replace(/<head>/i, `<head>\n${meta}`);
