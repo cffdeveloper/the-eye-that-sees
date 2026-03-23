@@ -50,18 +50,18 @@ export default function ResetPasswordPage() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="w-full max-w-[min(100%,440px)]"
     >
-      <div className="mb-6 rounded-2xl border border-border/60 bg-card/80 p-5 text-center shadow-sm sm:mb-10 sm:p-8">
-        <div className="relative mb-4 flex justify-center">
-          <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,18rem)] w-[min(100%,18rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
-          <BrandHexMark size="2xl" className="relative mx-auto h-auto max-h-[11rem] w-auto max-w-[15rem] object-contain drop-shadow-lg sm:max-h-none sm:max-w-none" />
-        </div>
-        <h1 className="font-bold text-foreground">
-          <BrandWordmark className="text-2xl sm:text-4xl" />
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">Password recovery</p>
-      </div>
       <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)] ring-1 ring-border/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.4)]">
-        <div className="space-y-4 p-6 text-center sm:p-10">
+        <div className="space-y-5 p-5 text-center sm:space-y-6 sm:p-9">
+          <div className="relative border-b border-border/50 pb-6 sm:pb-8">
+            <div className="relative mb-4 flex justify-center">
+              <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,12rem)] w-[min(100%,12rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
+              <BrandHexMark size="2xl" className="relative mx-auto object-contain drop-shadow-lg" />
+            </div>
+            <h1 className="font-bold text-foreground">
+              <BrandWordmark className="text-2xl sm:text-4xl" />
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">Password recovery</p>
+          </div>
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-muted/40">
             <Lock className="h-6 w-6 text-muted-foreground" />
           </div>
@@ -84,18 +84,19 @@ export default function ResetPasswordPage() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="w-full max-w-[min(100%,440px)]"
     >
-      <div className="mb-6 rounded-2xl border border-border/60 bg-card/80 p-5 text-center shadow-sm sm:mb-10 sm:p-8">
-        <div className="relative mb-4 flex justify-center">
-          <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,18rem)] w-[min(100%,18rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
-          <BrandHexMark size="2xl" className="relative mx-auto h-auto max-h-[11rem] w-auto max-w-[15rem] object-contain drop-shadow-lg sm:max-h-none sm:max-w-none" />
-        </div>
-        <h1 className="font-bold text-foreground">
-          <BrandWordmark className="text-2xl sm:text-4xl" />
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">Evidence-backed market intelligence</p>
-      </div>
       <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)] ring-1 ring-border/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.4)]">
         <div className="space-y-5 p-5 sm:space-y-6 sm:p-9">
+          <div className="relative border-b border-border/50 pb-6 text-center sm:pb-8">
+            <div className="relative mb-4 flex justify-center">
+              <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,12rem)] w-[min(100%,12rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
+              <BrandHexMark size="2xl" className="relative mx-auto object-contain drop-shadow-lg" />
+            </div>
+            <h1 className="font-bold text-foreground">
+              <BrandWordmark className="text-2xl sm:text-4xl" />
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">Evidence-backed market intelligence</p>
+          </div>
+
           <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[11px] text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
               <Shield className="w-3.5 h-3.5 text-signal-emerald shrink-0" />
@@ -144,7 +145,7 @@ export default function ResetPasswordPage() {
                 Terms
               </Link>
             </div>
-            <p className="text-[10px] text-muted-foreground/80">© {new Date().getFullYear()} Intel GoldMine · Not financial advice.</p>
+            <p className="text-[10px] text-muted-foreground/80">© {new Date().getFullYear()} Infinitygap · Not financial advice.</p>
           </div>
         </div>
       </div>

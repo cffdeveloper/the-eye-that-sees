@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+﻿import { useState, useRef, useCallback } from "react";
 import { streamChat } from "@/lib/streaming";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ export function useIntelGoldmineChat() {
     if (!input.trim() || isStreaming) return;
 
     if (!isPro) {
-      toast.error("Intel GoldMine chat is included with Pro. Upgrade for full access to use this feature.");
+      toast.error("Infinitygap chat is included with Pro. Upgrade for full access to use this feature.");
       return;
     }
 

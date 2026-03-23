@@ -1,4 +1,4 @@
-import { useParams, Navigate, Link } from "react-router-dom";
+﻿import { useParams, Navigate, Link } from "react-router-dom";
 import { getSubFlow } from "@/lib/industryData";
 import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle, Database, Clock } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
@@ -82,7 +82,7 @@ export default function SubFlowPage() {
           </Link>{" "}
           /{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
-            Intel Lab
+            Infinity Lab
           </Link>{" "}
           for multi-sector or custom briefs.
         </p>

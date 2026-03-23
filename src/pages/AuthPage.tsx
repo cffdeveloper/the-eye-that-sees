@@ -107,7 +107,7 @@ export default function AuthPage() {
         const opened = window.open(url, "_blank", "noopener,noreferrer");
         if (!opened) {
           toast.error(
-            "Sign-in could not open. Allow popups for this site, or open Intel GoldMine in a normal browser tab (not an embedded preview).",
+            "Sign-in could not open. Allow popups for this site, or open Infinitygap in a normal browser tab (not an embedded preview).",
           );
         }
       }
@@ -150,23 +150,20 @@ export default function AuthPage() {
         >
           <motion.div
             variants={formItem}
-            className="mb-6 rounded-2xl border border-border/60 bg-card/80 p-5 text-center shadow-sm sm:mb-10 sm:p-8"
-          >
-            <div className="relative mb-4 flex justify-center">
-              <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,18rem)] w-[min(100%,18rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
-              <BrandHexMark size="2xl" className="relative mx-auto h-auto max-h-[11rem] w-auto max-w-[15rem] object-contain drop-shadow-lg sm:max-h-none sm:max-w-none" />
-            </div>
-            <h1 className="font-bold text-foreground">
-              <BrandWordmark className="text-2xl sm:text-4xl" />
-            </h1>
-            <p className="text-sm text-muted-foreground mt-2">Evidence-backed market intelligence</p>
-          </motion.div>
-
-          <motion.div
-            variants={formItem}
             className="relative rounded-3xl border border-border/60 bg-card shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.4)] overflow-hidden ring-1 ring-border/40"
           >
             <div className="space-y-5 p-5 sm:space-y-6 sm:p-9">
+              <div className="relative border-b border-border/50 pb-6 text-center sm:pb-8">
+                <div className="relative mb-4 flex justify-center">
+                  <div className="pointer-events-none absolute inset-0 left-1/2 top-1/2 h-[min(100%,12rem)] w-[min(100%,12rem)] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-[2rem] bg-primary/12 blur-3xl" />
+                  <BrandHexMark size="2xl" className="relative mx-auto object-contain drop-shadow-lg" />
+                </div>
+                <h1 className="font-bold text-foreground">
+                  <BrandWordmark className="text-2xl sm:text-4xl" />
+                </h1>
+                <p className="mt-2 text-sm text-muted-foreground">Evidence-backed market intelligence</p>
+              </div>
+
               <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[11px] text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
                   <Shield className="w-3.5 h-3.5 text-signal-emerald shrink-0" />
@@ -382,7 +379,7 @@ export default function AuthPage() {
                   Terms
                 </Link>
               </div>
-              <p className="text-[10px] text-muted-foreground/80">© {new Date().getFullYear()} Intel GoldMine · Not financial advice.</p>
+              <p className="text-[10px] text-muted-foreground/80">© {new Date().getFullYear()} Infinitygap · Not financial advice.</p>
             </div>
             </div>
           </motion.div>

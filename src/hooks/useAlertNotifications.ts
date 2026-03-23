@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { BRAND_LOGO_PATH } from "@/lib/brandLogo";
 
 const ALERT_SOUND_URL = "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbsGczJliCqN3LfUA3WX2m19W9b0tGZYSdtM++b0tGZoqjrdHBdFBOa5GnrM7CdFBOcJitqc7BdFBOcZmtqM7BdFBOcpqtqM7BdFBOc5utqM7A";
 
@@ -41,10 +42,10 @@ export function useAlertNotifications(alerts: any[], enabled: boolean = true) {
     // Browser notification
     if ("Notification" in window && Notification.permission === "granted") {
       const top = criticalAlerts[0];
-      new Notification(`⚠️ Intel GoldMine`, {
+      new Notification(`⚠️ Infinitygap`, {
         body: `${top.title}\n${top.detail || ""}`,
-        icon: "/favicon.png",
-        tag: "intel-goldmine-alert",
+        icon: BRAND_LOGO_PATH,
+        tag: "infinitygap-alert",
       });
     }
   }, [alerts, enabled, playAlert]);

@@ -1,11 +1,11 @@
-import { LegalPageShell } from "@/components/legal/LegalPageShell";
+﻿import { LegalPageShell } from "@/components/legal/LegalPageShell";
 import { SITE_URL, TERMS_OF_SERVICE_URL } from "@/lib/site";
 
 export default function TermsOfServicePage() {
   return (
     <LegalPageShell title="Terms of service">
       <p className="text-muted-foreground">
-        These terms govern your use of Intel GoldMine at{" "}
+        These terms govern your use of Infinitygap at{" "}
         <a href={SITE_URL} className="text-primary font-medium hover:underline">
           {SITE_URL}
         </a>
@@ -19,12 +19,12 @@ export default function TermsOfServicePage() {
       <h2>Acceptance</h2>
       <p>
         By accessing or using the service, you agree to these Terms and our Privacy Policy. If you do not agree, do not
-        use Intel GoldMine.
+        use Infinitygap.
       </p>
 
       <h2>Description of service</h2>
       <p>
-        Intel GoldMine provides software for market intelligence, research workflows, and related AI-assisted features.
+        Infinitygap provides software for market intelligence, research workflows, and related AI-assisted features.
         Outputs may be incomplete or inaccurate; you are responsible for how you use them.
       </p>
 
@@ -59,7 +59,7 @@ export default function TermsOfServicePage() {
       <p>
         THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE.” TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE DISCLAIM ALL
         WARRANTIES, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
-        NON-INFRINGEMENT. INTEL GOLDMINE IS NOT FINANCIAL, LEGAL, OR INVESTMENT ADVICE.
+        NON-INFRINGEMENT. Infinitygap IS NOT FINANCIAL, LEGAL, OR INVESTMENT ADVICE.
       </p>
 
       <h2>Limitation of liability</h2>

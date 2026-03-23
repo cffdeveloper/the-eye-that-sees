@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+﻿import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { industries } from "@/lib/industryData";
 import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp, Users, Handshake } from "lucide-react";
@@ -66,7 +66,7 @@ export default function CrossIntelPage() {
             <Network className="w-5 h-5 text-brand-orange" /> Cross-industry intelligence
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">
-            Intel GoldMine runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
+            Infinitygap runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
           </p>
         </div>
         <button onClick={fetchIntel} disabled={loading || subscriptionLoading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
@@ -89,7 +89,7 @@ export default function CrossIntelPage() {
           </Link>{" "}
           for tempo and{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
-            Intel Lab
+            Infinity Lab
           </Link>{" "}
           when you need a custom scoped brief.
         </p>

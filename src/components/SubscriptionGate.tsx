@@ -1,4 +1,4 @@
-import { useSubscription } from "@/hooks/useSubscription";
+﻿import { useSubscription } from "@/hooks/useSubscription";
 import { Zap, Lock, ArrowUpRight } from "lucide-react";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { useState } from "react";
@@ -30,7 +30,7 @@ export function SubscriptionGate({ children, feature }: SubscriptionGateProps) {
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
             {feature ||
-              "This capability is included with Pro. Upgrade for full access across Intel GoldMine."}
+              "This capability is included with Pro. Upgrade for full access across Infinitygap."}
           </p>
           <UpgradeButton size="default" />
         </div>
@@ -49,7 +49,7 @@ export function FullPagePaywall() {
           Upgrade to unlock this page
         </h2>
         <p className="text-base text-muted-foreground mb-8 leading-relaxed">
-          This area is part of the Pro plan. Upgrade for full access to live feeds, cross-industry scans, Intel Lab, and the rest of the platform.
+          This area is part of the Pro plan. Upgrade for full access to live feeds, cross-industry scans, Infinity Lab, and the rest of the platform.
         </p>
         <UpgradeButton size="default" className="mx-auto" />
         <p className="text-xs text-muted-foreground mt-4">Cancel anytime · Instant access</p>

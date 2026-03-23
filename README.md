@@ -1,6 +1,6 @@
-# Intel GoldMine
+﻿# Infinitygap
 
-React + Vite frontend: **Intel GoldMine** is the product — AI-powered market intelligence (Supabase-backed intel pipelines, edge functions, and structured analysis).
+React + Vite frontend: **Infinitygap** is the product — AI-powered market intelligence (Supabase-backed intel pipelines, edge functions, and structured analysis).
 
 ## Development
 

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 type BrandWordmarkProps = {
   className?: string;
   compact?: boolean;
-  /** Use on dark headers/footers so “Intel” reads on navy. */
+  /** Use on dark headers/footers so “Infinity” reads on navy. */
   variant?: "default" | "onDark";
 };
 
@@ -11,7 +11,7 @@ export function BrandWordmark({ className, compact, variant = "default" }: Brand
   return (
     <span
       className={cn(
-        "inline-flex items-baseline select-none leading-none gap-2 font-sans",
+        "inline-flex items-baseline select-none leading-none gap-0 font-sans",
         compact ? "text-base sm:text-lg" : "text-lg sm:text-xl md:text-2xl",
         className,
       )}
@@ -22,13 +22,9 @@ export function BrandWordmark({ className, compact, variant = "default" }: Brand
           variant === "onDark" ? "text-white" : "text-foreground",
         )}
       >
-        Intel
+        Infinity
       </span>
-      <span className="text-gradient-gold font-bold tracking-tight" style={{
-        backgroundImage: "linear-gradient(135deg, hsl(38 92% 50%), hsl(32 85% 38%))",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-      }}>GoldMine</span>
+      <span className="text-gradient-gold font-bold tracking-tight">gap</span>
     </span>
   );
 }

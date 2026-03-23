@@ -1,4 +1,4 @@
-import { useIntelFeed } from "@/hooks/useIntelFeed";
+﻿import { useIntelFeed } from "@/hooks/useIntelFeed";
 import { AlertsBanner } from "@/components/intel/AlertsBanner";
 import { CryptoPanel } from "@/components/intel/CryptoPanel";
 import { ForexPanel } from "@/components/intel/ForexPanel";
@@ -33,7 +33,7 @@ const IntelGoldmineFeedPreview = () => {
               <h1 className="text-2xl sm:text-3xl md:text-[2.25rem] leading-tight">
                 <BrandWordmark />
               </h1>
-              <p className="text-[9px] text-muted-foreground mt-0.5">Intel GoldMine</p>
+              <p className="text-[9px] text-muted-foreground mt-0.5">Infinitygap</p>
               <p className="text-[10px] uppercase tracking-widest mt-0.5">
                 <span className="text-primary/90">Money flow</span>
                 <span className="text-muted-foreground/55"> • </span>

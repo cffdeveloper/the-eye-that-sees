@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+﻿import { useParams, Link, Navigate } from "react-router-dom";
 import { getIndustryBySlug, subFlowIdToPathSegment } from "@/lib/industryData";
 import { ArrowRight, TrendingUp, Loader2, Users, Handshake, Database, Clock } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
@@ -41,7 +41,7 @@ export default function IndustryPage() {
     getIndustryIntelCopy(industry.slug) ?? {
       eyebrow: "Sector workspace",
       title: `Why ${industry.name} intel here`,
-      body: `${industry.description} Intel GoldMine maps markets, news, and social layers to this sector so you can spot gaps, research angles, and timely updates as conditions change.\n\nOpen each money flow below for lane-specific analysis, alerts, and snapshot history.`,
+      body: `${industry.description} Infinitygap maps markets, news, and social layers to this sector so you can spot gaps, research angles, and timely updates as conditions change.\n\nOpen each money flow below for lane-specific analysis, alerts, and snapshot history.`,
     };
 
   return (
@@ -75,7 +75,7 @@ export default function IndustryPage() {
           </Link>
           ; for your own scoped brief,{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
-            Intel Lab
+            Infinity Lab
           </Link>
           .
         </p>

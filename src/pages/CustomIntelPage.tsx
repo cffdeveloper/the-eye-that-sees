@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+﻿import { useMemo, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { industries } from "@/lib/industryData";
@@ -124,7 +124,7 @@ export default function CustomIntelPage() {
 
   const runIntel = useCallback(async () => {
     if (!isPro) {
-      toast.error("Intel Lab requires Pro. Upgrade for full access to generate reports.");
+      toast.error("Infinity Lab requires Pro. Upgrade for full access to generate reports.");
       return;
     }
     const selectedCount = pool.size + primary.size + secondary.size;
@@ -184,7 +184,7 @@ export default function CustomIntelPage() {
       .filter(Boolean)
       .join("\n");
 
-    const systemPreamble = `You are the Intel GoldMine intelligence engine, continuing a custom intel session.
+    const systemPreamble = `You are the Infinitygap intelligence engine, continuing a custom intel session.
 
 SCOPE:
 ${scopeSummary}
@@ -274,13 +274,13 @@ Answer the user's follow-up with the same structured block style when analytical
 
   return (
     <div className="space-y-5 max-w-6xl mx-auto pb-24">
-      <PageIntro eyebrow="Compose your brief" title="How Intel Lab works">
+      <PageIntro eyebrow="Compose your brief" title="How Infinity Lab works">
         <ol className="list-decimal list-inside space-y-1.5 [&>li]:pl-0.5">
           <li>
             Pick industries and money flows below — promote lanes to <strong className="text-foreground">Primary</strong> (main thesis) and{" "}
             <strong className="text-foreground">Secondary</strong> (context), or keep candidates in the pool.
           </li>
-          <li>Add free-text context (deal, client, question) so Intel GoldMine aligns tone and depth.</li>
+          <li>Add free-text context (deal, client, question) so Infinitygap aligns tone and depth.</li>
           <li>Generate a structured brief, then use chat for follow-ups on the same scope.</li>
         </ol>
         <p>
@@ -308,12 +308,12 @@ Answer the user's follow-up with the same structured block style when analytical
               <Layers className="w-5 h-5 text-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg font-bold text-foreground tracking-tight">Custom Intel Lab</h1>
+              <h1 className="text-lg font-bold text-foreground tracking-tight">Custom Infinity Lab</h1>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
                 Scoped brief · primary vs secondary lanes · structured output
               </p>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
-                Intel GoldMine builds on the same structured blocks as industry and money-flow pages—scoped to the flows you choose and the context you add—so outputs stay comparable and actionable.
+                Infinitygap builds on the same structured blocks as industry and money-flow pages—scoped to the flows you choose and the context you add—so outputs stay comparable and actionable.
               </p>
             </div>
           </div>
@@ -540,14 +540,14 @@ Answer the user's follow-up with the same structured block style when analytical
                       : "bg-primary/5 border-primary/20 text-foreground mr-2 md:mr-6",
                   )}
                 >
-                  <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Intel GoldMine · "}</span>
+                  <span className="text-muted-foreground">{m.role === "user" ? "You · " : "Infinitygap · "}</span>
                   {msgSegments ? <BlockRenderer segments={msgSegments} /> : m.content}
                 </div>
               );
             })}
             {chatStreaming && (
               <div className="rounded-md px-3 py-2 text-[11px] whitespace-pre-wrap bg-primary/5 text-foreground mr-2 md:mr-6 border border-primary/20">
-                <span className="text-muted-foreground">Intel GoldMine · </span>
+                <span className="text-muted-foreground">Infinitygap · </span>
                 <BlockRenderer segments={parseBlocks(chatStreaming)} />
               </div>
             )}

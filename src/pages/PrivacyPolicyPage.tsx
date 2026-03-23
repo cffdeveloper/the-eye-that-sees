@@ -1,11 +1,11 @@
-import { LegalPageShell } from "@/components/legal/LegalPageShell";
+﻿import { LegalPageShell } from "@/components/legal/LegalPageShell";
 import { PRIVACY_POLICY_URL, SITE_URL } from "@/lib/site";
 
 export default function PrivacyPolicyPage() {
   return (
     <LegalPageShell title="Privacy policy">
       <p className="text-muted-foreground">
-        This policy describes how Intel GoldMine (“we”, “us”) handles information when you use our service at{" "}
+        This policy describes how Infinitygap (“we”, “us”) handles information when you use our service at{" "}
         <a href={SITE_URL} className="text-primary font-medium hover:underline">
           {SITE_URL}
         </a>
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>How we use information</h2>
       <p>
-        We use account and usage data to provide and improve Intel GoldMine, personalize your experience, secure the
+        We use account and usage data to provide and improve Infinitygap, personalize your experience, secure the
         platform, communicate with you about the service, and comply with law. AI-assisted features process your inputs
         according to our infrastructure and provider terms.
       </p>
@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <h2>Children</h2>
-      <p>Intel GoldMine is not directed at children under 16, and we do not knowingly collect their personal data.</p>
+      <p>Infinitygap is not directed at children under 16, and we do not knowingly collect their personal data.</p>
 
       <h2>Changes</h2>
       <p>
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <p className="text-xs text-muted-foreground pt-4">
-        Intel GoldMine provides market intelligence tools for informational purposes only. Nothing on this site is
+        Infinitygap provides market intelligence tools for informational purposes only. Nothing on this site is
         financial, legal, or investment advice.
       </p>
     </LegalPageShell>

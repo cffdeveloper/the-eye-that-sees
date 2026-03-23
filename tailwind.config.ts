@@ -18,6 +18,8 @@ export default {
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
         brand: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
         display: ["Playfair Display", "Georgia", "Times New Roman", "serif"],
+        /** Hero / marketing headlines — geometric, high legibility */
+        outfit: ["Outfit", "DM Sans", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -130,7 +132,7 @@ export default {
         "shimmer": "shimmer 3s ease-in-out infinite",
         "hero-rise": "hero-rise 0.7s ease-out forwards",
         "hero-float": "hero-float 9s ease-in-out infinite",
-        marquee: "marquee 45s linear infinite",
+        marquee: "marquee 24s linear infinite",
         "spin-slow": "spin-slow 28s linear infinite",
       },
     },

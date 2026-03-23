@@ -1,4 +1,4 @@
-import { useIntelFeed } from "@/hooks/useIntelFeed";
+﻿import { useIntelFeed } from "@/hooks/useIntelFeed";
 import { AlertsBanner } from "@/components/intel/AlertsBanner";
 import { CryptoPanel } from "@/components/intel/CryptoPanel";
 import { ForexPanel } from "@/components/intel/ForexPanel";
@@ -34,7 +34,7 @@ export default function IntelDashboard() {
           </Link>{" "}
           scan, or compose a scoped brief in{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
-            Intel Lab
+            Infinity Lab
           </Link>
           .
         </p>

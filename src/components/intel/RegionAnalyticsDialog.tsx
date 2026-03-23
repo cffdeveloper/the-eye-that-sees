@@ -198,7 +198,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
               <p className="text-sm font-bold text-primary">{region.tradeVolume}</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
-              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Intel pulse</p>
+              <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Infinity pulse</p>
               <p className="text-sm font-bold text-foreground">{intelScore}/100</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">

@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { industries } from "@/lib/industryData";
 import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
+import { HeroSplineRobot } from "@/components/motion/HeroSplineRobot";
 import {
   ArrowRight,
   CheckCircle2,
@@ -21,9 +22,10 @@ import {
   Cpu,
   Globe2,
   Layers,
+  Key,
   Radar,
   Radio,
-  PlayCircle,
+  Rocket,
   FlaskConical,
   Workflow,
   CreditCard,
@@ -53,8 +55,8 @@ const CHOOSE_LANE_CARDS = [
     grad: "bg-gradient-to-br from-primary/30 via-primary/10 to-slate-900/80",
   },
   {
-    title: "Intel Lab",
-    desc: "Scope industries & money flows, add context, and let Intel GoldMine generate research-grade briefs you can challenge line by line — your private lab.",
+    title: "Infinity Lab",
+    desc: "Scope industries & money flows, add context, and let Infinitygap generate research-grade briefs you can challenge line by line — your private lab.",
     icon: FlaskConical,
     grad: "bg-gradient-to-br from-amber-500/35 via-brand-orange/15 to-slate-900/85",
   },
@@ -128,23 +130,25 @@ function ChooseLaneCarousel() {
   }, [updateScrollMotion]);
 
   return (
-    <div className="relative [perspective:1400px]">
+    <div className="relative mx-auto w-full max-w-6xl [perspective:1400px]">
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 bg-gradient-to-r from-amber-50/95 via-amber-50/40 to-transparent dark:from-amber-950/50 dark:via-amber-950/20 sm:w-14"
+        className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-10 bg-gradient-to-r from-amber-50/95 via-amber-50/40 to-transparent dark:from-amber-950/50 dark:via-amber-950/20 sm:w-14 md:hidden"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 bg-gradient-to-l from-amber-50/95 via-amber-50/40 to-transparent dark:from-amber-950/50 dark:via-amber-950/20 sm:w-14"
+        className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-10 bg-gradient-to-l from-amber-50/95 via-amber-50/40 to-transparent dark:from-amber-950/50 dark:via-amber-950/20 sm:w-14 md:hidden"
         aria-hidden
       />
 
       <div
         ref={scrollRef}
         className={cn(
-          "flex gap-4 overflow-x-auto overscroll-x-contain scroll-smooth scroll-pl-4 scroll-pr-4 pb-3 pt-1",
-          "snap-x snap-mandatory [-webkit-overflow-scrolling:touch]",
-          "-mx-4 px-4 sm:-mx-8 sm:px-8",
-          "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+          "flex gap-4 pb-3 pt-1",
+          "md:flex-wrap md:justify-center md:gap-6 md:overflow-x-visible md:px-0 md:pb-0",
+          "max-md:overflow-x-auto max-md:overscroll-x-contain max-md:scroll-smooth max-md:scroll-pl-4 max-md:scroll-pr-4",
+          "max-md:snap-x max-md:snap-mandatory max-md:[-webkit-overflow-scrolling:touch]",
+          "-mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0",
+          "max-md:[scrollbar-width:none] max-md:[-ms-overflow-style:none] max-md:[&::-webkit-scrollbar]:hidden",
         )}
       >
         {CHOOSE_LANE_CARDS.map((item, i) => {
@@ -231,7 +235,7 @@ export default function LandingPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="sticky top-0 z-50 overflow-visible border-b border-border/40 bg-background/75 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65"
+        className="fixed inset-x-0 top-0 z-50 overflow-visible border-b border-border/40 bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75"
       >
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-2 gap-y-2 px-3 py-2 sm:px-8 md:min-h-16 md:flex-nowrap md:items-center md:gap-6 md:py-0">
           <Link
@@ -252,7 +256,7 @@ export default function LandingPage() {
                     "group touch-manipulation inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-background/85 px-2.5 py-2 text-center shadow-sm backdrop-blur-sm transition-colors",
                     "hover:border-border hover:bg-muted/60 hover:text-foreground",
                     "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    "md:min-h-9 md:min-w-0 md:px-3",
+                    "md:min-h-9 md:w-auto md:shrink-0 md:justify-center md:gap-1.5 md:px-2.5 md:py-1.5 lg:px-3",
                   )}
                 >
                   <Workflow className="h-3.5 w-3.5 shrink-0 text-primary/80 group-hover:text-primary transition-colors" />
@@ -279,7 +283,7 @@ export default function LandingPage() {
                         title: "01 — Ingest · scope · prioritize",
                         body: (
                           <p>
-                            Intel GoldMine pulls from markets, macro, news, funding rails, and social signals —{" "}
+                            Infinitygap pulls from markets, macro, news, funding rails, and social signals —{" "}
                             <span className="font-semibold text-foreground">{SOURCE_INTEGRATIONS_LABEL} integrated feed types</span>{" "}
                             — then respects <em>your</em> industries, regions, and watchlists. You’re not drowning in tabs;
                             the machine aggregates toward answers that match how you think.
@@ -304,7 +308,7 @@ export default function LandingPage() {
                         body: (
                           <p>
                             Outputs read like a serious research desk: frameworks, risks, opportunities, and follow-up
-                            prompts — not a ticker wall. Use the live pulse for rhythm, deep dives for rigor, Intel Lab when
+                            prompts — not a ticker wall. Use the live pulse for rhythm, deep dives for rigor, Infinity Lab when
                             you need a bespoke brief, and geo snapshots when place matters as much as price.
                           </p>
                         ),
@@ -336,7 +340,7 @@ export default function LandingPage() {
                     "group touch-manipulation inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-background/85 px-2.5 py-2 text-center shadow-sm backdrop-blur-sm transition-colors",
                     "hover:border-border hover:bg-muted/60 hover:text-foreground",
                     "outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    "md:min-h-9 md:min-w-0 md:px-3",
+                    "md:min-h-9 md:w-auto md:shrink-0 md:justify-center md:gap-1.5 md:px-2.5 md:py-1.5 lg:px-3",
                   )}
                 >
                   <BadgePercent className="h-3.5 w-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
@@ -373,11 +377,11 @@ export default function LandingPage() {
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 space-y-3">
                         <p>
                           Pro is the full desk: unlimited live global pulse, deep sector & money-flow workspaces,{" "}
-                          cross-industry relationship maps, Intel Lab sessions, and geo-scoped snapshots — the same stack
+                          cross-industry relationship maps, Infinity Lab sessions, and geo-scoped snapshots — the same stack
                           serious operators use to stay ahead of headlines.
                         </p>
                         <p className="text-xs text-muted-foreground/90">
-                          Start free; upgrade when you want the full firehose and Intel GoldMine without limits.
+                          Start free; upgrade when you want the full firehose and Infinitygap without limits.
                         </p>
                         <Button size="sm" className="w-full font-bold rounded-lg" asChild>
                           <Link to="/auth?mode=signup">
@@ -401,11 +405,11 @@ export default function LandingPage() {
                       <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
                         <ul className="space-y-2 text-sm text-muted-foreground pt-2">
                           {[
-                            "Intel GoldMine research, synthesis & follow-up chat",
+                            "Infinitygap research, synthesis & follow-up chat",
                             `${industries.length} global sectors · ${FLOW_LANES_LABEL} mapped capital lanes`,
                             `${SOURCE_INTEGRATIONS_LABEL} source integrations — aggregated for you`,
                             "Cross-industry bridges, gaps & second-order links",
-                            "Intel Lab — scoped briefs when you need a private lens",
+                            "Infinity Lab — scoped briefs when you need a private lens",
                             "Geo filters & regional snapshots (where place matters)",
                           ].map((line) => (
                             <li key={line} className="flex gap-2">
@@ -469,166 +473,219 @@ export default function LandingPage() {
         </div>
       </motion.header>
 
-      <main className="relative z-10 flex-1">
-        {/* Hero — full first viewport (below sticky header); next sections only after scroll */}
+      <main className="relative z-10 flex-1 pt-14 sm:pt-16">
+        {/* Hero — full first viewport below fixed header (pt matches calc(100dvh − header)); next sections only after scroll */}
         <section
           ref={heroRef}
-          className="relative flex min-h-[calc(100svh-3.5rem)] flex-col overflow-hidden mesh-marketing landing-aurora text-foreground sm:min-h-[calc(100svh-4rem)]"
+          className="relative flex h-[calc(100dvh-3.5rem)] max-h-[calc(100dvh-3.5rem)] min-h-0 flex-col overflow-x-hidden overflow-y-visible mesh-marketing landing-aurora text-foreground sm:h-[calc(100dvh-4rem)] sm:max-h-[calc(100dvh-4rem)]"
         >
           <LandingBackdrop />
+          <HeroSplineRobot />
 
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
-            className="relative z-10 flex min-h-0 flex-1 flex-col justify-center py-6 sm:py-8"
+            className="relative z-10 flex min-h-0 flex-1 flex-col justify-start px-0 pb-2 pt-20 max-sm:pb-3 sm:justify-center sm:pt-0 sm:py-3 md:py-4 overflow-x-hidden overflow-y-visible"
           >
-            <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 pt-4 sm:pt-6 lg:pt-8 pb-0">
-              <p className="mb-3 text-left sm:mb-4">
-                <span className="inline-flex max-w-full items-start gap-2 rounded-2xl border border-primary/15 bg-card/90 px-3.5 py-2.5 text-foreground shadow-sm backdrop-blur-sm sm:max-w-4xl">
-                  <Radar className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-                  <span className="min-w-0 text-[13px] font-medium leading-snug text-foreground sm:text-sm">
-                    Intel GoldMine is an intelligence agent that continuously gathers news and intel from hundreds of sources, maps how money moves, surfaces business gaps, research angles, and the relationships analysts, investors, and researchers need for cross-reading, and delivers high-signal updates to you proactively across every industry, 24/7—not scattered headlines.
+            <div className="relative z-30 mx-auto flex w-full min-h-0 max-w-7xl flex-col px-4 max-sm:min-h-0 max-sm:flex-1 sm:px-8">
+              {/* Intro callout — vertical position adjusted on this wrapper only (does not add big gap before headline grid) */}
+              <div className="relative z-[15] mb-3 shrink-0 translate-y-4 sm:mb-5 sm:-translate-y-1.5 md:-translate-y-2 lg:mb-7 xl:mb-8">
+                <p className="mb-0 text-left">
+                  <span className="inline-flex max-w-full items-start gap-2.5 rounded-2xl border border-primary/35 bg-card/95 px-3 py-2 text-foreground shadow-[0_12px_40px_-16px_hsl(var(--primary)/0.35)] ring-1 ring-primary/15 backdrop-blur-md sm:max-w-4xl sm:px-3.5 sm:py-2.5 dark:border-primary/25 dark:shadow-[0_14px_44px_-14px_hsl(var(--primary)/0.25)]">
+                    <Radar className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                    <span className="min-w-0 text-[12px] font-medium leading-snug text-foreground sm:text-sm">
+                      Infinitygap is an intelligence agent that continuously gathers news and intel from hundreds of sources, maps how money moves, surfaces business gaps, research angles, and the relationships analysts, investors, and researchers need for cross-reading, and delivers high-signal updates to you proactively across every industry, 24/7—not scattered headlines.
+                    </span>
                   </span>
-                </span>
-              </p>
+                </p>
+              </div>
 
               <motion.div
                 variants={stagger}
                 initial="hidden"
                 animate="show"
-                className="grid lg:grid-cols-[1.08fr_0.92fr] gap-8 lg:gap-10 xl:gap-12 lg:items-stretch"
+                className="mt-0 grid min-h-0 gap-y-5 gap-x-0 max-sm:flex max-sm:min-h-0 max-sm:flex-1 max-sm:flex-col sm:gap-y-6"
               >
-                <div className="text-left lg:flex lg:flex-col lg:justify-center">
+                <div className="min-h-0 max-w-full text-left max-sm:flex max-sm:min-h-0 max-sm:flex-1 max-sm:flex-col max-sm:justify-between xl:max-w-[min(100%,42rem)]">
+                  <div className="max-sm:flex max-sm:min-h-0 max-sm:flex-1 max-sm:flex-col max-sm:justify-evenly max-sm:gap-3 max-sm:py-1">
                   <motion.h1
                     variants={fadeUp}
-                    className="font-display text-[2.35rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl xl:text-[3.5rem]"
+                    className="font-outfit text-[1.65rem] font-semibold leading-[1.08] tracking-[-0.045em] text-foreground sm:text-4xl md:text-5xl lg:text-[2.75rem] lg:leading-[1.06] xl:text-[3.1rem]"
                   >
-                    Global market intelligence —{" "}
-                    <span className="text-gradient-gold bg-clip-text text-transparent">one command center</span>
-                    <span className="text-foreground">.</span>
+                    <span className="block">
+                      <span className="font-display italic font-medium tracking-[-0.02em] text-foreground/95">
+                        Global market intelligence
+                      </span>
+                    </span>
+                    <span className="mt-2 block sm:mt-2.5 lg:mt-3.5">
+                      <span className="text-foreground/35">—</span>{" "}
+                      <span className="text-gradient-gold bg-clip-text font-bold text-transparent">one command center</span>
+                      <span className="font-bold text-foreground">.</span>
+                    </span>
                   </motion.h1>
 
                   <motion.p
                     variants={fadeUp}
-                    className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg"
+                    className="mt-5 max-w-xl font-mono text-[10px] font-medium uppercase leading-relaxed tracking-[0.18em] text-muted-foreground max-sm:mt-0 sm:mt-6 sm:text-[11px] sm:tracking-[0.2em] md:mt-7 md:text-xs md:tracking-[0.22em] lg:mt-9 xl:mt-10"
                   >
-                    <span className="font-semibold text-foreground">{industries.length} sectors</span> ·{" "}
-                    <span className="font-semibold text-foreground">{FLOW_LANES_LABEL} capital lanes</span> ·{" "}
-                    <span className="font-semibold text-foreground">
-                      {SOURCE_INTEGRATIONS_LABEL} feed integrations.
+                    <span className="text-foreground/90 tabular-nums">{industries.length} sectors</span>
+                    <span className="mx-2 text-border sm:mx-3">/</span>
+                    <span className="text-foreground/90 tabular-nums">{FLOW_LANES_LABEL} capital lanes</span>
+                    <span className="mx-2 text-border sm:mx-3">/</span>
+                    <span className="text-foreground/90 tabular-nums">
+                      {SOURCE_INTEGRATIONS_LABEL} feed integrations
                     </span>
                   </motion.p>
 
-                  <motion.div
-                    variants={fadeUp}
-                    className="mt-5 grid grid-cols-6 gap-x-2 gap-y-2 sm:gap-x-2.5 sm:gap-y-2.5"
-                  >
-                    {[
-                      { icon: Globe2, label: "Worldwide signal mesh", c: "text-brand-orange" },
-                      { icon: Layers, label: "Cross-industry links", c: "text-signal-violet" },
-                      { icon: Cpu, label: "Intel Lab & briefs", c: "text-primary" },
-                    ].map(({ icon: Icon, label, c }) => (
-                      <span
-                        key={label}
-                        className="col-span-2 flex min-h-[2.75rem] items-center justify-center gap-1 rounded-lg border border-border/60 bg-muted/40 px-1.5 py-1.5 text-center text-[10px] font-medium leading-tight text-foreground/90 sm:min-h-0 sm:gap-1.5 sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[13px] sm:font-normal md:text-sm"
-                      >
-                        <Icon className={cn("h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5", c)} />
-                        <span className="min-w-0">{label}</span>
-                      </span>
-                    ))}
-                    <Button
-                      size="lg"
-                      className="col-span-3 h-11 min-h-11 w-full gap-1.5 rounded-full px-3 text-sm font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all sm:h-14 sm:gap-2 sm:px-8 sm:text-base"
-                      asChild
-                    >
-                      <Link to="/auth?mode=signup">
-                        Start free
-                        <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Link>
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="col-span-3 h-11 min-h-11 w-full rounded-full border-border/70 bg-card/60 px-2.5 text-sm hover:bg-card sm:h-14 sm:px-8 sm:text-base"
-                      asChild
-                    >
-                      <Link to="/auth" className="inline-flex items-center justify-center gap-1.5 sm:gap-2.5">
-                        <PlayCircle className="h-3.5 w-3.5 shrink-0 text-primary sm:h-4 sm:w-4" />
-                        <span className="min-w-0 leading-tight">Sign in to explore</span>
-                      </Link>
-                    </Button>
-                  </motion.div>
-                </div>
-
-                <motion.div variants={fadeUp} className="relative hidden h-full min-h-0 lg:flex lg:flex-col">
-                  <div className="absolute -inset-5 rounded-[2rem] bg-gradient-to-br from-primary/15 via-transparent to-brand-orange/15 blur-2xl" />
-                  <motion.div
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    className="shine-border relative flex h-full min-h-0 flex-col rounded-2xl border border-border/40 bg-card shadow-2xl overflow-hidden"
-                  >
-                    <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/40">
-                      <span className="flex gap-1.5">
-                        <span className="h-2.5 w-2.5 rounded-full bg-red-400/90" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
-                      </span>
-                      <div className="flex-1 flex justify-center">
-                        <span className="rounded-lg bg-background/80 border border-border/50 px-3 py-1 text-[11px] text-muted-foreground font-medium truncate max-w-[280px]">
-                          intelgoldmine.app · dashboard
+                  <motion.div variants={fadeUp} className="mt-5 flex min-h-0 flex-col gap-5 max-sm:mt-0 sm:mt-6 sm:gap-6 md:mt-7 md:gap-6 lg:mt-9 lg:gap-7 xl:mt-10 xl:gap-8">
+                    <div className="grid w-full grid-cols-3 gap-1.5 sm:gap-2 md:gap-3">
+                      {[
+                        { icon: Globe2, label: "Worldwide signal mesh", c: "text-brand-orange" },
+                        { icon: Layers, label: "Cross-industry links", c: "text-signal-violet" },
+                        { icon: Cpu, label: "Infinity Lab & briefs", c: "text-primary" },
+                      ].map(({ icon: Icon, label, c }) => (
+                        <span
+                          key={label}
+                          className="group flex min-h-[2.75rem] min-w-0 flex-col items-center justify-center gap-1 rounded-xl border border-border/55 bg-gradient-to-br from-muted/45 via-muted/25 to-muted/40 px-1 py-2 text-center shadow-sm backdrop-blur-[2px] transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-md sm:min-h-0 sm:flex-row sm:items-center sm:justify-center sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-2.5 sm:text-left md:gap-2.5 md:px-4 md:py-3"
+                        >
+                          <span
+                            className={cn(
+                              "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border/50 bg-background/80 shadow-inner sm:h-8 sm:w-8 sm:rounded-xl",
+                              c,
+                            )}
+                          >
+                            <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                          </span>
+                          <span className="min-w-0 font-outfit text-[10px] font-semibold leading-snug tracking-[-0.02em] text-foreground sm:text-[12px] md:text-sm">
+                            {label}
+                          </span>
                         </span>
-                      </div>
-                    </div>
-                    <div className="relative min-h-[clamp(240px,44vh,580px)] flex-1 bg-muted/30">
-                      <img
-                        src="/hero-visual.png"
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover object-top"
-                        loading="eager"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/35 via-transparent to-transparent pointer-events-none" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-px border-t border-border/40 bg-border/30 text-[10px] sm:text-[11px]">
-                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
-                        <p className="font-bold tabular-nums text-primary">{industries.length}</p>
-                        <p className="text-muted-foreground">Sectors</p>
-                      </div>
-                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
-                        <p className="font-bold tabular-nums text-brand-orange">{FLOW_LANES_LABEL}</p>
-                        <p className="text-muted-foreground">Capital lanes</p>
-                      </div>
-                      <div className="bg-card/95 p-2.5 text-center backdrop-blur-sm sm:p-3">
-                        <p className="font-bold tabular-nums text-signal-emerald">{SOURCE_INTEGRATIONS_LABEL}</p>
-                        <p className="text-muted-foreground">Feed types</p>
-                      </div>
+                      ))}
                     </div>
                   </motion.div>
-                </motion.div>
+                  </div>
+
+                  {/* Mobile: CTA pair — tighter to chips, more gap between the two buttons only */}
+                  <div className="hidden max-sm:mt-2 max-sm:flex max-sm:shrink-0 max-sm:flex-col max-sm:gap-5 max-sm:pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+                  <Link
+                    to="/auth?mode=signup"
+                    className={cn(
+                      "group relative hidden min-h-10 w-full items-stretch overflow-hidden rounded-xl max-sm:flex sm:mt-0 md:rounded-2xl",
+                      "border border-white/25 bg-primary/95 text-primary-foreground shadow-[0_10px_40px_-8px_hsl(var(--primary)/0.55),inset_0_1px_0_0_rgba(255,255,255,0.22)]",
+                      "backdrop-blur-md dark:border-white/15 dark:shadow-[0_12px_48px_-10px_hsl(var(--primary)/0.45),inset_0_1px_0_0_rgba(255,255,255,0.12)]",
+                      "transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_16px_48px_-8px_hsl(var(--primary)/0.6),inset_0_1px_0_0_rgba(255,255,255,0.28)]",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    )}
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute -left-8 -top-12 h-32 w-32 rounded-full bg-white/20 blur-2xl transition-opacity group-hover:opacity-90"
+                    />
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-90"
+                    />
+                    <span className="relative z-10 flex w-full items-center gap-2 px-3 py-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/30 bg-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm">
+                        <Rocket className="h-4 w-4 text-primary-foreground" strokeWidth={2.25} />
+                      </span>
+                      <span className="min-w-0 flex-1 text-left font-outfit text-sm font-bold tracking-tight">Start free</span>
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 transition-transform group-hover:translate-x-0.5">
+                        <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+                      </span>
+                    </span>
+                  </Link>
+
+                  {/* Mobile: Sign in (paired with Start free above) */}
+                  <Link
+                    to="/auth"
+                    className={cn(
+                      "group relative hidden min-h-10 w-full shrink-0 items-stretch overflow-hidden rounded-xl max-sm:flex md:rounded-2xl",
+                      "border border-border/70 bg-background/55 text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55),0_8px_32px_-12px_rgba(0,0,0,0.15)]",
+                      "backdrop-blur-xl dark:border-white/12 dark:bg-card/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_8px_36px_-12px_rgba(0,0,0,0.45)]",
+                      "transition-all duration-300 hover:border-primary/40 hover:bg-background/75 hover:shadow-lg dark:hover:bg-card/55",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    )}
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.07] via-transparent to-brand-orange/[0.06] opacity-0 transition-opacity group-hover:opacity-100"
+                    />
+                    <span className="relative z-10 flex w-full items-center gap-2 px-3 py-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.45)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]">
+                        <Key className="h-4 w-4 text-primary" strokeWidth={2.25} />
+                      </span>
+                      <span className="min-w-0 flex-1 text-left font-outfit text-sm font-semibold leading-tight tracking-tight text-foreground">
+                        Sign in to explore
+                      </span>
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border/50 bg-muted/30 text-muted-foreground transition-all group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary dark:border-white/10 dark:bg-white/[0.04]">
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </span>
+                  </Link>
+                  </div>
+
+                  {/* Desktop: two-up CTAs (sm+) */}
+                  <div className="hidden grid-cols-1 gap-2 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-2.5 md:mt-7 lg:mt-9 xl:mt-10">
+                    <Link
+                      to="/auth?mode=signup"
+                      className={cn(
+                        "group relative flex min-h-8 w-full items-stretch overflow-hidden rounded-xl sm:min-h-9 md:rounded-2xl",
+                        "border border-white/25 bg-primary/95 text-primary-foreground shadow-[0_10px_40px_-8px_hsl(var(--primary)/0.55),inset_0_1px_0_0_rgba(255,255,255,0.22)]",
+                        "backdrop-blur-md dark:border-white/15 dark:shadow-[0_12px_48px_-10px_hsl(var(--primary)/0.45),inset_0_1px_0_0_rgba(255,255,255,0.12)]",
+                        "transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_16px_48px_-8px_hsl(var(--primary)/0.6),inset_0_1px_0_0_rgba(255,255,255,0.28)]",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      )}
+                    >
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute -left-8 -top-12 h-32 w-32 rounded-full bg-white/20 blur-2xl transition-opacity group-hover:opacity-90"
+                      />
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-90"
+                      />
+                      <span className="relative z-10 flex w-full items-center gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-2.5 sm:py-2 md:px-3">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/30 bg-white/15 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm sm:h-7 sm:w-7 sm:rounded-lg">
+                          <Rocket className="h-3.5 w-3.5 text-primary-foreground sm:h-4 sm:w-4" strokeWidth={2.25} />
+                        </span>
+                        <span className="min-w-0 flex-1 text-left font-outfit text-[11px] font-bold tracking-tight sm:text-xs md:text-sm">
+                          Start free
+                        </span>
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 transition-transform group-hover:translate-x-0.5 sm:h-7 sm:w-7">
+                          <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={2.5} />
+                        </span>
+                      </span>
+                    </Link>
+                    <Link
+                      to="/auth"
+                      className={cn(
+                        "group relative flex min-h-8 w-full items-stretch overflow-hidden rounded-xl sm:min-h-9 md:rounded-2xl",
+                        "border border-border/70 bg-background/55 text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55),0_8px_32px_-12px_rgba(0,0,0,0.15)]",
+                        "backdrop-blur-xl dark:border-white/12 dark:bg-card/45 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_8px_36px_-12px_rgba(0,0,0,0.45)]",
+                        "transition-all duration-300 hover:border-primary/40 hover:bg-background/75 hover:shadow-lg dark:hover:bg-card/55",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      )}
+                    >
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.07] via-transparent to-brand-orange/[0.06] opacity-0 transition-opacity group-hover:opacity-100"
+                      />
+                      <span className="relative z-10 flex w-full items-center gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-2.5 sm:py-2 md:px-3">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.45)] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] sm:h-7 sm:w-7 sm:rounded-lg">
+                          <Key className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" strokeWidth={2.25} />
+                        </span>
+                        <span className="min-w-0 flex-1 text-left font-outfit text-[11px] font-semibold leading-tight tracking-tight text-foreground sm:text-xs md:text-sm">
+                          Sign in to explore
+                        </span>
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border/50 bg-muted/30 text-muted-foreground transition-all group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary dark:border-white/10 dark:bg-white/[0.04] sm:h-7 sm:w-7">
+                          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 sm:h-3.5 sm:w-3.5" />
+                        </span>
+                      </span>
+                    </Link>
+                  </div>
+                </div>
               </motion.div>
             </div>
-
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="show"
-              className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 pb-2 lg:hidden"
-            >
-              <div className="shine-border relative overflow-hidden rounded-2xl border border-border/40 bg-card shadow-2xl">
-                <div className="flex items-center gap-2 border-b border-border/40 bg-muted/30 px-3 py-2">
-                  <span className="h-2 w-2 rounded-full bg-red-400/90" />
-                  <span className="h-2 w-2 rounded-full bg-amber-400/90" />
-                  <span className="h-2 w-2 rounded-full bg-emerald-400/90" />
-                </div>
-                <div className="relative aspect-[16/10] w-full max-h-[min(52vh,420px)]">
-                  <img
-                    src="/hero-visual.png"
-                    alt="Intel GoldMine — market intelligence workspace"
-                    className="h-full w-full object-cover object-top"
-                    loading="eager"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
         </section>
 
@@ -639,13 +696,13 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 dot-pattern-fine opacity-[0.28] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-4 sm:px-8 py-14 sm:py-20 relative">
-            <div className="mb-10 max-w-2xl text-left sm:mb-14 md:mx-auto md:text-center">
+            <div className="mb-10 max-w-2xl mx-auto text-center sm:mb-14">
               <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Choose your lane</p>
               <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-[2.75rem]">
                 Three ways in. One global brain.
               </h2>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Pulse the world, stress-test relationships across sectors, or run a private brief — same Intel GoldMine engine,
+                Pulse the world, stress-test relationships across sectors, or run a private brief — same Infinitygap engine,
                 same truth bar.
               </p>
             </div>
@@ -669,10 +726,10 @@ export default function LandingPage() {
       <footer className="relative z-10 border-t border-zinc-800 dark:border-zinc-900 bg-zinc-950 dark:bg-black text-zinc-300 py-14 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
           <div className="md:col-span-5 space-y-4">
-            <div className="flex flex-wrap items-center gap-4 sm:gap-5 md:gap-6">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-3.5 md:gap-4">
               <BrandHexMark size="footer" variant="onDark" />
               <BrandWordmark
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl !leading-[1.05] tracking-tight"
+                className="text-xl sm:text-2xl md:text-2xl lg:text-3xl !leading-[1.12] tracking-tight"
                 variant="onDark"
               />
             </div>
@@ -722,7 +779,7 @@ export default function LandingPage() {
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-zinc-600">© 2026 Intel GoldMine · Not financial advice.</p>
+            <p className="text-xs text-zinc-600">© 2026 Infinitygap · Not financial advice.</p>
           </div>
         </div>
       </footer>

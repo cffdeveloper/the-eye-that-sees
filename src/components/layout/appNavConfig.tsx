@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+﻿import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, Radio, Network, FlaskConical, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -6,7 +6,7 @@ export const APP_NAV_ITEMS: { to: string; label: string; icon: LucideIcon }[] = 
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/intel", label: "Live Feed", icon: Radio },
   { to: "/cross-intel", label: "Cross-Intel", icon: Network },
-  { to: "/custom-intel", label: "Intel Lab", icon: FlaskConical },
+  { to: "/custom-intel", label: "Infinity Lab", icon: FlaskConical },
   { to: "/profile", label: "My Profile", icon: UserCircle },
 ];
 

@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const PLAN_NAME = "Intel GoldMine Pro Monthly";
+const PLAN_NAME = "Infinitygap Pro Monthly";
 const PLAN_AMOUNT_LOWEST = 3000; // $30.00 in cents (Paystack lowest denomination)
 const PLAN_CURRENCY = "USD";
 const PLAN_INTERVAL = "monthly";
@@ -42,7 +42,7 @@ async function ensurePlan(secretKey: string): Promise<string> {
       interval: PLAN_INTERVAL,
       currency: PLAN_CURRENCY,
       description:
-        "Full Intel GoldMine access — AI intelligence, deep dives, cross-industry analysis, Intel Lab.",
+        "Full Infinitygap access — AI intelligence, deep dives, cross-industry analysis, Infinity Lab.",
     }),
   });
 
@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
           amount: PLAN_AMOUNT_LOWEST,
           currency: PLAN_CURRENCY,
           callback_url:
-            callbackUrl || "https://intelgoldmine.onrender.com/dashboard?payment=verify",
+            callbackUrl || "https://infinitygap.app/dashboard?payment=verify",
           plan: planCode,
           channels: ["card"],
           metadata: {

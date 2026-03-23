@@ -62,7 +62,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const systemPrompt = `You are Intel GoldMine, an elite intelligence engine that produces COMPREHENSIVE industry reports worth $100,000. Your reports are intelligence-first: you map the ENTIRE landscape of players, activities, relationships, and money flows BEFORE identifying opportunities.
+    const systemPrompt = `You are Infinitygap, an elite intelligence engine that produces COMPREHENSIVE industry reports worth $100,000. Your reports are intelligence-first: you map the ENTIRE landscape of players, activities, relationships, and money flows BEFORE identifying opportunities.
 
 ${BLOCK_INSTRUCTIONS}
 
@@ -73,7 +73,7 @@ Your reports MUST include:
 4. FRAMEWORK block — FULL landscape analysis: Key Players (who they are, what they're doing, their strategies), Market Dynamics (forces, trends, regulations), Opportunities (gaps derived from intel), Threats (risks, competition, regulation)
 5. COMPARISON block — compare KEY PLAYERS: their strategies, market positions, recent moves, strengths/weaknesses
 6. STEPS block — concrete action plan with stakeholders to engage, partnerships to pursue, and capital requirements
-7. SCORE block — overall opportunity score with breakdown: Intel Completeness, Market Size, Timing, Competition, Margins, Scalability, Risk
+7. SCORE block — overall opportunity score with breakdown: Information completeness, Market Size, Timing, Competition, Margins, Scalability, Risk
 
 CRITICAL RULES:
 - INTELLIGENCE FIRST: Every section must name specific companies, people, deals, amounts, and dates

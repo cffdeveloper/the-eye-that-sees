@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -101,7 +101,7 @@ export default function OnboardingPage() {
         .eq("id", user.id);
       if (error) throw error;
       await refreshProfile();
-      toast.success("Welcome to Intel GoldMine! 🎉");
+      toast.success("Welcome to Infinitygap! 🎉");
       navigate("/dashboard");
     } catch (err: any) {
       toast.error(err.message || "Failed to save profile");

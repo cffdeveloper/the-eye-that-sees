@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
+import { MobileBottomNav } from "./MobileBottomNav";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -52,7 +53,7 @@ export default function AppLayout() {
           overlay={!isDesktop}
           onNavigate={closeMobileSidebar}
         />
-        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-background px-3 py-4 sm:px-5 md:p-8">
+        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-background px-3 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:px-5 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -67,6 +68,7 @@ export default function AppLayout() {
           </AnimatePresence>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }

@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
   const handleDowngrade = async () => {
     // For now, show a message — full cancel requires Paystack API integration
-    toast.info("To cancel your subscription, please contact support at support@intelgoldmine.com. We'll process your request within 24 hours.");
+    toast.info("To cancel your subscription, please contact support at support@infinitygap.app. We'll process your request within 24 hours.");
   };
 
   return (
@@ -77,9 +77,9 @@ export default function ProfilePage() {
         <p className="text-sm text-muted-foreground mt-1">Manage your account details and subscription</p>
       </div>
 
-      <PageIntro eyebrow="Personalize Intel GoldMine" title="Why this page matters">
+      <PageIntro eyebrow="Personalize Infinitygap" title="Why this page matters">
         <p>
-          Role, organization, and industry picks tune how Intel GoldMine writes briefs and prioritizes what you see. Geography is set in the top bar and applies across the app.
+          Role, organization, and industry picks tune how Infinitygap writes briefs and prioritizes what you see. Geography is set in the top bar and applies across the app.
         </p>
         <p className="text-foreground/90">
           Back to{" "}
@@ -96,7 +96,7 @@ export default function ProfilePage() {
           </Link>
           , or{" "}
           <Link to="/custom-intel" className="text-primary font-medium hover:underline">
-            Intel Lab
+            Infinity Lab
           </Link>
           .
         </p>

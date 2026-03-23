@@ -1,32 +1,33 @@
-import { useTheme } from "next-themes";
-import { useEffect, useState, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
+import { BRAND_LOGO_PATH } from "@/lib/brandLogo";
 
 const sizeMap = {
-  /** Compact rails (TopBar, legal shell) — readable at a glance */
-  sm: "w-9 h-9 sm:w-10 sm:h-10",
-  /** Marketing footer / dark surfaces — large lockup */
+  /** Compact rails — readable at a glance */
+  sm: "w-8 h-8 sm:w-9 sm:h-9",
+  /** Marketing footer / dark surfaces */
   footer:
-    "w-[5.5rem] h-[5.5rem] sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36",
-  md: "w-11 h-11 sm:w-12 sm:h-12",
-  lg: "w-14 h-14 sm:w-[3.75rem] sm:h-[3.75rem]",
-  /** Marketing / dashboard hero emphasis */
-  xl: "w-[3.75rem] h-[3.75rem] sm:w-16 sm:h-16 md:w-[4.25rem] md:h-[4.25rem] lg:w-[4.5rem] lg:h-[4.5rem]",
+    "w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 xl:w-[3.25rem] xl:h-[3.25rem]",
+  /** App chrome (TopBar, legal shell) */
+  md: "w-9 h-9 sm:w-10 sm:h-10",
+  lg: "w-11 h-11 sm:w-12 sm:h-12",
+  /** Marketing / onboarding emphasis */
+  xl: "w-12 h-12 sm:w-14 sm:h-14 md:w-[3.25rem] md:h-[3.25rem] lg:w-14 lg:h-14",
   /**
-   * Marketing + auth headers — tune with `--brand-header-mark-size` on the mark.
+   * Marketing header — tune with `--brand-header-mark-size` on the mark.
    */
   header:
-    "w-[clamp(3.75rem,var(--brand-header-mark-size,5.75rem),8rem)] h-[clamp(3.75rem,var(--brand-header-mark-size,5.75rem),8rem)]",
+    "w-[clamp(2.25rem,var(--brand-header-mark-size,3.25rem),4rem)] h-[clamp(2.25rem,var(--brand-header-mark-size,3.25rem),4rem)]",
   /** Landing hero */
-  hero: "w-[6.25rem] h-[6.25rem] sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 xl:w-[9.5rem] xl:h-[9.5rem]",
+  hero: "w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36",
   /** Auth / reset spotlight */
   "2xl":
-    "w-[8rem] h-[8rem] sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-[13.5rem] lg:h-[13.5rem] xl:w-[15.5rem] xl:h-[15.5rem]",
+    "w-[5.5rem] h-[5.5rem] sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-[7.5rem] lg:h-[7.5rem]",
 } as const;
 
 type Size = keyof typeof sizeMap;
 
-/** Logos: `/logo-light.png` (light UI) · `/logo-dark.png` (dark UI / dark surfaces). */
+/** Product mark — uses `public/Final Logo.png` everywhere (light/dark). */
 export function BrandHexMark({
   size = "md",
   className,
@@ -36,18 +37,10 @@ export function BrandHexMark({
 }: {
   size?: Size;
   className?: string;
-  /** Logo for dark backgrounds (e.g. marketing footer) — always uses the dark-surface asset. */
+  /** Slight style tweak on dark surfaces (same asset). */
   variant?: "default" | "onDark";
   headerMarkSize?: string;
 }) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const useDarkAsset = variant === "onDark" || (mounted && resolvedTheme === "dark");
-  const src = useDarkAsset ? "/logo-dark.png" : "/logo-light.png";
-
   const headerVarStyle =
     size === "header" && headerMarkSize
       ? ({ ["--brand-header-mark-size" as string]: headerMarkSize } as CSSProperties)
@@ -55,12 +48,13 @@ export function BrandHexMark({
 
   return (
     <img
-      src={src}
-      alt="Intel GoldMine"
+      src={BRAND_LOGO_PATH}
+      alt="Infinitygap"
       style={headerVarStyle}
       className={cn(
         "shrink-0 object-contain",
-        variant === "default" && !useDarkAsset && "drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)]",
+        variant === "default" && "drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)]",
+        variant === "onDark" && "drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
         sizeMap[size],
         className,
       )}

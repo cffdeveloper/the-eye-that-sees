@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&display=swap');
 @import "leaflet/dist/leaflet.css";
 
 @tailwind base;
@@ -26,7 +26,8 @@
     --muted: 40 12% 95%;
     --muted-foreground: 0 0% 35%;
 
-    --accent: 38 92% 50%;
+    /* Brand accent #fc4c00 */
+    --accent: 18 100% 49%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 68% 54%;
@@ -50,17 +51,17 @@
     --surface-elevated: 0 0% 100%;
     --glow-primary: 226 58% 42%;
     --success: 152 55% 42%;
-    --warning: 38 92% 50%;
+    --warning: 18 100% 49%;
     --info: 205 70% 48%;
     --up: 152 55% 38%;
     --down: 0 68% 50%;
 
-    --signal-amber: 38 90% 50%;
+    --signal-amber: 18 100% 49%;
     --signal-emerald: 152 55% 42%;
     --signal-violet: 262 60% 55%;
     --signal-coral: 14 78% 55%;
 
-    --brand-orange: 38 92% 50%;
+    --brand-orange: 18 100% 49%;
     --brand-navy: 226 58% 22%;
   }
 
@@ -85,7 +86,7 @@
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 58%;
 
-    --accent: 38 90% 54%;
+    --accent: 18 100% 54%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 78% 58%;
@@ -106,15 +107,15 @@
 
     --surface-elevated: 0 0% 8%;
     --glow-primary: 226 72% 62%;
-    --brand-orange: 38 90% 56%;
+    --brand-orange: 18 100% 54%;
     --brand-navy: 226 72% 62%;
     --success: 152 60% 46%;
-    --warning: 40 92% 55%;
+    --warning: 18 100% 56%;
     --info: 205 75% 55%;
     --up: 152 60% 50%;
     --down: 0 78% 58%;
 
-    --signal-amber: 38 90% 58%;
+    --signal-amber: 18 100% 56%;
     --signal-emerald: 152 58% 50%;
     --signal-violet: 262 72% 65%;
     --signal-coral: 14 82% 60%;
@@ -154,7 +155,7 @@
 }
 
 @layer utilities {
-  .prose-intel-goldmine {
+  .prose-infinitygap {
     @apply prose prose-sm max-w-none dark:prose-invert;
   }
 
@@ -213,7 +214,7 @@
       radial-gradient(ellipse 90% 55% at 50% -25%, hsl(var(--primary) / 0.14), transparent 55%),
       radial-gradient(ellipse 55% 45% at 100% 5%, hsl(var(--brand-orange) / 0.1), transparent 50%),
       radial-gradient(ellipse 45% 35% at 0% 80%, hsl(var(--primary) / 0.08), transparent 45%),
-      radial-gradient(ellipse 60% 40% at 70% 100%, hsl(38 90% 50% / 0.06), transparent 50%);
+      radial-gradient(ellipse 60% 40% at 70% 100%, hsl(var(--brand-orange) / 0.06), transparent 50%);
   }
 
   .dot-pattern-fine {
@@ -249,7 +250,7 @@
     background-color: #000000;
     background-image:
       radial-gradient(ellipse 120% 70% at 0% -20%, hsl(226 65% 45% / 0.22), transparent 50%),
-      radial-gradient(ellipse 90% 50% at 100% 0%, hsl(38 85% 45% / 0.12), transparent 48%),
+      radial-gradient(ellipse 90% 50% at 100% 0%, hsl(var(--brand-orange) / 0.12), transparent 48%),
       radial-gradient(ellipse 55% 45% at 92% 85%, hsl(262 55% 42% / 0.14), transparent 52%),
       radial-gradient(ellipse 85% 40% at 35% 100%, hsl(226 50% 38% / 0.12), transparent 55%);
   }
@@ -259,7 +260,7 @@
       radial-gradient(ellipse 90% 55% at 50% -25%, hsl(var(--primary) / 0.18), transparent 55%),
       radial-gradient(ellipse 55% 45% at 100% 5%, hsl(var(--brand-orange) / 0.08), transparent 50%),
       radial-gradient(ellipse 45% 35% at 0% 80%, hsl(var(--primary) / 0.1), transparent 45%),
-      radial-gradient(ellipse 60% 40% at 70% 100%, hsl(38 90% 50% / 0.05), transparent 50%);
+      radial-gradient(ellipse 60% 40% at 70% 100%, hsl(var(--brand-orange) / 0.05), transparent 50%);
   }
 
   .dark .dot-pattern-fine {
@@ -320,7 +321,7 @@
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(38 92% 50%), hsl(32 85% 42%));
+    background-image: linear-gradient(135deg, hsl(var(--brand-orange)), hsl(18 95% 36%));
   }
 
   .font-brand {

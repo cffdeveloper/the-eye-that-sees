@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { PanelLeftClose, PanelLeft, LogOut, Menu } from "lucide-react";
+import { PanelLeftClose, PanelLeft, LogOut, Layers } from "lucide-react";
 import { motion } from "framer-motion";
 import { GeoSelector } from "@/components/intel/GeoSelector";
 import { useGeoContext } from "@/contexts/GeoContext";
@@ -8,7 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { IndustryNavList } from "@/components/layout/IndustryNavList";
 import { APP_NAV_ITEMS, appNavIconClass, appNavLinkClass, isAppNavActive } from "@/components/layout/appNavConfig";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
   const { isGlobal, geoString } = useGeoContext();
   const { profile, signOut } = useAuth();
   const location = useLocation();
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [industriesOpen, setIndustriesOpen] = useState(false);
 
   return (
     <motion.header
@@ -47,6 +48,19 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
 
       <div className="min-w-0 flex-1 md:hidden" aria-hidden />
 
+      {/* Mobile: prominent Industries entry (sidebar toggle is easy to miss on small screens) */}
+      <div className="flex shrink-0 items-center md:hidden">
+        <button
+          type="button"
+          onClick={() => setIndustriesOpen(true)}
+          className="flex min-w-[4.25rem] touch-manipulation flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground active:bg-muted/50"
+          aria-label="Browse industries and money flows"
+        >
+          <Layers className="h-[18px] w-[18px] shrink-0" />
+          <span className="text-[9px] font-bold leading-none">Industries</span>
+        </button>
+      </div>
+
       <nav
         className="hidden min-w-0 flex-1 items-center justify-center gap-1 px-1 md:flex lg:gap-1.5 lg:px-2"
         aria-label="Main navigation"
@@ -66,36 +80,20 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
         })}
       </nav>
 
-      <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-        <SheetTrigger asChild>
-          <button
-            type="button"
-            className="shrink-0 p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all md:hidden"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="w-[18px] h-[18px]" />
-          </button>
-        </SheetTrigger>
-        <SheetContent side="right" className="w-[min(100%,20rem)] border-border/60 bg-card/95 px-5 pt-10 backdrop-blur-xl">
-          <SheetHeader className="text-left">
-            <SheetTitle className="font-display text-lg">Navigate</SheetTitle>
+      <Sheet open={industriesOpen} onOpenChange={setIndustriesOpen}>
+        <SheetContent
+          side="bottom"
+          className="flex h-[min(92dvh,800px)] max-h-[92dvh] flex-col rounded-t-2xl border-border/60 bg-card p-0 pt-5"
+        >
+          <SheetHeader className="shrink-0 space-y-1 px-5 pb-2 text-left">
+            <SheetTitle className="font-display text-lg">Industries & money flows</SheetTitle>
+            <SheetDescription className="text-left text-sm leading-relaxed">
+              Expand any sector for overview and capital lanes — same list as the sidebar.
+            </SheetDescription>
           </SheetHeader>
-          <nav className="mt-6 flex flex-col gap-1.5" aria-label="Main navigation">
-            {APP_NAV_ITEMS.map((item) => {
-              const active = isAppNavActive(location.pathname, item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={cn(appNavLinkClass(active, "sidebar"))}
-                >
-                  <item.icon className={appNavIconClass(active)} />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-6">
+            <IndustryNavList showHeading={false} onNavigate={() => setIndustriesOpen(false)} />
+          </div>
         </SheetContent>
       </Sheet>
 

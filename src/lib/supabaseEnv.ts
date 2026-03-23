@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Vite replaces import.meta.env.VITE_* at **build** time.
  * If these are missing when `npm run build` runs (e.g. on Render), the app ships with
  * empty strings and Supabase throws "supabaseUrl is required".
@@ -7,7 +7,7 @@ function required(name: string, value: string | undefined): string {
   const v = typeof value === "string" ? value.trim() : "";
   if (!v) {
     throw new Error(
-      `[Intel GoldMine] Missing ${name}. ` +
+      `[Infinitygap] Missing ${name}. ` +
         `Set it in .env locally, and in your host (e.g. Render → Environment) for production. ` +
         `Vite bakes VITE_* into the bundle at build time — add the vars, then trigger a new build/deploy.`,
     );

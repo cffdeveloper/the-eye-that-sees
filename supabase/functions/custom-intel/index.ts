@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+﻿import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
@@ -11,7 +11,7 @@ const corsHeaders = {
 const BLOCK_INSTRUCTIONS = `
 ## STRUCTURED OUTPUT BLOCKS
 
-Your brief MUST use the SAME syntax as Intel GoldMine Deep Dive reports. Plain prose alone is not enough for analytical sections.
+Your brief MUST use the SAME syntax as Infinitygap Deep Dive reports. Plain prose alone is not enough for analytical sections.
 
 ### METRICS
 :::metrics
@@ -83,7 +83,7 @@ serve(async (req) => {
     const hasPrimary =
       (primarySubflows as unknown[]).length > 0 || (String(freeTextPrimary || "").trim() && freeTextMode === "primary");
 
-    const systemPrompt = `You are Intel GoldMine, an elite cross-domain intelligence engine. The user has defined a CUSTOM scope with optional PRIMARY focus areas and SECONDARY lenses.
+    const systemPrompt = `You are Infinitygap, an elite cross-domain intelligence engine. The user has defined a CUSTOM scope with optional PRIMARY focus areas and SECONDARY lenses.
 
 ${BLOCK_INSTRUCTIONS}
 

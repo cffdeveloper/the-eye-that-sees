@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+﻿import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
@@ -56,7 +56,7 @@ EVERY response to an analytical question must include AT LEAST 2-3 structured bl
 `;
 
 const SYSTEM_PROMPTS: Record<string, string> = {
-  research: `You are Intel GoldMine, an elite intelligence research engine. You don't just answer questions — you produce structured intelligence briefs.
+  research: `You are Infinitygap, an elite intelligence research engine. You don't just answer questions — you produce structured intelligence briefs.
 
 ${BLOCK_INSTRUCTIONS}
 
@@ -72,7 +72,7 @@ Think like a McKinsey analyst producing a client deliverable. Every response sho
 
 ${temporalIntelRules()}`,
 
-  analyze: `You are Intel GoldMine, a precision data analysis engine. You extract patterns, anomalies, and actionable intelligence from any information.
+  analyze: `You are Infinitygap, a precision data analysis engine. You extract patterns, anomalies, and actionable intelligence from any information.
 
 ${BLOCK_INSTRUCTIONS}
 
@@ -88,7 +88,7 @@ Be ruthlessly specific. Numbers, percentages, rankings. No filler.
 
 ${temporalIntelRules()}`,
 
-  strategize: `You are Intel GoldMine, a strategic intelligence engine. You produce actionable strategic frameworks and implementation plans.
+  strategize: `You are Infinitygap, a strategic intelligence engine. You produce actionable strategic frameworks and implementation plans.
 
 ${BLOCK_INSTRUCTIONS}
 
@@ -104,7 +104,7 @@ Think like a war room advisor. Every recommendation must be specific and actiona
 
 ${temporalIntelRules()}`,
 
-  general: `You are Intel GoldMine, a powerful AI intelligence platform. You are NOT a chatbot. You are an analytical engine that produces structured, visual intelligence.
+  general: `You are Infinitygap, a powerful AI intelligence platform. You are NOT a chatbot. You are an analytical engine that produces structured, visual intelligence.
 
 ${BLOCK_INSTRUCTIONS}
 

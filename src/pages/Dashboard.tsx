@@ -18,8 +18,9 @@ import {
   Shield,
   MapPin,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
-import { WorldMap } from "@/components/intel/WorldMap";
+import { DashboardIntelMap } from "@/components/intel/DashboardIntelMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,8 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { IntelWorkflowGuide } from "@/components/marketing/ProductWayfinding";
 import { dashboardIntelCopy } from "@/lib/pageIntelMessages";
+import { TrialShowcaseDialog } from "@/components/intel/TrialShowcaseDialog";
+import { Button } from "@/components/ui/button";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -49,6 +52,7 @@ export default function Dashboard() {
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const { requestNotificationPermission } = useAlertNotifications([], alertsEnabled);
   const [dbStats, setDbStats] = useState({ rawData: 0, insights: 0, matches: 0 });
+  const [trialShowcaseOpen, setTrialShowcaseOpen] = useState(false);
 
   const sortedIndustries = useMemo(() => {
     if (!profile?.industries_of_interest?.length) return industries;
@@ -177,7 +181,7 @@ export default function Dashboard() {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border/60 bg-card px-5 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted/30"
               >
                 <Layers className="h-4 w-4 shrink-0 text-primary" />
-                Intel Lab
+                Infinity Lab
               </Link>
             </div>
           </div>
@@ -195,9 +199,20 @@ export default function Dashboard() {
                   <span className="text-sm text-muted-foreground font-medium">/mo</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                  Unlock deep dives, cross-industry analysis, and Intel Lab.
+                  Unlock deep dives, cross-industry analysis, and Infinity Lab.
                 </p>
-                <UpgradeButton className="w-full rounded-xl h-11 font-bold" />
+                <div className="flex flex-col gap-2.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full rounded-xl h-11 font-semibold border-primary/35 bg-primary/[0.06] hover:bg-primary/10 gap-2"
+                    onClick={() => setTrialShowcaseOpen(true)}
+                  >
+                    <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                    Try it for free
+                  </Button>
+                  <UpgradeButton className="w-full rounded-xl h-11 font-bold" />
+                </div>
               </div>
             </div>
           )}
@@ -233,7 +248,7 @@ export default function Dashboard() {
           { title: "Live intel feed", desc: "Crypto, FX, commodities, VC, supply chain & headlines—refreshed so you orient before you drill down.", icon: Radio, href: "/intel", color: "text-primary", gradient: "from-primary/8 to-transparent" },
           { title: "Cross-industry AI", desc: "One pass across mapped sectors to surface gaps, deals, connections, and alerts for your region.", icon: Network, href: "/cross-intel", color: "text-brand-orange", gradient: "from-brand-orange/8 to-transparent" },
           { title: "Deep dives", desc: "Sector briefs plus every money flow—tailored intel, news, and snapshots per lane.", icon: TrendingUp, href: "/industry/technology", color: "text-signal-violet", gradient: "from-signal-violet/8 to-transparent" },
-          { title: "Intel Lab", desc: "Scope primary vs secondary flows, add context, get structured briefs + follow-up chat.", icon: Layers, href: "/custom-intel", color: "text-signal-emerald", gradient: "from-signal-emerald/8 to-transparent" },
+          { title: "Infinity Lab", desc: "Scope primary vs secondary flows, add context, get structured briefs + follow-up chat.", icon: Layers, href: "/custom-intel", color: "text-signal-emerald", gradient: "from-signal-emerald/8 to-transparent" },
         ].map((f) => (
           <Link
             key={f.href}
@@ -292,15 +307,19 @@ export default function Dashboard() {
         </button>
       </motion.div>
 
-      {/* Map */}
+      {/* Map — Leaflet + OpenStreetMap (list / map, geolocation, distances) */}
       <motion.div variants={fadeIn} className="space-y-3 sm:space-y-4">
-        <div className="flex items-center gap-2.5">
-          <MapPin className="h-5 w-5 shrink-0 text-brand-orange" />
-          <span className="text-base font-bold text-foreground sm:text-lg">Global coverage</span>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5">
+            <MapPin className="h-5 w-5 shrink-0 text-brand-orange" />
+            <span className="text-base font-bold text-foreground sm:text-lg">Global coverage map</span>
+          </div>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Browse macro regions in a list or on an interactive map. Enable location to sort and label distances; markers
+            open the same regional intel panel as the cross-industry workspace.
+          </p>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-border/50 shadow-sm sm:rounded-3xl">
-          <WorldMap />
-        </div>
+        <DashboardIntelMap />
       </motion.div>
 
       {/* Industries */}
@@ -338,6 +357,8 @@ export default function Dashboard() {
           ))}
         </div>
       </motion.div>
+
+      <TrialShowcaseDialog open={trialShowcaseOpen} onOpenChange={setTrialShowcaseOpen} />
     </motion.div>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Globe, Zap } from "lucide-react";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { RegionAnalyticsDialog } from "./RegionAnalyticsDialog";
 import { MAP_REGIONS, MAP_FLOWS, getMapRegion, nearestMapRegion } from "@/lib/mapRegionData";
