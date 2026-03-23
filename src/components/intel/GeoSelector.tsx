@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { CONTINENTS, COUNTRIES, getSubRegions, GeoOption, getGeoLabel } from "@/lib/geoData";
+import { CONTINENTS, COUNTRIES, getSubRegions, GeoOption, getGeoNavLabel } from "@/lib/geoData";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Globe, X, ChevronDown, MapPin, Search, BadgeCheck, Loader2 } from "lucide-react";
@@ -75,15 +75,14 @@ export function GeoSelector() {
           )}
           aria-expanded={open}
           aria-haspopup="dialog"
-          aria-label={`Region: ${getGeoLabel(selections)}. Open to change.`}
+          aria-label={
+            selections.length <= 1
+              ? `Region: ${getGeoNavLabel(selections)}. Open to change.`
+              : `Region: ${selections.length} selected — ${selections.map((s) => s.label).join(", ")}. Open to change.`
+          }
         >
           <Globe className="h-3.5 w-3.5 shrink-0 opacity-90" />
-          <span className="min-w-0 flex-1 truncate font-medium">{getGeoLabel(selections)}</span>
-          {selections.length > 0 && (
-            <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-primary/20 px-1 text-[10px] font-bold tabular-nums text-primary">
-              {selections.length}
-            </span>
-          )}
+          <span className="min-w-0 flex-1 truncate font-medium">{getGeoNavLabel(selections)}</span>
           <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 opacity-70 transition-transform duration-200", open && "rotate-180")} />
         </button>
       </PopoverTrigger>

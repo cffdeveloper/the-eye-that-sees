@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { IndustryNavList } from "@/components/layout/IndustryNavList";
 import { APP_NAV_ITEMS, appNavIconClass, appNavLinkClass, isAppNavActive } from "@/components/layout/appNavConfig";
 import { cn } from "@/lib/utils";
+import { getGeoNavLabel } from "@/lib/geoData";
 
 export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const { isGlobal, geoString } = useGeoContext();
@@ -97,8 +98,8 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
         </SheetContent>
       </Sheet>
 
-      <span className="hidden text-xs font-medium text-muted-foreground lg:inline shrink-0">
-        {isGlobal ? "Global" : geoString}
+      <span className="hidden max-w-[14rem] truncate text-xs font-medium text-muted-foreground lg:inline shrink-0" title={!isGlobal ? selections.map((s) => s.label).join(", ") : undefined}>
+        {getGeoNavLabel(selections)}
       </span>
 
       <div className="ml-auto flex min-w-0 max-w-[min(100%,calc(100vw-11rem))] shrink items-center gap-1 sm:gap-2 sm:max-w-none md:gap-3">

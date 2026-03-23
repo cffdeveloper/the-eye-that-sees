@@ -737,6 +737,13 @@ export function getGeoLabel(selections: GeoOption[]): string {
   return `${selections.length} regions selected`;
 }
 
+/** Compact label for header / geo trigger — avoids long country lists pushing layout. Full list stays in the geo popover. */
+export function getGeoNavLabel(selections: GeoOption[]): string {
+  if (!selections.length) return "Global";
+  if (selections.length === 1) return selections[0].label;
+  return `${selections.length} regions selected`;
+}
+
 export function getGeoContextString(selections: GeoOption[]): string {
   if (!selections.length) return "global";
   return selections.map(s => s.label).join(", ");
