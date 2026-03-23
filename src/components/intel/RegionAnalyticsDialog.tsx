@@ -18,7 +18,18 @@ import {
 import { industries } from "@/lib/industryData";
 import { useNavigate } from "react-router-dom";
 import { InlineMarkdown } from "@/components/InlineMarkdown";
-import { getFlowsTouchingRegion, regionIntelScore, type MapFlow } from "@/lib/mapRegionData";
+import {
+  getFlowsTouchingRegion,
+  nearestMapRegion,
+  regionIntelScore,
+  type MapFlow,
+} from "@/lib/mapRegionData";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
+import {
+  incrementTrialIntelPromptCount,
+  trialIntelPromptsRemaining,
+} from "@/lib/trialIntelStorage";
 
 export interface RegionData {
   name: string;
@@ -30,10 +41,14 @@ export interface RegionData {
   disruptions: string[];
 }
 
+export type RegionAnalyticsScope =
+  | { kind: "macro"; region: RegionData }
+  | { kind: "country"; code: string; label: string; lat: number; lng: number };
+
 interface RegionAnalyticsDialogProps {
   open: boolean;
   onClose: () => void;
-  region: RegionData | null;
+  scope: RegionAnalyticsScope | null;
 }
 
 interface InsightRow {
@@ -59,35 +74,46 @@ interface MatchRow {
   created_at: string;
 }
 
-export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalyticsDialogProps) {
+export function RegionAnalyticsDialog({ open, onClose, scope }: RegionAnalyticsDialogProps) {
   const [insights, setInsights] = useState<InsightRow[]>([]);
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [aiReport, setAiReport] = useState("");
   const [loading, setLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const navigate = useNavigate();
+  const { isPro } = useSubscription();
+
+  const macroRegion = useMemo(() => {
+    if (!scope) return null;
+    if (scope.kind === "macro") return scope.region;
+    return nearestMapRegion(scope.lat, scope.lng);
+  }, [scope]);
 
   const industryNames = useMemo(() => {
-    if (!region) return [] as string[];
-    return industries.filter((i) => region.industries.includes(i.slug)).map((i) => i.name);
-  }, [region]);
+    if (!macroRegion) return [] as string[];
+    return industries.filter((i) => macroRegion.industries.includes(i.slug)).map((i) => i.name);
+  }, [macroRegion]);
 
-  const flowsCorridor = useMemo< MapFlow[]>(() => (region ? getFlowsTouchingRegion(region.name) : []), [region]);
+  const flowsCorridor = useMemo<MapFlow[]>(
+    () => (macroRegion ? getFlowsTouchingRegion(macroRegion.name) : []),
+    [macroRegion],
+  );
 
   const intelScore = useMemo(() => {
-    if (!region) return 0;
-    return regionIntelScore(region.disruptions.length, flowsCorridor.length);
-  }, [region, flowsCorridor.length]);
+    if (!macroRegion) return 0;
+    return regionIntelScore(macroRegion.disruptions.length, flowsCorridor.length);
+  }, [macroRegion, flowsCorridor.length]);
 
   const fetchData = useCallback(async () => {
-    if (!region) return;
+    if (!scope || !macroRegion) return;
     setLoading(true);
     setInsights([]);
     setMatches([]);
     setAiReport("");
 
-    const names = industries.filter((i) => region.industries.includes(i.slug)).map((i) => i.name);
-    const corridorCount = getFlowsTouchingRegion(region.name).length;
+    const names = industries.filter((i) => macroRegion.industries.includes(i.slug)).map((i) => i.name);
+    const corridorCount = getFlowsTouchingRegion(macroRegion.name).length;
+    const isCountry = scope.kind === "country";
 
     try {
       if (names.length > 0) {
@@ -118,32 +144,57 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
 
     setReportLoading(true);
     try {
+      if (isCountry && !isPro && trialIntelPromptsRemaining() <= 0) {
+        toast.error("You've used all 3 free trial questions. Upgrade to Pro for unlimited intel.");
+        setReportLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("deep-dive", {
-        body: {
-          topic: `${region.name} — Regional intelligence command brief`,
-          context: `Macro-region: ${region.name} (${region.code}). Trade: ${region.tradeVolume}. Tracked industries (slugs): ${region.industries.join(", ")}. Active disruptions: ${region.disruptions.join("; ")}. Trade corridors touching this region: ${corridorCount}. Produce a decisive executive brief: capital flows, policy/regulatory risk, sector rotation, and 3–5 actionable theses.`,
-          industryName: names[0] || region.name,
-          subFlowName: "",
-          geoContext: region.name,
-        },
+        body:
+          isCountry
+            ? {
+                topic: `${scope.label} — Country intelligence brief`,
+                context: `Country focus: ${scope.label} (ISO ${scope.code}). Cover policy, FX and funding conditions, trade and capital formation, sector drivers, and material risks for actors operating **in this country only** — avoid treating the whole macro region as one thesis. Use "${macroRegion.name}" only as data-coverage context. Trade backdrop: ${macroRegion.tradeVolume}. Tracked industry lenses (slugs): ${macroRegion.industries.join(", ")}. Corridors touching shelf region ${macroRegion.name}: ${corridorCount}. Disruptions in wider shelf: ${macroRegion.disruptions.join("; ")}.`,
+                industryName: names[0] || scope.label,
+                subFlowName: "",
+                geoContext: scope.label,
+              }
+            : {
+                topic: `${macroRegion.name} — Regional intelligence command brief`,
+                context: `Macro-region: ${macroRegion.name} (${macroRegion.code}). Trade: ${macroRegion.tradeVolume}. Tracked industries (slugs): ${macroRegion.industries.join(", ")}. Active disruptions: ${macroRegion.disruptions.join("; ")}. Trade corridors touching this region: ${corridorCount}. Produce a decisive executive brief: capital flows, policy/regulatory risk, sector rotation, and 3–5 actionable theses.`,
+                industryName: names[0] || macroRegion.name,
+                subFlowName: "",
+                geoContext: macroRegion.name,
+              },
       });
       if (error) throw error;
-      setAiReport(data?.report || "");
+      const reportText = (data?.report as string | undefined)?.trim() || "";
+      setAiReport(reportText);
+      if (reportText && isCountry && !isPro) {
+        incrementTrialIntelPromptCount();
+        toast.success("Country intel brief ready (1 trial question used).");
+      }
     } catch (e) {
       console.error("Region AI report error:", e);
     } finally {
       setReportLoading(false);
     }
-  }, [region]);
+  }, [scope, macroRegion, isPro]);
 
   useEffect(() => {
-    if (open && region) fetchData();
-  }, [open, region, fetchData]);
+    if (open && scope && macroRegion) fetchData();
+  }, [open, scope, macroRegion, fetchData]);
 
-  if (!region) return null;
+  if (!scope || !macroRegion) return null;
+
+  const displayTitle = scope.kind === "country" ? scope.label : scope.region.name;
+  const displayCode = scope.kind === "country" ? scope.code : scope.region.code;
+  const displayLat = scope.kind === "country" ? scope.lat : scope.region.lat;
+  const displayLng = scope.kind === "country" ? scope.lng : scope.region.lng;
 
   const reportSegments = aiReport ? parseBlocks(aiReport) : [];
-  const regionIndustries = industries.filter((i) => region.industries.includes(i.slug));
+  const regionIndustries = industries.filter((i) => macroRegion.industries.includes(i.slug));
 
   const urgencyColor = (u: string | null) => {
     if (u === "critical") return "text-destructive";
@@ -173,17 +224,17 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
             <div className="flex flex-wrap items-start gap-3 gap-y-2">
               <span className="inline-flex items-center gap-1.5 rounded border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary">
                 <Radio className="w-3 h-3 animate-pulse" />
-                {region.code}
+                {displayCode}
               </span>
               <span className="rounded border border-border/60 bg-muted/30 px-2 py-0.5 text-[9px] text-muted-foreground">
-                {region.lat.toFixed(1)}°, {region.lng.toFixed(1)}°
+                {displayLat.toFixed(1)}°, {displayLng.toFixed(1)}°
               </span>
             </div>
             <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2 mt-2 pr-8">
               <Globe className="w-5 h-5 text-primary shrink-0" />
-              <span>{region.name}</span>
+              <span>{displayTitle}</span>
               <span className="text-[10px] font-normal text-muted-foreground tracking-wide">
-                — REGIONAL INTEL COMMAND
+                {scope.kind === "country" ? "— COUNTRY INTEL" : "— REGIONAL INTEL COMMAND"}
               </span>
             </DialogTitle>
             <p className="text-[10px] text-muted-foreground mt-1 max-w-2xl leading-relaxed">
@@ -195,7 +246,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
           <div className="relative mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
               <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Trade volume</p>
-              <p className="text-sm font-bold text-primary">{region.tradeVolume}</p>
+              <p className="text-sm font-bold text-primary">{macroRegion.tradeVolume}</p>
             </div>
             <div className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5 backdrop-blur-sm">
               <p className="text-[8px] uppercase tracking-wider text-muted-foreground">Infinity pulse</p>
@@ -211,9 +262,9 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
             </div>
           </div>
 
-          {region.disruptions.length > 0 && (
+          {macroRegion.disruptions.length > 0 && (
             <div className="relative mt-3 flex flex-wrap gap-2">
-              {region.disruptions.map((d, i) => (
+              {macroRegion.disruptions.map((d, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-destructive/10 border border-destructive/25"
@@ -232,7 +283,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
             <div>
               <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <GitBranch className="w-3 h-3 text-primary" />
-                Trade corridors (this region)
+                Trade corridors ({macroRegion.name} shelf)
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {flowsCorridor.map((f, i) => (
@@ -259,7 +310,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
           <div>
             <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <BarChart3 className="w-3 h-3 text-primary" />
-              Key industries in {region.name}
+              Key industries ({scope.kind === "country" ? `${displayTitle} lens` : `in ${displayTitle}`})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
               {regionIndustries.map((ind) => (
@@ -372,7 +423,7 @@ export function RegionAnalyticsDialog({ open, onClose, region }: RegionAnalytics
             {reportLoading ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 rounded-lg border border-dashed border-primary/20 bg-primary/5">
                 <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                <p className="text-[10px] text-muted-foreground">Generating {region.name} command brief…</p>
+                <p className="text-[10px] text-muted-foreground">Generating {displayTitle} command brief…</p>
                 <p className="text-[8px] text-muted-foreground/50 text-center max-w-md">
                   Weaving corridors, disruptions, and industry signals into a single structured report
                 </p>

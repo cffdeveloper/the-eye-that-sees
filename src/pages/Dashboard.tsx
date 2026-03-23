@@ -18,7 +18,7 @@ import {
   Shield,
   MapPin,
   CheckCircle2,
-  Sparkles,
+  Presentation,
 } from "lucide-react";
 import { DashboardIntelMap } from "@/components/intel/DashboardIntelMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
@@ -208,7 +208,7 @@ export default function Dashboard() {
                     className="w-full rounded-xl h-11 font-semibold border-primary/35 bg-primary/[0.06] hover:bg-primary/10 gap-2"
                     onClick={() => setTrialShowcaseOpen(true)}
                   >
-                    <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                    <Presentation className="h-4 w-4 text-primary shrink-0" />
                     Try it for free
                   </Button>
                   <UpgradeButton className="w-full rounded-xl h-11 font-bold" />
@@ -270,24 +270,98 @@ export default function Dashboard() {
         ))}
       </motion.div>
 
-      {/* Stats */}
-      <motion.div variants={fadeIn} className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+      {/* Coverage — compact */}
+      <motion.div variants={fadeIn} className="grid grid-cols-2 gap-3 sm:gap-4">
         {[
           { label: "Industries", value: industries.length, icon: BarChart3, color: "text-primary" },
           { label: "Money flows", value: totalFlows, icon: Activity, color: "text-foreground" },
-          { label: "Data sources", value: "11+", icon: Database, color: "text-brand-orange" },
-          { label: "Raw data", value: dbStats.rawData.toLocaleString(), icon: Database, color: "text-foreground" },
-          { label: "Insights", value: dbStats.insights.toLocaleString(), icon: Zap, color: "text-brand-orange" },
-          { label: "Matches", value: dbStats.matches.toLocaleString(), icon: TrendingUp, color: "text-primary" },
         ].map((stat, i) => (
-          <div key={i} className="rounded-xl border border-border/50 bg-card p-3 sm:rounded-2xl sm:p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <stat.icon className={cn("w-4 h-4", stat.color)} />
-              <p className="text-xs text-muted-foreground font-semibold">{stat.label}</p>
+          <div
+            key={i}
+            className="rounded-xl border border-border/50 bg-card p-4 sm:rounded-2xl sm:p-5"
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <stat.icon className={cn("h-4 w-4", stat.color)} />
+              <p className="text-xs font-semibold text-muted-foreground">{stat.label}</p>
             </div>
-            <p className={cn("text-2xl font-bold tabular-nums font-display", stat.color)}>{stat.value}</p>
+            <p className={cn("font-display text-2xl font-bold tabular-nums sm:text-3xl", stat.color)}>{stat.value}</p>
           </div>
         ))}
+      </motion.div>
+
+      {/* Data pipeline — exaggerated */}
+      <motion.div variants={fadeIn} className="space-y-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary/80 sm:text-xs">
+          Live data pipeline
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {[
+            {
+              label: "Data sources",
+              value: "11+",
+              icon: Database,
+              accent: "from-brand-orange/25 via-brand-orange/10 to-transparent",
+              iconBg: "bg-brand-orange/20 text-brand-orange",
+              valueClass: "text-brand-orange",
+            },
+            {
+              label: "Raw data",
+              value: dbStats.rawData.toLocaleString(),
+              icon: Database,
+              accent: "from-primary/25 via-primary/10 to-transparent",
+              iconBg: "bg-primary/15 text-primary",
+              valueClass: "text-foreground",
+            },
+            {
+              label: "Insights",
+              value: dbStats.insights.toLocaleString(),
+              icon: Zap,
+              accent: "from-amber-500/20 via-amber-500/5 to-transparent",
+              iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+              valueClass: "text-amber-600 dark:text-amber-400",
+            },
+            {
+              label: "Matches",
+              value: dbStats.matches.toLocaleString(),
+              icon: TrendingUp,
+              accent: "from-primary/30 via-signal-violet/10 to-transparent",
+              iconBg: "bg-primary/15 text-primary",
+              valueClass: "text-primary",
+            },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className={cn(
+                "relative overflow-hidden rounded-2xl border border-border/60 p-4 shadow-lg shadow-black/[0.06] sm:p-6",
+                "bg-gradient-to-br from-card via-card to-muted/30",
+                "ring-1 ring-primary/10 dark:ring-primary/20",
+              )}
+            >
+              <div
+                className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-90", stat.accent)}
+                aria-hidden
+              />
+              <div className="relative z-10 flex flex-col gap-3 sm:gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground sm:text-xs">
+                    {stat.label}
+                  </p>
+                  <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl sm:h-12 sm:w-12", stat.iconBg)}>
+                    <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
+                </div>
+                <p
+                  className={cn(
+                    "font-display text-4xl font-bold tabular-nums leading-none tracking-tight sm:text-5xl lg:text-6xl",
+                    stat.valueClass,
+                  )}
+                >
+                  {stat.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </motion.div>
 
       {/* Alerts toggle */}

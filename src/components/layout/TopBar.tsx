@@ -101,8 +101,8 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
         {isGlobal ? "Global" : geoString}
       </span>
 
-      <div className="ml-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-3">
-        <ThemeToggle size="sm" />
+      <div className="ml-auto flex min-w-0 max-w-[min(100%,calc(100vw-11rem))] shrink items-center gap-1 sm:gap-2 sm:max-w-none md:gap-3">
+        <ThemeToggle size="sm" className="shrink-0" />
         {profile?.display_name && (
           <span className="text-sm text-muted-foreground hidden sm:block truncate max-w-[160px] font-semibold">
             {profile.display_name}
@@ -111,7 +111,7 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
         <GeoSelector />
         <button
           onClick={signOut}
-          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all"
+          className="shrink-0 p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all"
           title="Sign out"
         >
           <LogOut className="w-[18px] h-[18px]" />

@@ -27,7 +27,7 @@ import {
 } from "@/lib/trialIntelStorage";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2, Sparkles, ChevronRight, ChevronLeft, Globe2 } from "lucide-react";
+import { Loader2, Presentation, ChevronRight, ChevronLeft, Globe2 } from "lucide-react";
 
 const GEO_POOL: GeoOption[] = [...CONTINENTS, ...COUNTRIES];
 
@@ -188,8 +188,12 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
   const stepLabel = (n: number) => (
     <span
       className={cn(
-        "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
-        step === n ? "bg-primary text-primary-foreground" : step > n ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground",
+        "inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-md border text-xs font-semibold tabular-nums",
+        step === n
+          ? "border-primary bg-primary text-primary-foreground"
+          : step > n
+            ? "border-primary/35 bg-primary/10 text-primary"
+            : "border-border bg-muted/50 text-muted-foreground",
       )}
     >
       {n}
@@ -220,13 +224,19 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
             </p>
           </DialogHeader>
           {!report && (
-            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+            <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
               {stepLabel(1)}
-              <ChevronRight className="h-3 w-3 opacity-50" />
+              <span className="text-border select-none" aria-hidden>
+                —
+              </span>
               {stepLabel(2)}
-              <ChevronRight className="h-3 w-3 opacity-50" />
+              <span className="text-border select-none" aria-hidden>
+                —
+              </span>
               {stepLabel(3)}
-              <ChevronRight className="h-3 w-3 opacity-50" />
+              <span className="text-border select-none" aria-hidden>
+                —
+              </span>
               {stepLabel(4)}
             </div>
           )}

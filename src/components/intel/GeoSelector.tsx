@@ -6,7 +6,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { CONTINENTS, COUNTRIES, getSubRegions, GeoOption, getGeoLabel } from "@/lib/geoData";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Globe, X, ChevronDown, MapPin, Search, Sparkles, Loader2 } from "lucide-react";
+import { Globe, X, ChevronDown, MapPin, Search, BadgeCheck, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TAB_LABELS: Record<"continent" | "country" | "sub", string> = {
@@ -67,7 +67,7 @@ export function GeoSelector() {
         <button
           type="button"
           className={cn(
-            "flex max-w-[min(100vw-7rem,16rem)] min-h-11 touch-manipulation items-center gap-2 rounded-xl border px-2.5 py-2 text-left text-xs transition-all sm:max-w-[220px] sm:min-h-0 sm:px-3",
+            "flex min-w-0 max-w-[7.25rem] min-h-10 touch-manipulation items-center gap-1 rounded-lg border px-1.5 py-1.5 text-left text-[10px] leading-tight transition-all sm:max-w-[220px] sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2 sm:text-xs",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             selections.length > 0
               ? "border-primary/45 bg-primary/[0.08] text-primary shadow-sm"
@@ -99,7 +99,7 @@ export function GeoSelector() {
         }
         className={cn(
           "flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/98 p-0 shadow-2xl backdrop-blur-xl",
-          "z-[200] data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "z-[10040] data-[state=open]:animate-in data-[state=closed]:animate-out",
           /* Mobile: near full-width sheet, cap height with dynamic viewport + safe areas */
           "w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] max-h-[min(88dvh,calc(100dvh-4.5rem-env(safe-area-inset-bottom)))]",
           "sm:max-h-[min(90vh,44rem)] sm:w-[min(calc(100vw-1.25rem),23rem)] sm:max-w-none",
@@ -128,7 +128,7 @@ export function GeoSelector() {
           ) : isPro ? (
             <div className="flex items-center gap-2 text-[11px] font-semibold text-primary">
               <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/15">
-                <Sparkles className="h-3.5 w-3.5" />
+                <BadgeCheck className="h-3.5 w-3.5" />
               </span>
               <span>Pro — full regional intel & feeds</span>
             </div>

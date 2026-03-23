@@ -222,7 +222,11 @@ export function WorldMap() {
         ))}
       </div>
 
-      <RegionAnalyticsDialog open={!!selectedRegion} onClose={() => setSelectedRegion(null)} region={selectedRegion} />
+      <RegionAnalyticsDialog
+        open={!!selectedRegion}
+        onClose={() => setSelectedRegion(null)}
+        scope={selectedRegion ? { kind: "macro", region: selectedRegion } : null}
+      />
     </div>
   );
 }
