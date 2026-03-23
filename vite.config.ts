@@ -10,6 +10,7 @@ function googleSiteVerificationPlugin(mode: string): Plugin {
   return {
     name: "google-site-verification",
     transformIndexHtml(html) {
+      if (/name=["']google-site-verification["']/.test(html)) return html;
       const env = loadEnv(mode, process.cwd(), "");
       const token =
         env.VITE_GOOGLE_SITE_VERIFICATION?.trim() || env.GOOGLE_SITE_VERIFICATION?.trim();
