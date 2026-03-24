@@ -23,6 +23,7 @@ import LandingPage from "./pages/LandingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import { Loader2 } from "lucide-react";
+import { SUPABASE_ENV_ERROR } from "@/lib/supabaseEnv";
 
 const queryClient = new QueryClient();
 
@@ -101,22 +102,35 @@ const AppRoutes = () => (
   </Routes>
 );
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <GeoProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppRoutes />
-            </BrowserRouter>
-          </GeoProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  if (SUPABASE_ENV_ERROR) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+        <div className="max-w-2xl rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h1 className="text-xl font-semibold mb-3">Configuration required</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">{SUPABASE_ENV_ERROR}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <GeoProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AppRoutes />
+              </BrowserRouter>
+            </GeoProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
