@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
           amount: PLAN_AMOUNT_LOWEST,
           currency: PLAN_CURRENCY,
           callback_url:
-            callbackUrl || "https://infinitygap.app/dashboard?payment=verify",
+            callbackUrl || "https://infinitygap.onrender.com/dashboard?payment=verify",
           plan: planCode,
           channels: ["card"],
           metadata: {

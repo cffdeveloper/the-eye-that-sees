@@ -140,7 +140,7 @@ export async function downloadIntelBriefPdf(options: {
   brand.style.letterSpacing = "0.22em";
   brand.style.textTransform = "uppercase";
   brand.style.color = muted;
-  brand.textContent = "Infinitygap · infinitygap.app";
+  brand.textContent = "Infinitygap · infinitygap.onrender.com";
 
   const h1 = document.createElement("h1");
   h1.style.margin = "0";

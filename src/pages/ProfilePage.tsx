@@ -66,7 +66,7 @@ export default function ProfilePage() {
   };
 
   const handleDowngrade = async () => {
-    toast.info("To cancel your subscription, please contact support at support@infinitygap.app. We'll process your request within 24 hours.");
+    toast.info("To cancel your subscription, please contact support at support@infinitygap.onrender.com. We'll process your request within 24 hours.");
   };
 
   return (
@@ -177,7 +177,7 @@ export default function ProfilePage() {
               <Shield className="h-3.5 w-3.5 shrink-0" />
               <span>
                 Card details are securely managed by Paystack (PCI-DSS compliant). 
-                To update your card, contact support at support@infinitygap.app.
+                To update your card, contact support at support@infinitygap.onrender.com.
               </span>
             </div>
           </div>

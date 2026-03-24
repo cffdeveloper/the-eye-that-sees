@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["infinitygap.app", "intelgoldmine.onrender.com", ".onrender.com"],
+    allowedHosts: ["infinitygap.onrender.com", "intelgoldmine.onrender.com", ".onrender.com"],
     hmr: {
       overlay: false,
     },
@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => ({
   preview: {
     host: "::",
     port: 10000,
-    allowedHosts: ["infinitygap.app", "intelgoldmine.onrender.com", ".onrender.com"],
+    allowedHosts: ["infinitygap.onrender.com", "intelgoldmine.onrender.com", ".onrender.com"],
   },
   plugins: [react(), googleSiteVerificationPlugin(mode)],
   resolve: {
