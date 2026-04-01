@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard, Radio, Network, FlaskConical, UserCircle, Bookmark } from "lucide-react";
+import { LayoutDashboard, Radio, Network, FlaskConical, UserCircle, Bookmark, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type AppNavItem = { to: string; label: string; icon: LucideIcon };
@@ -9,6 +9,7 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { to: "/intel", label: "Live Feed", icon: Radio },
   { to: "/cross-intel", label: "Cross-Intel", icon: Network },
   { to: "/custom-intel", label: "Infinity Lab", icon: FlaskConical },
+  { to: "/alfred", label: "Alfred", icon: Bot },
   { to: "/profile", label: "My Profile", icon: UserCircle },
 ];
 
@@ -23,6 +24,7 @@ export function getAppNavItems(isPro: boolean): AppNavItem[] {
 export function isAppNavActive(pathname: string, to: string): boolean {
   if (to === "/dashboard") return pathname === "/dashboard";
   if (to === "/saved") return pathname === "/saved";
+  if (to === "/alfred") return pathname === "/alfred" || pathname.startsWith("/alfred/");
   if (to === "/profile") return pathname === "/profile" || pathname.startsWith("/profile/");
   return pathname === to || pathname.startsWith(`${to}/`);
 }

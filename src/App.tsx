@@ -18,6 +18,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import SavedLibraryPage from "./pages/SavedLibraryPage";
+import AlfredPage from "./pages/AlfredPage";
+import AlfredDeepDivePage from "./pages/AlfredDeepDivePage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -93,6 +95,8 @@ const AppRoutes = () => (
       <Route path="/intel" element={<IntelDashboard />} />
       <Route path="/cross-intel" element={<CrossIntelPage />} />
       <Route path="/custom-intel" element={<CustomIntelPage />} />
+      <Route path="/alfred" element={<AlfredPage />} />
+      <Route path="/alfred/deep-dive/:insightId" element={<AlfredDeepDivePage />} />
       <Route path="/industry/:slug" element={<IndustryPage />} />
       <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
       <Route path="/profile" element={<ProfilePage />} />

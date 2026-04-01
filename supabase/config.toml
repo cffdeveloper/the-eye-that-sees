@@ -1,1 +1,8 @@
 project_id = "gtyzvmnqifwyccgmirym"
+
+# Let browser OPTIONS preflight reach Alfred function CORS handlers (anon invoke from localhost).
+[functions.alfred-deep-dive]
+verify_jwt = false
+
+[functions.alfred-opportunities]
+verify_jwt = false

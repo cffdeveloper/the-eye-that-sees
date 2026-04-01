@@ -9,6 +9,8 @@ export function MobileBottomNav() {
   const { isPro } = useSubscription();
   const navItems = getAppNavItems(isPro);
   const cols = navItems.length;
+  const gridCols =
+    cols >= 7 ? "grid-cols-7" : cols >= 6 ? "grid-cols-6" : "grid-cols-5";
 
   return (
     <nav
@@ -17,7 +19,7 @@ export function MobileBottomNav() {
       aria-label="Main navigation"
     >
       <div
-        className={`mx-auto grid max-w-lg gap-0 px-0.5 pt-1 ${cols >= 6 ? "grid-cols-6" : "grid-cols-5"}`}
+        className={`mx-auto grid max-w-lg gap-0 px-0.5 pt-1 ${gridCols}`}
       >
         {navItems.map((item) => {
           const active = isAppNavActive(location.pathname, item.to);

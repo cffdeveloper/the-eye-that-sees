@@ -26,6 +26,7 @@ export type FrameworkSection = {
   label: string;
   color: string;
   items: string[];
+  status?: string;
 };
 
 export type FrameworkBlock = {

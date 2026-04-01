@@ -37,6 +37,11 @@ export function FrameworkBlockView({ data }: { data: FrameworkBlock["data"] }) {
                 <h4 className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
                   {section.label}
                 </h4>
+                {section.status ? (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-border/40 bg-muted/40 text-muted-foreground uppercase tracking-wider">
+                    {section.status}
+                  </span>
+                ) : null}
               </div>
               <ul className="space-y-1.5">
                 {section.items.map((item, j) => (

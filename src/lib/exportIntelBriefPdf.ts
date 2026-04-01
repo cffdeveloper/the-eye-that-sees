@@ -57,14 +57,17 @@ export async function downloadIntelBriefPdf(options: {
   const utcStamp = generatedAt.toISOString().replace("T", " ").slice(0, 19).concat(" UTC");
 
   const wrapper = document.createElement("div");
+  // Keep near full A4 width while forcing mobile-style breakpoints for dense content.
+  const pdfContentWidthPx = 740;
+  const responsiveViewportWidthPx = 620;
   wrapper.setAttribute("data-pdf-export", "true");
   wrapper.className =
     theme === "dark"
       ? "pdf-export-scope dark bg-background text-foreground antialiased"
       : "pdf-export-scope bg-background text-foreground antialiased";
   wrapper.style.boxSizing = "border-box";
-  wrapper.style.width = "800px";
-  wrapper.style.maxWidth = "800px";
+  wrapper.style.width = `${pdfContentWidthPx}px`;
+  wrapper.style.maxWidth = `${pdfContentWidthPx}px`;
   wrapper.style.padding = "36px 44px 48px";
   wrapper.style.fontFamily = "'DM Sans', 'Inter', system-ui, sans-serif";
   wrapper.style.borderTop = `4px solid hsl(${theme === "dark" ? "18 100% 49%" : "226 58% 42%"})`;
@@ -77,6 +80,19 @@ export async function downloadIntelBriefPdf(options: {
   const styleEl = document.createElement("style");
   styleEl.textContent = `
     [data-pdf-export="true"] .pdf-export-blocks { color: hsl(var(--card-foreground)); }
+    [data-pdf-export="true"] .pdf-export-blocks * {
+      box-sizing: border-box;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      max-width: 100%;
+    }
+    [data-pdf-export="true"] .pdf-export-blocks img,
+    [data-pdf-export="true"] .pdf-export-blocks svg,
+    [data-pdf-export="true"] .pdf-export-blocks canvas,
+    [data-pdf-export="true"] .pdf-export-blocks video {
+      max-width: 100% !important;
+      height: auto !important;
+    }
     /* html2canvas renders backdrop-filter poorly — use solid surfaces */
     [data-pdf-export="true"] .glass-panel,
     [data-pdf-export="true"] .glass-panel-strong {
@@ -100,6 +116,7 @@ export async function downloadIntelBriefPdf(options: {
     [data-pdf-export="true"] .pdf-export-blocks pre {
       background: hsl(var(--muted) / 0.35) !important;
       border: 1px solid hsl(var(--border) / 0.5) !important;
+      white-space: pre-wrap;
     }
     [data-pdf-export="true"] .pdf-export-blocks blockquote {
       border-left-color: hsl(var(--primary) / 0.45) !important;
@@ -232,7 +249,7 @@ export async function downloadIntelBriefPdf(options: {
         backgroundColor: bgCanvas,
         scrollX: 0,
         scrollY: -window.scrollY,
-        windowWidth: 800,
+        windowWidth: responsiveViewportWidthPx,
       },
       jsPDF: {
         unit: "mm" as const,
