@@ -161,6 +161,23 @@ export async function runParallelSearches(opts: ParallelSearchOptions): Promise<
     }
   }
 
+  // Grok xAI search — uses first 4 queries for LLM-augmented research
+  if (opts.grokApiKey) {
+    for (const q of opts.queries.slice(0, 4)) {
+      tasks.push((async () => {
+        const key = hashKey(["grok", q]);
+        const cached = await cacheGet(sb, key);
+        if (cached) {
+          chunks.push(`GROK RESEARCH: ${q}\n${cached}\n`);
+          return;
+        }
+        const text = await grokSearch(q, opts.grokApiKey!);
+        await cacheSet(sb, key, text, ttl);
+        chunks.push(`GROK RESEARCH: ${q}\n${text}\n`);
+      })());
+    }
+  }
+
   if (opts.browseUrls?.length) {
     for (const u of opts.browseUrls.slice(0, 3)) {
       tasks.push((async () => {
