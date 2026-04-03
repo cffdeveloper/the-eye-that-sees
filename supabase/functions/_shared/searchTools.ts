@@ -126,7 +126,7 @@ export async function runParallelSearches(opts: ParallelSearchOptions): Promise<
           chunks.push(`X SEARCH: ${q}\n${cached}\n`);
           return;
         }
-        const text = await xSearch(`${q} (Kenya OR Africa OR startup)`, opts.xBearer);
+        const text = await xSearch(`${q} (Kenya OR Africa OR startup)`, opts.xBearer!);
         await cacheSet(sb, key, text, ttl);
         chunks.push(`X SEARCH: ${q}\n${text}\n`);
       })());
