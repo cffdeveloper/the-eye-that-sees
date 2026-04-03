@@ -82,12 +82,40 @@ export async function xSearch(query: string, bearer: string): Promise<string> {
   return data.map((t: { text?: string }) => t.text || "").join("\n---\n").slice(0, 6000);
 }
 
+/** Grok (xAI) search — optional LLM-augmented web search. */
+export async function grokSearch(query: string, apiKey: string): Promise<string> {
+  try {
+    const res = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-3-mini",
+        messages: [
+          { role: "system", content: "You are a market research assistant. Provide concise factual intel about the query topic with sources, data points, and actionable insights. Focus on Kenya, Africa, and online/remote opportunities." },
+          { role: "user", content: query },
+        ],
+        temperature: 0.3,
+        search_mode: "auto",
+      }),
+    });
+    if (!res.ok) return `[grok error ${res.status}]`;
+    const j = await res.json();
+    return (j.choices?.[0]?.message?.content || "").slice(0, 6000);
+  } catch {
+    return "[grok unavailable]";
+  }
+}
+
 export type ParallelSearchOptions = {
   supabaseUrl: string;
   serviceKey: string;
   queries: string[];
   tavilyApiKey?: string;
   xBearer?: string;
+  grokApiKey?: string;
   browseUrls?: string[];
 };
 
