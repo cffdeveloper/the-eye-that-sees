@@ -2,6 +2,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 export type SearchSnippet = { source: string; title: string; snippet: string; url?: string };
 
+// deno-lint-ignore no-explicit-any
+type AnySupabaseClient = ReturnType<typeof createClient<any>>;
+
 function hashKey(parts: string[]): string {
   const s = parts.join("|");
   let h = 2166136261;
@@ -13,20 +16,22 @@ function hashKey(parts: string[]): string {
 }
 
 async function cacheGet(
-  sb: ReturnType<typeof createClient>,
+  sb: AnySupabaseClient,
   key: string,
 ): Promise<string | null> {
   const { data } = await sb.from("proactive_search_cache").select("payload, expires_at").eq("cache_key", key).maybeSingle();
   if (!data) return null;
-  if (new Date(data.expires_at as string) < new Date()) return null;
-  const payload = data.payload as { text?: string } | null;
+  // deno-lint-ignore no-explicit-any
+  const row = data as any;
+  if (new Date(row.expires_at as string) < new Date()) return null;
+  const payload = row.payload as { text?: string } | null;
   const t = payload?.text;
   return typeof t === "string" ? t : null;
 }
 
-async function cacheSet(sb: ReturnType<typeof createClient>, key: string, text: string, ttlMs: number) {
+async function cacheSet(sb: AnySupabaseClient, key: string, text: string, ttlMs: number) {
   const expires = new Date(Date.now() + ttlMs).toISOString();
-  await sb.from("proactive_search_cache").upsert({
+  await (sb.from("proactive_search_cache") as any).upsert({
     cache_key: key,
     payload: { text },
     expires_at: expires,
