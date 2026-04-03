@@ -111,6 +111,7 @@ serve(async (req) => {
           queries,
           tavilyApiKey,
           xBearer,
+          grokApiKey,
           browseUrls: [
             "https://www.knbs.or.ke/",
             "https://www.worldbank.org/en/country/kenya",
