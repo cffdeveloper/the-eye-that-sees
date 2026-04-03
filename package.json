@@ -14,8 +14,8 @@
     "test:watch": "vitest",
     "remove-logo-bg": "node scripts/remove-logo-bg.mjs",
     "docs:industries": "npx --yes tsx scripts/generate-industries-md.mts",
-    "supabase:link": "supabase link --project-ref gtyzvmnqifwyccgmirym",
-    "supabase:functions:deploy": "supabase functions deploy --project-ref gtyzvmnqifwyccgmirym"
+    "supabase:link": "supabase link",
+    "supabase:functions:deploy": "supabase functions deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

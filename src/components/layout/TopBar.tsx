@@ -19,12 +19,13 @@ import {
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import { getGeoNavLabel } from "@/lib/geoData";
+import { deskNavLabel } from "@/lib/profileDisplayName";
 
 export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const { isGlobal, geoString, selections } = useGeoContext();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, user } = useAuth();
   const { isPro } = useSubscription();
-  const navItems = getAppNavItems(isPro);
+  const navItems = getAppNavItems(isPro, deskNavLabel(profile, user?.email));
   const location = useLocation();
   const [industriesOpen, setIndustriesOpen] = useState(false);
 

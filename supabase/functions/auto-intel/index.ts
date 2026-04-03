@@ -1,3 +1,7 @@
+/**
+ * Rotating industry intel snapshots → `intel_snapshots`.
+ * Complements the proactive system: see `proactive-gap-scanner` + `proactive_gaps` (user-specific, cron).
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";

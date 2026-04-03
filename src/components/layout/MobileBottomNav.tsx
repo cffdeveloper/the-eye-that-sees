@@ -1,13 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 import { getAppNavItems, isAppNavActive } from "@/components/layout/appNavConfig";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/contexts/AuthContext";
+import { deskNavLabel } from "@/lib/profileDisplayName";
 import { cn } from "@/lib/utils";
 
 /** Mobile-only: primary app destinations in one row (laptop nav stays in TopBar). */
 export function MobileBottomNav() {
   const location = useLocation();
   const { isPro } = useSubscription();
-  const navItems = getAppNavItems(isPro);
+  const { profile, user } = useAuth();
+  const navItems = getAppNavItems(isPro, deskNavLabel(profile, user?.email));
   const cols = navItems.length;
   const gridCols =
     cols >= 7 ? "grid-cols-7" : cols >= 6 ? "grid-cols-6" : "grid-cols-5";

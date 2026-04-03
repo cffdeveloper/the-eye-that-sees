@@ -1,30 +1,34 @@
 import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, Radio, Network, FlaskConical, UserCircle, Bookmark, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { assistantHomePath } from "@/lib/assistantBranding";
 
 export type AppNavItem = { to: string; label: string; icon: LucideIcon };
 
-export const APP_NAV_ITEMS: AppNavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/intel", label: "Live Feed", icon: Radio },
-  { to: "/cross-intel", label: "Cross-Intel", icon: Network },
-  { to: "/custom-intel", label: "Infinity Lab", icon: FlaskConical },
-  { to: "/alfred", label: "Alfred", icon: Bot },
-  { to: "/profile", label: "My Profile", icon: UserCircle },
-];
+function buildBaseItems(deskNavLabel: string): AppNavItem[] {
+  return [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/intel", label: "Live Feed", icon: Radio },
+    { to: "/cross-intel", label: "Cross-Intel", icon: Network },
+    { to: "/custom-intel", label: "Infinity Lab", icon: FlaskConical },
+    { to: assistantHomePath, label: deskNavLabel, icon: Bot },
+    { to: "/profile", label: "My Profile", icon: UserCircle },
+  ];
+}
 
-/** Pro: inserts Saved before Profile. */
-export function getAppNavItems(isPro: boolean): AppNavItem[] {
-  if (!isPro) return APP_NAV_ITEMS;
-  const profile = APP_NAV_ITEMS[APP_NAV_ITEMS.length - 1];
-  const rest = APP_NAV_ITEMS.slice(0, -1);
+/** Pro: inserts Saved before Profile. `deskNavLabel` is usually the user’s first name from profile. */
+export function getAppNavItems(isPro: boolean, deskNavLabel = "My desk"): AppNavItem[] {
+  const items = buildBaseItems(deskNavLabel);
+  if (!isPro) return items;
+  const profile = items[items.length - 1];
+  const rest = items.slice(0, -1);
   return [...rest, { to: "/saved", label: "Saved", icon: Bookmark }, profile];
 }
 
 export function isAppNavActive(pathname: string, to: string): boolean {
   if (to === "/dashboard") return pathname === "/dashboard";
   if (to === "/saved") return pathname === "/saved";
-  if (to === "/alfred") return pathname === "/alfred" || pathname.startsWith("/alfred/");
+  if (to === assistantHomePath) return pathname === assistantHomePath || pathname.startsWith(`${assistantHomePath}/`);
   if (to === "/profile") return pathname === "/profile" || pathname.startsWith("/profile/");
   return pathname === to || pathname.startsWith(`${to}/`);
 }

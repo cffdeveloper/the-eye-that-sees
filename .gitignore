@@ -28,3 +28,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Certificates and local private keys (never commit)
+*.pem
+*.p12
+*.key

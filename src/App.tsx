@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,8 +18,9 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage";
 import SavedLibraryPage from "./pages/SavedLibraryPage";
-import AlfredPage from "./pages/AlfredPage";
-import AlfredDeepDivePage from "./pages/AlfredDeepDivePage";
+import OpportunityDeskPage from "./pages/OpportunityDeskPage";
+import OpportunityDeskDeepDivePage from "./pages/OpportunityDeskDeepDivePage";
+import { OPPORTUNITY_DESK_PATH, assistantDeepDivePath, assistantHomePath } from "@/lib/assistantBranding";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -54,6 +55,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!user) return <Navigate to="/auth" replace />;
   if (user && profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;
+}
+
+/** Old `/alfred` and `/jordan` URLs → `/my-desk`. */
+function LegacyAssistantHomeRedirect() {
+  return <Navigate to={assistantHomePath} replace />;
+}
+
+function LegacyAssistantDeepDiveRedirect() {
+  const { insightId } = useParams<{ insightId: string }>();
+  if (!insightId) return <Navigate to={assistantHomePath} replace />;
+  return <Navigate to={assistantDeepDivePath(insightId)} replace />;
 }
 
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
@@ -95,8 +107,12 @@ const AppRoutes = () => (
       <Route path="/intel" element={<IntelDashboard />} />
       <Route path="/cross-intel" element={<CrossIntelPage />} />
       <Route path="/custom-intel" element={<CustomIntelPage />} />
-      <Route path="/alfred" element={<AlfredPage />} />
-      <Route path="/alfred/deep-dive/:insightId" element={<AlfredDeepDivePage />} />
+      <Route path={`/${OPPORTUNITY_DESK_PATH}`} element={<OpportunityDeskPage />} />
+      <Route path={`/${OPPORTUNITY_DESK_PATH}/deep-dive/:insightId`} element={<OpportunityDeskDeepDivePage />} />
+      <Route path="/alfred" element={<LegacyAssistantHomeRedirect />} />
+      <Route path="/alfred/deep-dive/:insightId" element={<LegacyAssistantDeepDiveRedirect />} />
+      <Route path="/jordan" element={<LegacyAssistantHomeRedirect />} />
+      <Route path="/jordan/deep-dive/:insightId" element={<LegacyAssistantDeepDiveRedirect />} />
       <Route path="/industry/:slug" element={<IndustryPage />} />
       <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
       <Route path="/profile" element={<ProfilePage />} />

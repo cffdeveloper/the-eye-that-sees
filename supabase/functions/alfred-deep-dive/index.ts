@@ -31,6 +31,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const trainingCorpus = String(body.trainingCorpus || "").trim().slice(0, 24_000);
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
+    const addressAs = String(body.addressAs || "the user").trim().slice(0, 48) || "the user";
     const seed = body.insightSeed && typeof body.insightSeed === "object" ? body.insightSeed : {};
 
     const title = String(seed.title || "").trim().slice(0, 200);
@@ -56,7 +57,9 @@ serve(async (req) => {
       });
     }
 
-    const system = `You are "Alfred" in deep-dive mode for Infinitygap — produce a long-form, analyst-style brief.
+    const system = `You are Infinitygap's opportunity desk in deep-dive mode — produce a long-form, analyst-style brief.
+
+Personalize for the user they call themselves "${addressAs}" in userProfileMirror where appropriate.
 
 The user wants industry-grade depth: situation analysis, cross-industry links, explicit "gaps" (white space, friction, arbitrage, skill stacks, distribution holes) they could exploit to earn income or improve positioning — not a short blog post.
 

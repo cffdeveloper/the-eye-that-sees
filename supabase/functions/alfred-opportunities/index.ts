@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
@@ -17,6 +18,9 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const trainingCorpus = String(body.trainingCorpus || "").trim().slice(0, 24_000);
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
+    const addressAs = String(body.addressAs || "the user").trim().slice(0, 48) || "the user";
+    const mergeProactiveGaps = Boolean(body.mergeProactiveGaps);
+    const authHeader = req.headers.get("Authorization") || "";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -26,13 +30,15 @@ serve(async (req) => {
       });
     }
 
-    const system = `You are "Alfred", a personal opportunity research assistant inside Infinitygap.
+    const system = `You are Infinitygap's personal opportunity research assistant.
+
+The user prefers to be addressed as "${addressAs}" in executiveSummary tone where natural (not in JSON keys).
 
 Your job is to know WHO this user is from their training notes (skills, capital, time budget, risk tolerance, geography, goals, what they have tried), then surface ideas that CONNECT GAPS across industries — arbitrage, white space, skill stacks, distribution holes, regulatory friction, talent/capital mismatches — so they can earn money, reposition, or build leverage. You are not a single-industry screener: deliberately scan and link multiple domains.
 
 STRICT RULES:
 1. Output VALID JSON ONLY — no markdown fences, no prose outside the JSON object.
-2. BEFORE the deck: internalize training notes. If notes exist, executiveSummary must name 1–2 inferred constraints (e.g. time, capital, skills) and how the deck respects them. If notes are empty, say you lack a profile and encourage them to train Alfred — still deliver a cross-industry gap-oriented deck.
+2. BEFORE the deck: internalize training notes. If notes exist, executiveSummary must name 1–2 inferred constraints (e.g. time, capital, skills) and how the deck respects them. If notes are empty, say you lack a profile and encourage them to add training notes in the app — still deliver a cross-industry gap-oriented deck.
 3. Include 10–14 items in "insights". Each must be actionable and cite at least TWO distinct industry/domain angles in the summary or actions (e.g. "content + fintech", "local services + AI tooling", "commodities + policy").
 4. "priority" is an integer 1–100 (100 = highest fit + urgency for THIS user; down-rank ideas that ignore their constraints).
 5. Categories may include: stocks, crypto, forex, commodities, online_business, freelancing, content, ecommerce, real_estate, geo_arbitrage, skills, savings, labor_market, ai_tools, policy_regulatory, other.
@@ -73,7 +79,7 @@ ${trainingCorpus}
 Produce the JSON opportunity brief now. Insights must span multiple industries and emphasize connectable gaps this person could exploit.`
         : `GEO / MARKET LENS: ${geoHint}
 
-No personal training notes yet. Produce a cross-industry, gap-focused opportunity deck anyway, and in executiveSummary clearly say Alfred does not yet know their profile — urge them to use Train Alfred with goals, skills, capital, time, and country.`;
+No personal training notes yet. Produce a cross-industry, gap-focused opportunity deck anyway, and in executiveSummary clearly say you do not yet know their profile — urge them to add training notes with goals, skills, capital, time, and country.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -121,8 +127,9 @@ No personal training notes yet. Produce a cross-industry, gap-focused opportunit
     }
 
     const rawInsights = Array.isArray(parsed.insights) ? parsed.insights : [];
-    const insights = rawInsights
+    const baseInsights = rawInsights
       .map((x: any) => ({
+        id: typeof x.id === "string" ? x.id : undefined,
         priority: Math.min(100, Math.max(1, Number(x.priority) || 50)),
         title: String(x.title || "Opportunity").slice(0, 200),
         summary: String(x.summary || "").slice(0, 1200),
@@ -132,6 +139,52 @@ No personal training notes yet. Produce a cross-industry, gap-focused opportunit
         caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 400)).slice(0, 6) : [],
       }))
       .sort((a, b) => b.priority - a.priority);
+
+    let insights = baseInsights;
+    if (mergeProactiveGaps && authHeader.startsWith("Bearer ")) {
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+        const sb = createClient(supabaseUrl, anon, {
+          global: { headers: { Authorization: authHeader } },
+        });
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          const { data: gaps } = await sb
+            .from("proactive_gaps")
+            .select("insight")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(12);
+          const proactiveRows = (gaps || [])
+            .map((g: { insight: Record<string, unknown> }) => {
+              const x = g.insight;
+              const titleRaw = String(x.title || "Opportunity");
+              const title = titleRaw.startsWith("[Proactive]") ? titleRaw : `[Proactive] ${titleRaw}`.slice(0, 200);
+              return {
+                id: typeof x.id === "string" ? x.id : undefined,
+                priority: Math.min(100, Math.max(1, Number(x.priority) || 62)),
+                title,
+                summary: String(x.summary || "").slice(0, 1200),
+                category: String(x.category || "other").slice(0, 80),
+                timing: String(x.timing || "watchlist").slice(0, 80),
+                actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 400)).slice(0, 8) : [],
+                caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 400)).slice(0, 6) : [],
+              };
+            });
+          const seen = new Set<string>();
+          const merged = [...proactiveRows, ...baseInsights].filter((row) => {
+            const k = row.title.toLowerCase();
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+          });
+          insights = merged.slice(0, 24);
+        }
+      } catch (e) {
+        console.warn("mergeProactiveGaps:", e);
+      }
+    }
 
     return new Response(
       JSON.stringify({

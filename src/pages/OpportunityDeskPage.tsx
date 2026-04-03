@@ -4,10 +4,28 @@ import { Bot, BrainCircuit, Clock, Loader2, RefreshCw, ScanSearch, Sparkles } fr
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { cn } from "@/lib/utils";
+import { assistantDeepDivePath } from "@/lib/assistantBranding";
+import {
+  opportunityDeskTitle,
+  profileFirstName,
+  trainActionLabel,
+} from "@/lib/profileDisplayName";
 import {
   appendTrainingEntry,
   getTrainingCorpus,
@@ -15,10 +33,16 @@ import {
   loadInsightsCache,
   loadTrainingEntries,
   msUntilNextRefresh,
+  normalizeInsight,
   saveInsightsCache,
   type AlfredInsight,
   type AlfredInsightsBundle,
 } from "@/lib/alfredStorage";
+import { useProactiveGaps } from "@/hooks/useProactiveGaps";
+import { formatDistanceToNow } from "date-fns";
+
+const FREE_INSIGHT_LIMIT = 2;
+const FREE_EXEC_SUMMARY_CHARS = 480;
 
 function formatDuration(ms: number): string {
   if (ms <= 0) return "now";
@@ -64,7 +88,15 @@ function InsightMetaRow({ insight, rank }: { insight: AlfredInsight; rank: numbe
   );
 }
 
-function InsightCard({ insight, rank }: { insight: AlfredInsight; rank: number }) {
+function InsightCard({
+  insight,
+  rank,
+  allowDeepDive,
+}: {
+  insight: AlfredInsight;
+  rank: number;
+  allowDeepDive: boolean;
+}) {
   return (
     <article
       className={cn(
@@ -92,25 +124,47 @@ function InsightCard({ insight, rank }: { insight: AlfredInsight; rank: number }
       )}
 
       <div className="mt-4 flex flex-wrap gap-2 border-t border-border/40 pt-4">
-        <Button type="button" variant="secondary" size="sm" className="rounded-lg gap-1.5 font-semibold" asChild>
-          <Link to={`/alfred/deep-dive/${insight.id}`}>
-            <ScanSearch className="h-3.5 w-3.5 shrink-0" />
-            Full deep dive
-          </Link>
-        </Button>
+        {allowDeepDive ? (
+          <Button type="button" variant="secondary" size="sm" className="rounded-lg gap-1.5 font-semibold" asChild>
+            <Link to={assistantDeepDivePath(insight.id)}>
+              <ScanSearch className="h-3.5 w-3.5 shrink-0" />
+              Full deep dive
+            </Link>
+          </Button>
+        ) : (
+          <div className="w-full min-w-0 rounded-xl border border-border/50 bg-muted/15 p-3">
+            <ProUpgradePrompt
+              compact
+              feature="Full deep-dive briefs with cross-industry analysis and execution maps are included with Pro."
+            />
+          </div>
+        )}
       </div>
     </article>
   );
 }
 
-export default function AlfredPage() {
+export default function OpportunityDeskPage() {
   const { geoString, isGlobal } = useGeoContext();
+  const { profile, user } = useAuth();
+  const { loading: subscriptionLoading } = useSubscription();
+  const { isFree, isPro } = useIsFreeUser();
+  const {
+    rows: proactiveRows,
+    loading: proactiveLoading,
+    lastUpdated: proactiveLastUpdated,
+  } = useProactiveGaps(isPro);
+
   const [trainOpen, setTrainOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [training, setTraining] = useState<ReturnType<typeof loadTrainingEntries>>([]);
   const [cache, setCache] = useState<AlfredInsightsBundle | null>(() => loadInsightsCache());
   const [loading, setLoading] = useState(false);
   const [autoRan, setAutoRan] = useState(false);
+
+  const pageTitle = opportunityDeskTitle(profile, user?.email);
+  const addressAs = profileFirstName(profile, user?.email);
+  const trainLabel = trainActionLabel(profile, user?.email);
 
   const refreshTraining = useCallback(() => {
     setTraining(loadTrainingEntries());
@@ -128,7 +182,12 @@ export default function AlfredPage() {
       try {
         const corpus = getTrainingCorpus();
         const { data, error } = await supabase.functions.invoke("alfred-opportunities", {
-          body: { trainingCorpus: corpus, geoHint },
+          body: {
+            trainingCorpus: corpus,
+            geoHint,
+            addressAs: addressAs || undefined,
+            mergeProactiveGaps: isPro,
+          },
         });
         if (error) throw error;
         if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
@@ -139,7 +198,7 @@ export default function AlfredPage() {
           disclaimer: data.disclaimer || undefined,
         });
         setCache(bundle);
-        if (!opts?.silent) toast.success("Alfred updated your opportunity deck");
+        if (!opts?.silent) toast.success("Opportunity deck updated");
       } catch (e) {
         console.error(e);
         toast.error(e instanceof Error ? e.message : "Could not refresh insights");
@@ -147,7 +206,7 @@ export default function AlfredPage() {
         setLoading(false);
       }
     },
-    [geoHint],
+    [geoHint, addressAs, isPro],
   );
 
   useEffect(() => {
@@ -164,30 +223,78 @@ export default function AlfredPage() {
   const nextRefreshMs = useMemo(() => msUntilNextRefresh(cache), [cache]);
   const needsRefresh = useMemo(() => insightsNeedRefresh(cache), [cache]);
 
+  const allInsights = cache?.insights ?? [];
+  const visibleInsights = useMemo(() => {
+    if (isPro) return allInsights;
+    return allInsights.slice(0, FREE_INSIGHT_LIMIT);
+  }, [allInsights, isPro]);
+
+  const lockedCount = isPro ? 0 : Math.max(0, allInsights.length - FREE_INSIGHT_LIMIT);
+
+  const executiveRead = cache?.executiveSummary ?? "";
+  const executivePreview = useMemo(() => {
+    if (isPro || executiveRead.length <= FREE_EXEC_SUMMARY_CHARS) return executiveRead;
+    return `${executiveRead.slice(0, FREE_EXEC_SUMMARY_CHARS).trim()}…`;
+  }, [executiveRead, isPro]);
+
   const saveTraining = () => {
     try {
       appendTrainingEntry(draft);
       setDraft("");
       setTrainOpen(false);
       refreshTraining();
-      toast.success("Alfred saved your notes — use Refresh to fold them into the next insight pass");
+      toast.success("Notes saved — they’ll shape your next refresh.");
     } catch {
       toast.error("Add some text before saving");
     }
   };
 
+  if (subscriptionLoading) {
+    return (
+      <div className="mx-auto max-w-3xl pb-12">
+        <ProGateLoading />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-8 pb-12">
+      <PageIntro eyebrow="Personal opportunity desk" title="What this page does">
+        <ol className="list-decimal list-inside space-y-1.5 [&>li]:pl-0.5">
+          <li>
+            <strong className="text-foreground">Train</strong> Infinitygap on your goals, skills, capital, and time — same notes
+            power every run.
+          </li>
+          <li>
+            <strong className="text-foreground">Get a ranked deck</strong> of cross-industry ideas and gaps you could monetize or
+            position on (refreshes every 24h).
+          </li>
+          <li>
+            <strong className="text-foreground">Deep dive</strong> any card for a long-form analyst-style brief —{" "}
+            <strong className="text-foreground">Pro</strong> unlocks full deep dives and the full opportunity list.
+          </li>
+        </ol>
+        <p>
+          Free accounts see a <strong className="text-foreground">preview</strong> of the executive read and the top {FREE_INSIGHT_LIMIT}{" "}
+          ideas. Upgrade for the full deck, complete summaries, and deep dives.
+        </p>
+      </PageIntro>
+
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/12 border border-primary/20">
             <Bot className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Alfred</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{pageTitle}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Your personal opportunity desk — trains on what you share, refreshes every 24 hours.
+              Trains on what you share in notes — refreshes every 24 hours. Geography: {geoHint}.
             </p>
+            {isFree && (
+              <p className="text-[11px] font-semibold text-primary mt-1.5">
+                Preview mode — upgrade for the full brief, all ideas, and deep dives.
+              </p>
+            )}
           </div>
         </div>
 
@@ -196,16 +303,15 @@ export default function AlfredPage() {
             <DialogTrigger asChild>
               <Button type="button" className="rounded-xl font-semibold gap-2 w-full sm:w-auto">
                 <BrainCircuit className="h-4 w-4 shrink-0" />
-                Train Alfred
+                {trainLabel}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg max-h-[min(90dvh,40rem)] flex flex-col">
               <DialogHeader>
-                <DialogTitle>Train Alfred on you</DialogTitle>
+                <DialogTitle>{trainLabel}</DialogTitle>
                 <DialogDescription>
-                  Alfred ranks ideas against this profile and connects gaps across industries (markets, online income,
-                  skills, policy, AI tools, and more). Include skills, capital, risk tolerance, country, goals, what
-                  you&apos;ve tried, hours per week, and how you want to earn — every save is merged into future runs.
+                  We use this text to personalize your deck — skills, capital, risk, country, goals, what you&apos;ve tried, hours
+                  per week, and how you want to earn. Every save is merged into future runs.
                 </DialogDescription>
               </DialogHeader>
               <Textarea
@@ -246,35 +352,75 @@ export default function AlfredPage() {
               {cache
                 ? needsRefresh
                   ? "Overdue for 24h refresh"
-                  : `Next auto-style refresh in ${formatDuration(nextRefreshMs)}`
+                  : `Next refresh in ${formatDuration(nextRefreshMs)}`
                 : "No deck yet"}
             </span>
           </div>
         </div>
       </header>
 
-      <section className="rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] to-transparent p-4 sm:p-5 space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-primary">How it works</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Alfred reads your training notes as your identity brief, scans across industries for gaps and connections you
-          could monetize or position on, and ranks ideas for your geography ({geoHint}). Open <strong>Full deep dive</strong>{" "}
-          on any card for a long-form analyst-style brief. It does not execute trades or access your accounts. Decks
-          older than 24 hours refresh when you open this page; you can train again or refresh anytime.
-        </p>
-      </section>
-
       {loading && !cache?.insights?.length && (
         <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm font-medium">Alfred is scanning themes for you…</p>
+          <p className="text-sm font-medium">Building your opportunity deck…</p>
         </div>
       )}
 
       {!loading && (!cache || !cache.insights?.length) && (
         <div className="rounded-2xl border border-dashed border-border/60 bg-muted/20 p-8 text-center space-y-3">
           <p className="text-sm text-muted-foreground">
-            No opportunity deck loaded yet. Alfred will generate one automatically, or tap <strong>Refresh insights now</strong>.
+            No deck yet. We&apos;ll generate one when you open this page, or tap <strong>Refresh insights now</strong>.
           </p>
+        </div>
+      )}
+
+      {isPro && (
+        <section className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-4 sm:p-5 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-display text-base font-bold text-foreground">Proactive gaps</h2>
+            <span className="text-[11px] text-muted-foreground tabular-nums">
+              {proactiveLoading
+                ? "Loading…"
+                : proactiveLastUpdated
+                  ? `Updated ${formatDistanceToNow(new Date(proactiveLastUpdated), { addSuffix: true })}`
+                  : "No background scans yet"}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            24/7 scanner runs on a schedule (Pro). Gaps respect your profile: Kenya / online, low capital, profitable angles that can
+            employ people when that fits you. They also merge into your main deck when you refresh.
+          </p>
+          {proactiveRows.length === 0 && !proactiveLoading && (
+            <p className="text-xs text-muted-foreground italic">Waiting for the next scan — or ensure migrations and cron are deployed.</p>
+          )}
+          <ul className="space-y-3">
+            {proactiveRows.slice(0, 6).map((row, i) => {
+              const raw = row.insight as Record<string, unknown>;
+              const ins = normalizeInsight(raw, {
+                generatedAt: new Date(row.created_at).getTime(),
+                index: i,
+              });
+              return (
+                <li
+                  key={row.id}
+                  className="rounded-xl border border-border/50 bg-background/60 px-3 py-2.5 text-sm text-foreground/90"
+                >
+                  <span className="font-semibold text-foreground">{ins.title}</span>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{ins.summary}</p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      {isFree && (
+        <div className="rounded-2xl border border-border/50 bg-muted/10 p-4">
+          <p className="text-xs font-semibold text-foreground mb-1">Proactive 24/7 gap scanning</p>
+          <p className="text-xs text-muted-foreground mb-3">
+            Background research that surfaces Kenya / online, low-capital gaps is included with Pro.
+          </p>
+          <ProUpgradePrompt compact feature="Unlock scheduled multi-source scanning and proactive gaps on your desk." />
         </div>
       )}
 
@@ -283,7 +429,15 @@ export default function AlfredPage() {
           {cache.executiveSummary && (
             <div className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Executive read</p>
-              <p className="text-sm sm:text-base text-foreground leading-relaxed">{cache.executiveSummary}</p>
+              <p className="text-sm sm:text-base text-foreground leading-relaxed">{executivePreview}</p>
+              {isFree && executiveRead.length > FREE_EXEC_SUMMARY_CHARS && (
+                <div className="mt-4 rounded-xl border border-border/40 bg-muted/20 p-4">
+                  <ProUpgradePrompt
+                    compact
+                    feature="Upgrade to read the full executive brief and every insight card."
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -295,23 +449,37 @@ export default function AlfredPage() {
           </div>
 
           <div className="space-y-4">
-            {cache.insights.map((insight, i) => (
-              <InsightCard key={insight.id} insight={insight} rank={i + 1} />
+            {visibleInsights.map((insight, i) => (
+              <InsightCard key={insight.id} insight={insight} rank={i + 1} allowDeepDive={isPro} />
             ))}
           </div>
 
-          {cache.disclaimer && (
+          {isFree && lockedCount > 0 && (
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-5">
+              <p className="text-sm font-semibold text-foreground mb-2">
+                +{lockedCount} more opportunit{lockedCount === 1 ? "y" : "ies"} on Pro
+              </p>
+              <ProUpgradePrompt feature="Unlock the full ranked list, complete summaries, and unlimited deep-dive briefs." />
+            </div>
+          )}
+
+          {cache.disclaimer && isPro && (
             <p className="text-[11px] text-muted-foreground leading-relaxed border-t border-border/40 pt-4">
               {cache.disclaimer}
+            </p>
+          )}
+          {cache.disclaimer && isFree && (
+            <p className="text-[11px] text-muted-foreground leading-relaxed border-t border-border/40 pt-4 italic">
+              Full disclaimer text is shown with Pro.
             </p>
           )}
         </section>
       )}
 
       <footer className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-xs text-muted-foreground leading-relaxed">
-        <strong className="text-foreground">Not financial advice.</strong> Alfred outputs research-style ideas for
-        education only. Markets involve risk of loss. Verify data, fees, and tax rules yourself; consult a licensed
-        professional before investing or structuring a business.
+        <strong className="text-foreground">Not financial advice.</strong> This desk outputs research-style ideas for education only.
+        Markets involve risk of loss. Verify data, fees, and tax rules yourself; consult a licensed professional before investing or
+        structuring a business.
       </footer>
     </div>
   );

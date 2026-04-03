@@ -11,8 +11,13 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+import { ProUpgradePrompt, ProGateLoading } from "@/components/ProUpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { assistantHomePath } from "@/lib/assistantBranding";
+import { deskNavLabel, profileFirstName } from "@/lib/profileDisplayName";
 import {
   findInsightById,
   getTrainingCorpus,
@@ -34,7 +39,7 @@ type GapBridge = {
   roughDifficulty: string;
 };
 
-export type AlfredDeepDiveAnalysis = {
+export type DeepDiveAnalysis = {
   userProfileMirror: string;
   executiveThesis: string;
   landscape: string;
@@ -66,17 +71,34 @@ function SectionTitle({ children, className }: { children: ReactNode; className?
   );
 }
 
-export default function AlfredDeepDivePage() {
+function BackLink() {
+  const { profile, user } = useAuth();
+  const label = deskNavLabel(profile, user?.email);
+  return (
+    <Link
+      to={assistantHomePath}
+      className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+    >
+      <ArrowLeft className="h-4 w-4 shrink-0" />
+      Back to {label}
+    </Link>
+  );
+}
+
+export default function OpportunityDeskDeepDivePage() {
   const { insightId } = useParams<{ insightId: string }>();
   const { geoString, isGlobal } = useGeoContext();
+  const { profile, user } = useAuth();
+  const { isPro, loading: subscriptionLoading } = useSubscription();
   const geoHint = isGlobal ? "global markets" : geoString;
+  const addressAs = profileFirstName(profile, user?.email);
 
   const insight = useMemo(() => {
     if (!insightId) return null;
     return findInsightById(loadInsightsCache(), insightId);
   }, [insightId]);
 
-  const [analysis, setAnalysis] = useState<AlfredDeepDiveAnalysis | null>(null);
+  const [analysis, setAnalysis] = useState<DeepDiveAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,6 +112,7 @@ export default function AlfredDeepDivePage() {
           body: {
             trainingCorpus,
             geoHint,
+            addressAs: addressAs || undefined,
             insightSeed: {
               title: ins.title,
               summary: ins.summary,
@@ -103,7 +126,7 @@ export default function AlfredDeepDivePage() {
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
-        setAnalysis(data as unknown as AlfredDeepDiveAnalysis);
+        setAnalysis(data as unknown as DeepDiveAnalysis);
       } catch (e) {
         console.error(e);
         const msg = e instanceof Error ? e.message : "Could not load deep dive";
@@ -113,16 +136,29 @@ export default function AlfredDeepDivePage() {
         setLoading(false);
       }
     },
-    [geoHint],
+    [geoHint, addressAs],
   );
 
   useEffect(() => {
-    if (!insight) return;
+    if (!insight || !isPro || subscriptionLoading) return;
     void runDeepDive(insight);
-  }, [insight, runDeepDive]);
+  }, [insight, runDeepDive, isPro, subscriptionLoading]);
 
   if (!insightId) {
-    return <NavigateMissing />;
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-12">
+        <BackLink />
+        <p className="mt-6 text-sm text-muted-foreground">Missing opportunity id.</p>
+      </div>
+    );
+  }
+
+  if (subscriptionLoading) {
+    return (
+      <div className="mx-auto max-w-3xl pb-12">
+        <ProGateLoading />
+      </div>
+    );
   }
 
   if (!insight) {
@@ -131,12 +167,33 @@ export default function AlfredDeepDivePage() {
         <BackLink />
         <div className="rounded-2xl border border-dashed border-border/70 bg-muted/20 p-8 text-center space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            This opportunity is not in your saved deck anymore — refresh Alfred on the main page, or open deep dive from
-            a current card.
+            This opportunity is not in your saved deck anymore — refresh your deck on the main page, or open deep dive from a current
+            card.
           </p>
           <Button type="button" className="rounded-xl font-semibold" asChild>
-            <Link to="/alfred">Back to Alfred</Link>
+            <Link to={assistantHomePath}>Back to desk</Link>
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPro) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-8 pb-16 px-4 sm:px-0">
+        <BackLink />
+        <div className="rounded-2xl border border-border/60 bg-card/50 p-6 sm:p-8 space-y-4">
+          <h1 className="font-display text-xl font-bold text-foreground">Full deep dive is a Pro feature</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Upgrade to generate long-form cross-industry analysis, gap maps, positioning playbooks, and 90-day execution plans for
+            each opportunity.
+          </p>
+          <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Preview — your card</p>
+            <p className="text-sm font-semibold text-foreground">{insight.title}</p>
+            <p className="text-sm text-muted-foreground mt-2 line-clamp-4">{insight.summary}</p>
+          </div>
+          <ProUpgradePrompt feature="Unlock full deep-dive briefs, unlimited deck cards, and complete executive summaries on your personal opportunity desk." />
         </div>
       </div>
     );
@@ -217,7 +274,7 @@ export default function AlfredDeepDivePage() {
 
           {analysis.userProfileMirror && (
             <section className="space-y-3">
-              <SectionTitle>How Alfred reads you</SectionTitle>
+              <SectionTitle>How this applies to you</SectionTitle>
               <div className="prose-infinitygap text-[13px] text-card-foreground leading-relaxed rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5">
                 <p className="whitespace-pre-wrap">{analysis.userProfileMirror}</p>
               </div>
@@ -377,34 +434,13 @@ export default function AlfredDeepDivePage() {
 
           <section className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 space-y-2">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">Not financial or legal advice.</strong> This is generated research for
-              education. Verify facts, fees, and regulations yourself.
+              <strong className="text-foreground">Not financial or legal advice.</strong> This is generated research for education.
+              Verify facts, fees, and regulations yourself.
             </p>
             {analysis.disclaimer && <p className="text-[11px] text-muted-foreground leading-relaxed">{analysis.disclaimer}</p>}
           </section>
         </div>
       )}
-    </div>
-  );
-}
-
-function BackLink() {
-  return (
-    <Link
-      to="/alfred"
-      className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-    >
-      <ArrowLeft className="h-4 w-4 shrink-0" />
-      Back to Alfred
-    </Link>
-  );
-}
-
-function NavigateMissing() {
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <BackLink />
-      <p className="mt-6 text-sm text-muted-foreground">Missing opportunity id.</p>
     </div>
   );
 }

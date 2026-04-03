@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.alfred-opportunities]
 verify_jwt = false
+
+[functions.proactive-gap-scanner]
+verify_jwt = false

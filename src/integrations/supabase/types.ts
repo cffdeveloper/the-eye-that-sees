@@ -223,9 +223,13 @@ export type Database = {
           goals: string[] | null
           id: string
           industries_of_interest: string[] | null
+          max_startup_capital_usd: number | null
           onboarding_completed: boolean | null
           organization: string | null
           preferred_regions: string[] | null
+          primary_market: string | null
+          proactive_monitoring: string | null
+          prefers_business_that_employs: boolean | null
           role: string | null
           title: string | null
           updated_at: string | null
@@ -240,9 +244,13 @@ export type Database = {
           goals?: string[] | null
           id: string
           industries_of_interest?: string[] | null
+          max_startup_capital_usd?: number | null
           onboarding_completed?: boolean | null
           organization?: string | null
           preferred_regions?: string[] | null
+          primary_market?: string | null
+          proactive_monitoring?: string | null
+          prefers_business_that_employs?: boolean | null
           role?: string | null
           title?: string | null
           updated_at?: string | null
@@ -257,12 +265,49 @@ export type Database = {
           goals?: string[] | null
           id?: string
           industries_of_interest?: string[] | null
+          max_startup_capital_usd?: number | null
           onboarding_completed?: boolean | null
           organization?: string | null
           preferred_regions?: string[] | null
+          primary_market?: string | null
+          proactive_monitoring?: string | null
+          prefers_business_that_employs?: boolean | null
           role?: string | null
           title?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      proactive_gaps: {
+        Row: {
+          batch_id: string | null
+          created_at: string
+          feasibility: Json
+          id: string
+          insight: Json
+          search_evidence: Json
+          user_context_snapshot: Json
+          user_id: string
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string
+          feasibility?: Json
+          id?: string
+          insight: Json
+          search_evidence?: Json
+          user_context_snapshot?: Json
+          user_id: string
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string
+          feasibility?: Json
+          id?: string
+          insight?: Json
+          search_evidence?: Json
+          user_context_snapshot?: Json
+          user_id?: string
         }
         Relationships: []
       }

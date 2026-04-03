@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
-type Profile = {
+export type Profile = {
   id: string;
   full_name: string | null;
   display_name: string | null;
@@ -16,6 +16,11 @@ type Profile = {
   experience_level: string | null;
   preferred_regions: string[];
   onboarding_completed: boolean;
+  /** Proactive gap agent — max USD for startup ideas (DB default 1000). */
+  max_startup_capital_usd?: number | null;
+  prefers_business_that_employs?: boolean | null;
+  proactive_monitoring?: string | null;
+  primary_market?: string | null;
 };
 
 type AuthContextType = {
