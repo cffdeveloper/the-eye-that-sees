@@ -903,6 +903,193 @@ async function collectWorldBank(): Promise<any[]> {
   return rows;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// ADDITIONAL FREE API SOURCES (from industry_data_sources spreadsheet)
+// ═══════════════════════════════════════════════════════════════════
+
+/** Alpha Vantage — top movers + sector performance (free tier, 25 calls/day) */
+async function collectAlphaVantage(): Promise<any[]> {
+  const key = Deno.env.get("ALPHAVANTAGE_API_KEY");
+  if (!key) return [];
+  const rows: any[] = [];
+  const [topGainers, sectorPerf] = await Promise.all([
+    safeFetch(`https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${key}`),
+    safeFetch(`https://www.alphavantage.co/query?function=SECTOR&apikey=${key}`),
+  ]);
+  if (topGainers?.top_gainers) {
+    for (const s of topGainers.top_gainers.slice(0, 10)) {
+      rows.push({ source: "alphavantage", data_type: "stock_mover", geo_scope: "US", payload: { ticker: s.ticker, price: s.price, change_pct: s.change_percentage, volume: s.volume, direction: "gainer" }, tags: ["stocks", "movers", "gainer"] });
+    }
+    for (const s of (topGainers.top_losers || []).slice(0, 10)) {
+      rows.push({ source: "alphavantage", data_type: "stock_mover", geo_scope: "US", payload: { ticker: s.ticker, price: s.price, change_pct: s.change_percentage, volume: s.volume, direction: "loser" }, tags: ["stocks", "movers", "loser"] });
+    }
+  }
+  if (sectorPerf?.["Rank A: Real-Time Performance"]) {
+    rows.push({ source: "alphavantage", data_type: "sector_performance", geo_scope: "US", payload: sectorPerf, tags: ["stocks", "sectors"] });
+  }
+  return rows;
+}
+
+/** FRED (Federal Reserve Economic Data) — key US economic indicators (free, no key needed for basic) */
+async function collectFRED(): Promise<any[]> {
+  const key = Deno.env.get("FRED_API_KEY");
+  if (!key) return [];
+  const series = [
+    { id: "FEDFUNDS", name: "Fed Funds Rate" },
+    { id: "UNRATE", name: "US Unemployment" },
+    { id: "CPIAUCSL", name: "US CPI" },
+    { id: "GDP", name: "US GDP" },
+    { id: "DGS10", name: "10Y Treasury Yield" },
+    { id: "DEXUSEU", name: "USD/EUR Exchange" },
+    { id: "DCOILWTICO", name: "WTI Crude Oil" },
+    { id: "BAMLH0A0HYM2", name: "US High Yield Spread" },
+  ];
+  const rows: any[] = [];
+  for (const s of series) {
+    const data = await safeFetch(`https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${key}&file_type=json&sort_order=desc&limit=1`);
+    if (data?.observations?.[0]) {
+      const obs = data.observations[0];
+      rows.push({ source: "fred", data_type: "economic_indicator", geo_scope: "US", payload: { series_id: s.id, name: s.name, value: obs.value, date: obs.date }, tags: ["economics", "fred", s.name.toLowerCase().replace(/\s+/g, "-")] });
+    }
+  }
+  return rows;
+}
+
+/** UN Comtrade — top traded commodities (free tier) */
+async function collectUNComtrade(): Promise<any[]> {
+  const rows: any[] = [];
+  const data = await safeFetch("https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=404&period=2023&flowCode=M&cmdCode=TOTAL", 15000);
+  if (data?.data) {
+    for (const item of (data.data as any[]).slice(0, 20)) {
+      rows.push({ source: "uncomtrade", data_type: "trade_flow", geo_scope: item.reporterCode || "KE", payload: { reporter: item.reporterDesc, partner: item.partnerDesc, flow: item.flowDesc, commodity: item.cmdDesc, value: item.primaryValue, year: item.period }, tags: ["trade", "imports", "kenya"] });
+    }
+  }
+  return rows;
+}
+
+/** Product Hunt — latest launches (free GraphQL API) */
+async function collectProductHunt(): Promise<any[]> {
+  const rows: any[] = [];
+  const data = await safeFetch("https://api.producthunt.com/v2/api/graphql", 8000);
+  // PH needs auth, fallback to RSS-like scrape
+  const xml = await safeTextFetch("https://www.producthunt.com/feed", 8000);
+  if (!xml) return [];
+  const items = xml.split("<item>").slice(1, 10);
+  for (const item of items) {
+    const title = item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/)?.[1] || "";
+    const link = item.match(/<link>(.*?)<\/link>/)?.[1] || "";
+    if (title) {
+      rows.push({ source: "producthunt", data_type: "product_launch", geo_scope: "global", payload: { title, url: link }, tags: ["tech", "startup", "launch", "producthunt"] });
+    }
+  }
+  return rows;
+}
+
+/** GitHub Trending — weekly trending repos by language */
+async function collectGitHubTrending(): Promise<any[]> {
+  const rows: any[] = [];
+  const languages = ["python", "javascript", "typescript", "rust", "go"];
+  for (const lang of languages) {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const data = await safeFetch(`https://api.github.com/search/repositories?q=language:${lang}+created:>${since}&sort=stars&order=desc&per_page=5`);
+    if (data?.items) {
+      for (const r of data.items) {
+        rows.push({ source: "github-trending", data_type: "tech_signal", geo_scope: "global", payload: { name: r.full_name, description: (r.description || "").slice(0, 200), stars: r.stargazers_count, language: r.language, url: r.html_url, topics: r.topics?.slice(0, 5) }, tags: ["tech", "github", "trending", lang] });
+      }
+    }
+  }
+  return rows;
+}
+
+/** OpenWeatherMap — weather for key African agricultural regions */
+async function collectWeatherAg(): Promise<any[]> {
+  const key = Deno.env.get("OPENWEATHER_API_KEY");
+  if (!key) return [];
+  const cities = [
+    { name: "Nairobi", lat: -1.29, lon: 36.82, code: "KE" },
+    { name: "Mombasa", lat: -4.04, lon: 39.67, code: "KE" },
+    { name: "Nakuru", lat: -0.30, lon: 36.07, code: "KE" },
+    { name: "Eldoret", lat: 0.52, lon: 35.27, code: "KE" },
+    { name: "Kisumu", lat: -0.10, lon: 34.75, code: "KE" },
+    { name: "Lagos", lat: 6.45, lon: 3.40, code: "NG" },
+    { name: "Dar es Salaam", lat: -6.79, lon: 39.28, code: "TZ" },
+    { name: "Kampala", lat: 0.35, lon: 32.58, code: "UG" },
+  ];
+  const rows: any[] = [];
+  for (const city of cities) {
+    const data = await safeFetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${key}&units=metric`);
+    if (data?.main) {
+      rows.push({ source: "openweather", data_type: "weather_ag", geo_scope: city.code, payload: { city: city.name, temp: data.main.temp, humidity: data.main.humidity, pressure: data.main.pressure, weather: data.weather?.[0]?.description, wind_speed: data.wind?.speed, rain_1h: data.rain?.["1h"] || 0 }, tags: ["weather", "agriculture", city.code.toLowerCase()] });
+    }
+  }
+  return rows;
+}
+
+/** CoinGecko Trending — trending coins + NFTs */
+async function collectCryptoTrending(): Promise<any[]> {
+  const data = await safeFetch("https://api.coingecko.com/api/v3/search/trending");
+  if (!data?.coins) return [];
+  return data.coins.slice(0, 10).map((c: any) => ({
+    source: "coingecko-trending", data_type: "crypto_trending", geo_scope: "global",
+    payload: { id: c.item?.id, name: c.item?.name, symbol: c.item?.symbol, market_cap_rank: c.item?.market_cap_rank, price_btc: c.item?.price_btc },
+    tags: ["crypto", "trending", c.item?.symbol?.toLowerCase()].filter(Boolean),
+  }));
+}
+
+/** IMF Data — World Economic Outlook indicators */
+async function collectIMF(): Promise<any[]> {
+  const rows: any[] = [];
+  const countries = ["KEN", "NGA", "ZAF", "TZA", "UGA", "GHA", "EGY"];
+  for (const cc of countries) {
+    const data = await safeFetch(`https://www.imf.org/external/datamapper/api/v1/NGDP_RPCH/${cc}?periods=2024,2025,2026`, 10000);
+    if (data?.values?.NGDP_RPCH?.[cc]) {
+      const vals = data.values.NGDP_RPCH[cc];
+      rows.push({ source: "imf", data_type: "economic_forecast", geo_scope: cc.slice(0, 2), payload: { country: cc, indicator: "GDP Growth %", values: vals }, tags: ["economics", "imf", "gdp", cc.toLowerCase()] });
+    }
+  }
+  return rows;
+}
+
+/** Metals API / Gold-API — precious metals prices (free) */
+async function collectMetalPrices(): Promise<any[]> {
+  const data = await safeFetch("https://api.gold-api.com/price/XAU,XAG,XPT,XPD");
+  if (!Array.isArray(data)) return [];
+  return data.map((m: any) => ({
+    source: "gold-api", data_type: "commodity_price", geo_scope: "global",
+    payload: { metal: m.metal || m.symbol, price_usd: m.price, change_pct: m.chp, updated: m.updatedAt },
+    tags: ["commodity", "metals", (m.metal || m.symbol || "").toLowerCase()],
+  }));
+}
+
+/** Open Food Facts — food product data for consumer/FMCG intel */
+async function collectFoodTrends(): Promise<any[]> {
+  const data = await safeFetch("https://world.openfoodfacts.org/cgi/search.pl?search_terms=kenya&search_simple=1&action=process&json=1&page_size=15", 10000);
+  if (!data?.products) return [];
+  return data.products.slice(0, 10).map((p: any) => ({
+    source: "openfoodfacts", data_type: "food_product", geo_scope: p.countries_tags?.[0] || "global",
+    payload: { name: p.product_name, brands: p.brands, categories: p.categories, countries: p.countries, nutriscore: p.nutriscore_grade },
+    tags: ["food", "consumer", "fmcg"],
+  }));
+}
+
+/** EventBrite-like — via Predicthq for event signals */
+async function collectEventSignals(): Promise<any[]> {
+  const rows: any[] = [];
+  // Use Google calendar of public holidays & events via open calendar feeds
+  const xml = await safeTextFetch("https://www.officeholidays.com/ics-clean/kenya", 6000);
+  if (xml) {
+    const events = xml.split("BEGIN:VEVENT").slice(1, 10);
+    for (const ev of events) {
+      const summary = ev.match(/SUMMARY:(.*?)(?:\r?\n)/)?.[1] || "";
+      const dtstart = ev.match(/DTSTART.*?:(.*?)(?:\r?\n)/)?.[1] || "";
+      if (summary) {
+        rows.push({ source: "public-holidays", data_type: "event_signal", geo_scope: "KE", payload: { event: summary, date: dtstart, country: "Kenya" }, tags: ["events", "holidays", "kenya"] });
+      }
+    }
+  }
+  return rows;
+}
+
 async function collectSentiment(): Promise<any[]> {
   const rows: any[] = [];
   const [fng, gdeltTone] = await Promise.all([
@@ -961,14 +1148,16 @@ serve(async (req) => {
     // Wave 0: Global Tier-1 news RSS (BBC, CNN, Al Jazeera, Reuters, etc.)
     const [globalRSS] = await Promise.all([collectGlobalNewsRSS()]);
 
-    // Wave 1: Fast financial data
-    const [crypto, forex, sentiment] = await Promise.all([
+    // Wave 1: Fast financial data + new enrichment APIs
+    const [crypto, forex, sentiment, alphaVantage, fred, cryptoTrending, metalPrices] = await Promise.all([
       collectCrypto(), collectForex(), collectSentiment(),
+      collectAlphaVantage(), collectFRED(), collectCryptoTrending(), collectMetalPrices(),
     ]);
 
-    // Wave 2: Global news + macro signals
-    const [globalTopicNews, hackerNews, devTo, github, twitterSignals] = await Promise.all([
+    // Wave 2: Global news + macro signals + new sources
+    const [globalTopicNews, hackerNews, devTo, github, twitterSignals, githubTrending, productHunt, foodTrends] = await Promise.all([
       collectGlobalTopicNews(), collectHackerNews(), collectDevTo(), collectGitHub(), collectTwitter(),
+      collectGitHubTrending(), collectProductHunt(), collectFoodTrends(),
     ]);
 
     // Wave 3: Industry-specific data (THE BIG ONE — 30 industries × multiple platforms)
@@ -987,18 +1176,20 @@ serve(async (req) => {
       collectCountryNews(), collectCountryReddit(), collectYouTube(),
     ]);
 
-    // Wave 7: Economic indicators
-    const [worldbank] = await Promise.all([collectWorldBank()]);
+    // Wave 7: Economic indicators + new data sources
+    const [worldbank, uncomtrade, imf, weatherAg, eventSignals] = await Promise.all([
+      collectWorldBank(), collectUNComtrade(), collectIMF(), collectWeatherAg(), collectEventSignals(),
+    ]);
 
     const allRows = [
       ...globalRSS,
-      ...crypto, ...forex, ...sentiment,
-      ...globalTopicNews, ...hackerNews, ...devTo, ...github, ...twitterSignals,
+      ...crypto, ...forex, ...sentiment, ...alphaVantage, ...fred, ...cryptoTrending, ...metalPrices,
+      ...globalTopicNews, ...hackerNews, ...devTo, ...github, ...twitterSignals, ...githubTrending, ...productHunt, ...foodTrends,
       ...industryGDELT, ...industryYT, ...industryReddit,
       ...industryNews,
       ...industryTwitter,
       ...countryNews, ...countryReddit, ...youtubeSignals,
-      ...worldbank,
+      ...worldbank, ...uncomtrade, ...imf, ...weatherAg, ...eventSignals,
     ];
 
     let inserted = 0;
@@ -1020,9 +1211,11 @@ serve(async (req) => {
       globalRSS_sources: GLOBAL_NEWS_RSS.length,
       globalRSS_feeds: GLOBAL_NEWS_RSS.reduce((s, r) => s + r.feeds.length, 0),
       crypto: crypto.length, forex: forex.length, sentiment: sentiment.length,
+      alphavantage: alphaVantage.length, fred: fred.length, cryptoTrending: cryptoTrending.length, metalPrices: metalPrices.length,
       globalTopicNews: globalTopicNews.length,
       hackerNews: hackerNews.length, devTo: devTo.length, github: github.length,
       twitter_macro: twitterSignals.length,
+      githubTrending: githubTrending.length, productHunt: productHunt.length, foodTrends: foodTrends.length,
       industry_gdelt: industryGDELT.length,
       industry_youtube: industryYT.length,
       industry_reddit: industryReddit.length,
@@ -1030,6 +1223,7 @@ serve(async (req) => {
       industry_twitter: industryTwitter.length,
       countryNews: countryNews.length, countryReddit: countryReddit.length,
       youtube: youtubeSignals.length, worldbank: worldbank.length,
+      uncomtrade: uncomtrade.length, imf: imf.length, weatherAg: weatherAg.length, eventSignals: eventSignals.length,
       countries_covered: COUNTRIES.length,
       industries_covered: INDUSTRY_SOURCES.length,
       total_industry_subreddits: INDUSTRY_SOURCES.reduce((s, i) => s + i.subreddits.length, 0),

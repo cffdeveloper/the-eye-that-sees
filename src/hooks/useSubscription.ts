@@ -38,7 +38,11 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  const isActive = subscription?.status === "active";
+  // Admin emails bypass all paywalls
+  const ADMIN_EMAILS = ["intelgoldmine@gmail.com"];
+  const isAdmin = ADMIN_EMAILS.includes(user?.email?.toLowerCase() ?? "");
+
+  const isActive = subscription?.status === "active" || isAdmin;
   const isPro = isActive;
 
   const initializePayment = async () => {

@@ -67,6 +67,7 @@ serve(async (req) => {
 
     const tavilyApiKey = Deno.env.get("TAVILY_API_KEY") || undefined;
     const xBearer = Deno.env.get("TWITTER_BEARER_TOKEN") || Deno.env.get("X_BEARER_TOKEN") || undefined;
+    const grokApiKey = Deno.env.get("GROK_API_KEY") || undefined;
 
     const { data: subs, error: subErr } = await sb
       .from("subscriptions")
@@ -110,6 +111,7 @@ serve(async (req) => {
           queries,
           tavilyApiKey,
           xBearer,
+          grokApiKey,
           browseUrls: [
             "https://www.knbs.or.ke/",
             "https://www.worldbank.org/en/country/kenya",
