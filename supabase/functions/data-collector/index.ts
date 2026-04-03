@@ -1148,14 +1148,16 @@ serve(async (req) => {
     // Wave 0: Global Tier-1 news RSS (BBC, CNN, Al Jazeera, Reuters, etc.)
     const [globalRSS] = await Promise.all([collectGlobalNewsRSS()]);
 
-    // Wave 1: Fast financial data
-    const [crypto, forex, sentiment] = await Promise.all([
+    // Wave 1: Fast financial data + new enrichment APIs
+    const [crypto, forex, sentiment, alphaVantage, fred, cryptoTrending, metalPrices] = await Promise.all([
       collectCrypto(), collectForex(), collectSentiment(),
+      collectAlphaVantage(), collectFRED(), collectCryptoTrending(), collectMetalPrices(),
     ]);
 
-    // Wave 2: Global news + macro signals
-    const [globalTopicNews, hackerNews, devTo, github, twitterSignals] = await Promise.all([
+    // Wave 2: Global news + macro signals + new sources
+    const [globalTopicNews, hackerNews, devTo, github, twitterSignals, githubTrending, productHunt, foodTrends] = await Promise.all([
       collectGlobalTopicNews(), collectHackerNews(), collectDevTo(), collectGitHub(), collectTwitter(),
+      collectGitHubTrending(), collectProductHunt(), collectFoodTrends(),
     ]);
 
     // Wave 3: Industry-specific data (THE BIG ONE — 30 industries × multiple platforms)
@@ -1174,18 +1176,20 @@ serve(async (req) => {
       collectCountryNews(), collectCountryReddit(), collectYouTube(),
     ]);
 
-    // Wave 7: Economic indicators
-    const [worldbank] = await Promise.all([collectWorldBank()]);
+    // Wave 7: Economic indicators + new data sources
+    const [worldbank, uncomtrade, imf, weatherAg, eventSignals] = await Promise.all([
+      collectWorldBank(), collectUNComtrade(), collectIMF(), collectWeatherAg(), collectEventSignals(),
+    ]);
 
     const allRows = [
       ...globalRSS,
-      ...crypto, ...forex, ...sentiment,
-      ...globalTopicNews, ...hackerNews, ...devTo, ...github, ...twitterSignals,
+      ...crypto, ...forex, ...sentiment, ...alphaVantage, ...fred, ...cryptoTrending, ...metalPrices,
+      ...globalTopicNews, ...hackerNews, ...devTo, ...github, ...twitterSignals, ...githubTrending, ...productHunt, ...foodTrends,
       ...industryGDELT, ...industryYT, ...industryReddit,
       ...industryNews,
       ...industryTwitter,
       ...countryNews, ...countryReddit, ...youtubeSignals,
-      ...worldbank,
+      ...worldbank, ...uncomtrade, ...imf, ...weatherAg, ...eventSignals,
     ];
 
     let inserted = 0;
