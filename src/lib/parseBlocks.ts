@@ -40,7 +40,7 @@ function parseLooseFrameworkObject(content: string): StructuredBlock | null {
             : undefined,
       };
     })
-    .filter((x): x is { label: string; color: string; items: string[]; status?: string } => Boolean(x?.label));
+    .filter((x): x is { label: string; color: string; items: string[]; status: string } => Boolean(x?.label));
 
   if (sections.length === 0) return null;
   return {

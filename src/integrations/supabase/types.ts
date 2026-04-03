@@ -212,71 +212,40 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      memory_embeddings: {
         Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          display_name: string | null
-          experience_level: string | null
-          full_name: string | null
-          goals: string[] | null
+          content_hash: string
+          created_at: string
+          embedding: string
           id: string
-          industries_of_interest: string[] | null
-          max_startup_capital_usd: number | null
-          onboarding_completed: boolean | null
-          organization: string | null
-          preferred_regions: string[] | null
-          primary_market: string | null
-          proactive_monitoring: string | null
-          prefers_business_that_employs: boolean | null
-          role: string | null
-          title: string | null
-          updated_at: string | null
+          user_id: string
+          user_memory_id: string | null
         }
         Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          experience_level?: string | null
-          full_name?: string | null
-          goals?: string[] | null
-          id: string
-          industries_of_interest?: string[] | null
-          max_startup_capital_usd?: number | null
-          onboarding_completed?: boolean | null
-          organization?: string | null
-          preferred_regions?: string[] | null
-          primary_market?: string | null
-          proactive_monitoring?: string | null
-          prefers_business_that_employs?: boolean | null
-          role?: string | null
-          title?: string | null
-          updated_at?: string | null
+          content_hash: string
+          created_at?: string
+          embedding: string
+          id?: string
+          user_id: string
+          user_memory_id?: string | null
         }
         Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          experience_level?: string | null
-          full_name?: string | null
-          goals?: string[] | null
+          content_hash?: string
+          created_at?: string
+          embedding?: string
           id?: string
-          industries_of_interest?: string[] | null
-          max_startup_capital_usd?: number | null
-          onboarding_completed?: boolean | null
-          organization?: string | null
-          preferred_regions?: string[] | null
-          primary_market?: string | null
-          proactive_monitoring?: string | null
-          prefers_business_that_employs?: boolean | null
-          role?: string | null
-          title?: string | null
-          updated_at?: string | null
+          user_id?: string
+          user_memory_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "memory_embeddings_user_memory_id_fkey"
+            columns: ["user_memory_id"]
+            isOneToOne: false
+            referencedRelation: "user_memory"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proactive_gaps: {
         Row: {
@@ -308,6 +277,90 @@ export type Database = {
           search_evidence?: Json
           user_context_snapshot?: Json
           user_id?: string
+        }
+        Relationships: []
+      }
+      proactive_search_cache: {
+        Row: {
+          cache_key: string
+          expires_at: string
+          payload: Json
+        }
+        Insert: {
+          cache_key: string
+          expires_at: string
+          payload: Json
+        }
+        Update: {
+          cache_key?: string
+          expires_at?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          experience_level: string | null
+          full_name: string | null
+          goals: string[] | null
+          id: string
+          industries_of_interest: string[] | null
+          max_startup_capital_usd: number
+          onboarding_completed: boolean | null
+          organization: string | null
+          preferred_regions: string[] | null
+          prefers_business_that_employs: boolean
+          primary_market: string
+          proactive_monitoring: string
+          role: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          goals?: string[] | null
+          id: string
+          industries_of_interest?: string[] | null
+          max_startup_capital_usd?: number
+          onboarding_completed?: boolean | null
+          organization?: string | null
+          preferred_regions?: string[] | null
+          prefers_business_that_employs?: boolean
+          primary_market?: string
+          proactive_monitoring?: string
+          role?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          goals?: string[] | null
+          id?: string
+          industries_of_interest?: string[] | null
+          max_startup_capital_usd?: number
+          onboarding_completed?: boolean | null
+          organization?: string | null
+          preferred_regions?: string[] | null
+          prefers_business_that_employs?: boolean
+          primary_market?: string
+          proactive_monitoring?: string
+          role?: string | null
+          title?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -419,6 +472,33 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           session_id?: string
+        }
+        Relationships: []
+      }
+      user_memory: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          user_id?: string
         }
         Relationships: []
       }
