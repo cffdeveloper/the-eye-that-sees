@@ -35,7 +35,7 @@ export async function requireAuthUser(req: Request, anonKey: string, supabaseUrl
 }
 
 export async function debitCreditsOrResponse(
-  sb: SupabaseClient,
+  sb: any,
   userId: string,
   amountUsd: number,
   reason: string,
