@@ -10,6 +10,8 @@
  *   • YouTube — industry-specific channels
  *   • Specialized APIs — CoinGecko, forex, World Bank, etc.
  *   • Hacker News, Dev.to, GitHub — tech signals
+ *   • Semantic Scholar — per-industry paper search (official API; optional API key)
+ *   • arXiv — recent preprints (macro queries; respects 3s polite delay between calls)
  *
  * Each sub-flow's keywords are queried across ALL source platforms, giving
  * 20-100+ unique data source combinations per sub-category.
@@ -532,6 +534,122 @@ async function collectGlobalNewsRSS(): Promise<any[]> {
     });
     const results = await Promise.all(promises);
     rows.push(...results.flat());
+  }
+  return rows;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ACADEMIC / RESEARCH (Semantic Scholar + arXiv) — complements news/GDELT
+// ═══════════════════════════════════════════════════════════════════
+
+const SEMANTIC_SCHOLAR_FIELDS =
+  "paperId,title,year,citationCount,url,abstract,venue,publicationDate,externalIds,openAccessPdf,authors";
+
+/** Every other industry (~15 calls) to stay within Edge Function time limits; optional SEMANTIC_SCHOLAR_API_KEY for higher rate limits. */
+async function collectSemanticScholar(): Promise<any[]> {
+  const apiKey = Deno.env.get("SEMANTIC_SCHOLAR_API_KEY");
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (apiKey) headers["x-api-key"] = apiKey;
+
+  const rows: any[] = [];
+  const delayMs = apiKey ? 60 : 320;
+
+  for (let idx = 0; idx < INDUSTRY_SOURCES.length; idx++) {
+    if (idx % 2 !== 0) continue;
+    const ind = INDUSTRY_SOURCES[idx];
+    const rawQ = (ind.googleQueries[0] || ind.slug.replace(/-/g, " ")).replace(/\+/g, " ").trim();
+    const q = encodeURIComponent(rawQ.slice(0, 220));
+    const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${q}&limit=3&fields=${SEMANTIC_SCHOLAR_FIELDS}`;
+    const data = await safeFetchWithHeaders(url, headers, 20000);
+    if (!data?.data) {
+      await new Promise((r) => setTimeout(r, delayMs));
+      continue;
+    }
+    if (typeof data.error === "string" || (data.message && String(data.message).toLowerCase().includes("limit"))) {
+      console.warn("Semantic Scholar rate or error:", data.error || data.message);
+      break;
+    }
+    for (const p of data.data) {
+      const authorStr = Array.isArray(p.authors)
+        ? p.authors
+            .slice(0, 5)
+            .map((a: { name?: string }) => a?.name)
+            .filter(Boolean)
+            .join(", ")
+        : "";
+      rows.push({
+        source: `semantic-scholar-${ind.slug}`,
+        data_type: "academic_paper",
+        geo_scope: "global",
+        industry: ind.slug,
+        payload: {
+          title: p.title,
+          abstract: (p.abstract || "").slice(0, 900),
+          year: p.year,
+          citation_count: p.citationCount,
+          venue: p.venue,
+          url: p.url || (p.paperId ? `https://www.semanticscholar.org/paper/${p.paperId}` : ""),
+          publication_date: p.publicationDate,
+          doi: p.externalIds?.DOI,
+          arxiv_id: p.externalIds?.ArXiv,
+          open_access_pdf: p.openAccessPdf?.url ?? null,
+          semantic_scholar_id: p.paperId,
+          authors: authorStr,
+        },
+        tags: ["academic", "semantic_scholar", "research", ind.slug],
+      });
+    }
+    await new Promise((r) => setTimeout(r, delayMs));
+  }
+  return rows;
+}
+
+/** arXiv asks for ~3s between requests from the same client. */
+const ARXIV_SEARCH_QUERIES = [
+  'cat:q-fin.* AND all:market',
+  'all:"supply chain" AND all:disruption',
+  'cat:econ.GN AND all:development',
+  'cat:cs.LG AND all:"large language model"',
+  'cat:q-bio.* AND all:clinical',
+];
+
+async function collectArxivRecent(): Promise<any[]> {
+  const rows: any[] = [];
+  for (const searchQuery of ARXIV_SEARCH_QUERIES) {
+    const url =
+      `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(searchQuery)}&max_results=3&sortBy=submittedDate&sortOrder=descending`;
+    const xml = await safeTextFetch(url, 18000);
+    if (xml) {
+      const entries = xml.split("<entry>").slice(1);
+      for (const ent of entries) {
+        const title = ent
+          .match(/<title>\s*([\s\S]*?)\s*<\/title>/)?.[1]
+          ?.replace(/\s+/g, " ")
+          .trim();
+        const id = ent.match(/<id>([^<]+)<\/id>/)?.[1];
+        const published = ent.match(/<published>([^<]+)<\/published>/)?.[1];
+        const summary = ent
+          .match(/<summary>\s*([\s\S]*?)\s*<\/summary>/)?.[1]
+          ?.replace(/\s+/g, " ")
+          .trim();
+        if (title && id) {
+          rows.push({
+            source: "arxiv",
+            data_type: "academic_paper",
+            geo_scope: "global",
+            payload: {
+              title,
+              url: id,
+              published,
+              abstract: (summary || "").slice(0, 700),
+              arxiv_search: searchQuery,
+            },
+            tags: ["academic", "arxiv", "preprint", "research"],
+          });
+        }
+      }
+    }
+    await new Promise((r) => setTimeout(r, 3100));
   }
   return rows;
 }
@@ -1181,6 +1299,12 @@ serve(async (req) => {
       collectWorldBank(), collectUNComtrade(), collectIMF(), collectWeatherAg(), collectEventSignals(),
     ]);
 
+    // Wave 8: Academic research (Semantic Scholar by industry + arXiv macro feeds)
+    const [semanticScholar, arxivPapers] = await Promise.all([
+      collectSemanticScholar(),
+      collectArxivRecent(),
+    ]);
+
     const allRows = [
       ...globalRSS,
       ...crypto, ...forex, ...sentiment, ...alphaVantage, ...fred, ...cryptoTrending, ...metalPrices,
@@ -1190,6 +1314,8 @@ serve(async (req) => {
       ...industryTwitter,
       ...countryNews, ...countryReddit, ...youtubeSignals,
       ...worldbank, ...uncomtrade, ...imf, ...weatherAg, ...eventSignals,
+      ...semanticScholar,
+      ...arxivPapers,
     ];
 
     let inserted = 0;
@@ -1224,6 +1350,8 @@ serve(async (req) => {
       countryNews: countryNews.length, countryReddit: countryReddit.length,
       youtube: youtubeSignals.length, worldbank: worldbank.length,
       uncomtrade: uncomtrade.length, imf: imf.length, weatherAg: weatherAg.length, eventSignals: eventSignals.length,
+      semantic_scholar: semanticScholar.length,
+      arxiv: arxivPapers.length,
       countries_covered: COUNTRIES.length,
       industries_covered: INDUSTRY_SOURCES.length,
       total_industry_subreddits: INDUSTRY_SOURCES.reduce((s, i) => s + i.subreddits.length, 0),

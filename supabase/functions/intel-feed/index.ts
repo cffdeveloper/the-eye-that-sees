@@ -167,7 +167,7 @@ async function fetchVCSignals(sb: any): Promise<any[]> {
   const { data: dbInsights } = await sb
     .from("raw_market_data")
     .select("payload, tags, source")
-    .or("data_type.eq.social_signal,data_type.eq.news_signal")
+    .or("data_type.eq.social_signal,data_type.eq.news_signal,data_type.eq.academic_paper")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -194,10 +194,10 @@ async function fetchMarketSignals(sb: any): Promise<any[]> {
       "https://api.gdeltproject.org/api/v2/doc/doc?query=stock+market+OR+IPO+OR+acquisition+OR+merger+OR+earnings&mode=ArtList&maxrecords=20&format=json&sort=DateDesc"
     ),
     sb.from("raw_market_data")
-      .select("payload, source, geo_scope, created_at")
-      .eq("data_type", "news_signal")
+      .select("payload, source, geo_scope, created_at, data_type")
+      .in("data_type", ["news_signal", "academic_paper"])
       .order("created_at", { ascending: false })
-      .limit(30),
+      .limit(35),
   ]);
 
   const signals: any[] = [];
@@ -220,16 +220,17 @@ async function fetchMarketSignals(sb: any): Promise<any[]> {
 
   // DB-collected signals (from data-collector)
   if (dbNews?.data) {
-    for (const row of dbNews.data.slice(0, 10)) {
+    for (const row of dbNews.data.slice(0, 12)) {
       const p = row.payload as any;
       if (!p?.title) continue;
+      const isPaper = row.data_type === "academic_paper";
       signals.push({
         source: p.source || row.source || "collected",
         title: p.title,
         url: p.url || "",
-        date: p.date || row.created_at,
+        date: p.date || p.published || p.publication_date || row.created_at,
         country: row.geo_scope || "",
-        type: "market_signal",
+        type: isPaper ? "research_paper" : "market_signal",
         live: false,
       });
     }

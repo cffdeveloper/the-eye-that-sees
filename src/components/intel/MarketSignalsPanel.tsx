@@ -25,8 +25,11 @@ export function MarketSignalsPanel({ data }: { data: MarketSignal[] }) {
                 <p className="text-[11px] text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                   {s.title}
                 </p>
-                <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex flex-wrap items-center gap-2 mt-0.5">
                   <span className="text-[9px] text-muted-foreground">{s.source}</span>
+                  {s.type === "research_paper" && (
+                    <span className="text-[8px] font-semibold uppercase tracking-wide text-primary/90">Research</span>
+                  )}
                   {s.country && <span className="text-[9px] text-muted-foreground/60">{s.country}</span>}
                 </div>
               </div>

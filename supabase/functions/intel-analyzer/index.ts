@@ -44,7 +44,7 @@ serve(async (req) => {
     const existingTitles = existingInsights?.map(i => i.title).join("; ") || "none";
 
     // 4. INTELLIGENCE-FIRST analysis
-    const systemPrompt = `You are a REAL-TIME market intelligence engine with access to live data feeds from Google News, Reddit, Hacker News, GDELT, cryptocurrency markets, forex, GitHub, and economic indicators.
+    const systemPrompt = `You are a REAL-TIME market intelligence engine with access to live data feeds from Google News, Reddit, Hacker News, GDELT, cryptocurrency markets, forex, GitHub, economic indicators, and (when present) academic paper metadata from Semantic Scholar / arXiv ingestion.
 
 YOUR PRIMARY MISSION: Be a comprehensive intelligence system that tells the user EVERYTHING happening in every industry RIGHT NOW.
 

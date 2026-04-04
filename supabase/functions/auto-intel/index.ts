@@ -242,7 +242,13 @@ async function generateReport(
 
   const signalSummary = (rawSignals || []).map((r: any) => {
     const p = r.payload;
-    return `[${r.source} ${r.geo_scope}] ${p.title || p.text || JSON.stringify(p).slice(0, 150)}`;
+    const head = `[${r.source} ${r.geo_scope}]`;
+    if (p?.title && (p.abstract || p.citation_count != null || p.doi || p.arxiv_id)) {
+      const cite = p.citation_count != null ? ` [citations: ${p.citation_count}]` : "";
+      const ab = p.abstract ? ` — ${String(p.abstract).slice(0, 160)}` : "";
+      return `${head}${cite} ${p.title}${ab}`;
+    }
+    return `${head} ${p.title || p.text || JSON.stringify(p).slice(0, 150)}`;
   }).join("\n");
 
   const insightSummary = (recentInsights || []).map((i: any) =>
