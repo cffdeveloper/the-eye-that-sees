@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { RoutePageViewTracker } from "@/components/layout/RoutePageViewTracker";
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -38,6 +39,7 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <RoutePageViewTracker />
       <TopBar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen((o) => !o)} />
       <div className="relative flex min-h-0 flex-1">
         {!isDesktop && sidebarOpen && (

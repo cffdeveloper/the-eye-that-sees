@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { recentInsightCutoffIso, recencyAnchoringUserLine, temporalIntelRules } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,10 +18,11 @@ serve(async (req) => {
 
     const sb = createClient(supabaseUrl, serviceKey);
 
-    // 1. Get recent insights and matches that need enrichment
+    const insightSince = recentInsightCutoffIso(90);
     const { data: recentInsights } = await sb.from("intel_insights")
       .select("*")
       .eq("still_relevant", true)
+      .gte("created_at", insightSince)
       .order("created_at", { ascending: false })
       .limit(30);
 
@@ -54,7 +55,9 @@ Return JSON:
 
 ${temporalIntelRules()}`;
 
-    const userPrompt = `EXISTING INSIGHTS:\n${JSON.stringify(recentInsights?.slice(0, 20))}\n\nOPEN MATCHES:\n${JSON.stringify(recentMatches)}\n\nFind deeper connections, create action plans, and identify stale insights. Every new insight MUST have dollar values.`;
+    const userPrompt = `${recencyAnchoringUserLine()}
+
+EXISTING INSIGHTS (last ~90 days):\n${JSON.stringify(recentInsights?.slice(0, 20))}\n\nOPEN MATCHES:\n${JSON.stringify(recentMatches)}\n\nFind deeper connections, create action plans, and identify stale insights. Every new insight MUST have dollar values.`;
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -4,7 +4,7 @@
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { recentInsightCutoffIso, recencyAnchoringUserLine, temporalIntelRules } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -222,17 +222,21 @@ async function generateReport(
     if (age < 30 * 60 * 1000) return; // Skip if < 30min old
   }
 
-  // Fetch recent raw signals from DB for this industry
+  const signalSince = recentInsightCutoffIso(14);
+  const insightSince = recentInsightCutoffIso(45);
+
+  // Prefer fresh raw signals so cached snapshots don't drift to 2023–2024 filler when DB has old rows
   const { data: rawSignals } = await sb.from("raw_market_data")
     .select("payload, source, created_at, geo_scope")
+    .gte("created_at", signalSince)
     .or(`industry.eq.${industryName},tags.cs.{${keywords.slice(0, 3).join(",")}}`)
     .order("created_at", { ascending: false })
     .limit(50);
 
-  // Fetch recent insights
   const { data: recentInsights } = await sb.from("intel_insights")
     .select("title, detail, insight_type, urgency, tags, created_at")
     .eq("source_industry", industryName)
+    .gte("created_at", insightSince)
     .order("created_at", { ascending: false })
     .limit(20);
 
@@ -260,7 +264,21 @@ async function generateReport(
           },
           {
             role: "user",
-            content: `Generate a comprehensive intelligence report for ${scope}.\n\nRecent raw signals:\n${signalSummary || "No recent signals available"}\n\nRecent insights:\n${insightSummary || "No recent insights"}\n\nKeywords: ${keywords.join(", ")}\n\nReturn JSON:\n{"summary":"250-word executive summary emphasizing forward view + gaps (not old election-cycle filler)","analysis":"500-word analysis: trajectory, scenarios, risks, opportunities — historical only as labeled context","key_players":[{"name":"...","role":"...","recent_activity":"...","outlook":"..."}],"gaps":[{"title":"...","detail":"...","estimated_value":"...","urgency":"critical|high|medium"}],"alerts":[{"title":"...","severity":"critical|warning|info","detail":"...","affected_players":["..."]}],"connections":[{"from_sector":"...","to_sector":"...","mechanism":"...","strength":"strong|moderate|weak"}],"news_highlights":[{"headline":"...","source":"...","impact":"...","date":"..."}],"live_data":{"market_size":"...","growth_rate":"...","key_metrics":{}},"outlook":{"short_term":"...","medium_term":"...","long_term":"..."}}`
+            content: `${recencyAnchoringUserLine()}
+
+Generate a comprehensive intelligence report for ${scope}.
+Weight raw signals and insights from the last ~45 days highest; older material in the prompt should not dominate the narrative — anchor outlook to the current calendar year.
+
+Recent raw signals (last ~14 days when available):
+${signalSummary || "No recent signals in window — still produce a forward-looking snapshot aligned to current year; avoid defaulting to outdated training-year examples."}
+
+Recent insights (last ~45 days):
+${insightSummary || "No recent insights in window."}
+
+Keywords: ${keywords.join(", ")}
+
+Return JSON:
+{"summary":"250-word executive summary emphasizing forward view + gaps (not old election-cycle filler)","analysis":"500-word analysis: trajectory, scenarios, risks, opportunities — historical only as labeled context","key_players":[{"name":"...","role":"...","recent_activity":"...","outlook":"..."}],"gaps":[{"title":"...","detail":"...","estimated_value":"...","urgency":"critical|high|medium"}],"alerts":[{"title":"...","severity":"critical|warning|info","detail":"...","affected_players":["..."]}],"connections":[{"from_sector":"...","to_sector":"...","mechanism":"...","strength":"strong|moderate|weak"}],"news_highlights":[{"headline":"...","source":"...","impact":"...","date":"..."}],"live_data":{"market_size":"...","growth_rate":"...","key_metrics":{}},"outlook":{"short_term":"...","medium_term":"...","long_term":"..."}}`
           }
         ],
       }),

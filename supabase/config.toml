@@ -9,3 +9,7 @@ verify_jwt = false
 
 [functions.proactive-gap-scanner]
 verify_jwt = false
+
+# Admin dashboard API — requires valid user JWT; function also checks email server-side.
+[functions.admin-api]
+verify_jwt = true

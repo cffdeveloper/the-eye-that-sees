@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { recentInsightCutoffIso, recencyAnchoringUserLine, temporalIntelRules } from "../_shared/temporalPrompt.ts";
+
+const CROSS_INSIGHT_CONTEXT_MAX_CHARS = 320;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,14 +34,17 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       if (supabaseUrl && supabaseKey) {
         const sb = createClient(supabaseUrl, supabaseKey);
+        const insightSince = recentInsightCutoffIso(90);
         const { data: pastInsights } = await sb
           .from("intel_insights")
           .select("title, detail, insight_type, source_industry, estimated_value, created_at")
           .eq("still_relevant", true)
+          .gte("created_at", insightSince)
           .order("created_at", { ascending: false })
-          .limit(15);
+          .limit(12);
         if (pastInsights?.length) {
-          historicalContext = `\n\nPRIOR STORED INSIGHTS — REFERENCE ONLY (not current; compare to now):\n${pastInsights.map(i => `- [${i.insight_type}/${i.source_industry}] ${i.title}: ${i.detail} (${i.estimated_value || 'N/A'}, ${i.created_at})`).join("\n")}`;
+          const clip = (s: string) => (s || "").slice(0, CROSS_INSIGHT_CONTEXT_MAX_CHARS);
+          historicalContext = `\n\nPRIOR STORED INSIGHTS (last ~90 days only; REFERENCE ONLY — not current; compare to now):\n${pastInsights.map(i => `- [${i.insight_type}/${i.source_industry}] ${i.title}: ${clip(String(i.detail || ""))} (${i.estimated_value || "N/A"}, ${i.created_at})`).join("\n")}`;
         }
       }
     } catch (e) {
@@ -72,7 +77,9 @@ PRINCIPLES:
 - Every gap/opportunity must be DERIVED from the intelligence, not stated in isolation
 - Reference and evolve previous analyses${historicalContext}`;
 
-    const userPrompt = `Provide COMPREHENSIVE CROSS-INDUSTRY INTELLIGENCE across all 20 industries${!isGlobal ? ` for the ${geoStr} market` : ""}:
+    const userPrompt = `${recencyAnchoringUserLine()}
+
+Provide COMPREHENSIVE CROSS-INDUSTRY INTELLIGENCE across all mapped industries${!isGlobal ? ` for the ${geoStr} market` : ""}:
 
 ${industryList}
 

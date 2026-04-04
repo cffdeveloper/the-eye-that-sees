@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { recencyAnchoringUserLine } from "../_shared/temporalPrompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +17,25 @@ async function safeFetch(url: string, timeout = 8000): Promise<any> {
   } catch {
     return null;
   }
+}
+
+/** Newest first; prefer items under ~20 months old when enough exist (avoids 2022–2023 dominating when GNews returns mixed). */
+function sortNewsByRecency(articles: any[], max: number): any[] {
+  const sorted = [...articles].sort((a, b) => {
+    const ta = Date.parse(a.publishedAt || "") || 0;
+    const tb = Date.parse(b.publishedAt || "") || 0;
+    return tb - ta;
+  });
+  const maxAgeMs = 620 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const fresh = sorted.filter((a) => {
+    if (!a?.publishedAt) return true;
+    const t = Date.parse(a.publishedAt);
+    if (Number.isNaN(t)) return true;
+    return now - t <= maxAgeMs;
+  });
+  const use = fresh.length >= 2 ? fresh : sorted;
+  return use.slice(0, max);
 }
 
 serve(async (req) => {
@@ -60,16 +80,18 @@ serve(async (req) => {
       }
     }
 
+    const rankedGnews = sortNewsByRecency(newsApiResults, limit);
+
     // If we have enough real news, return it
-    if (newsApiResults.length >= 3) {
-      return new Response(JSON.stringify({ articles: newsApiResults, source: "gnews" }), {
+    if (rankedGnews.length >= 3) {
+      return new Response(JSON.stringify({ articles: rankedGnews, source: "gnews" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // Fallback: Use AI to generate current news analysis
     if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ articles: newsApiResults, source: "limited" }), {
+      return new Response(JSON.stringify({ articles: rankedGnews, source: "limited" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -83,14 +105,20 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a news analyst. Generate realistic, current news headlines and summaries based on real industry trends. Return valid JSON only." },
-          { role: "user", content: `Generate ${limit} realistic current news items for these topics: ${keywords.join(", ")}. Return JSON: {"articles": [{"title": "...", "summary": "30-word summary", "source": "realistic source name", "publishedAt": "ISO date within last 48 hours", "category": "business|tech|finance|science"}]}` },
+          {
+            role: "system",
+            content: `You are a news analyst. Generate realistic, current news headlines and summaries aligned to the present period. ${recencyAnchoringUserLine()} Return valid JSON only.`,
+          },
+          {
+            role: "user",
+            content: `Generate ${limit} realistic current news items for these topics: ${keywords.join(", ")}. publishedAt must be ISO-8601 within the last 72 hours of the anchoring date above. Return JSON: {"articles": [{"title": "...", "summary": "30-word summary", "source": "realistic source name", "publishedAt": "ISO date", "category": "business|tech|finance|science"}]}`,
+          },
         ],
       }),
     });
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ articles: newsApiResults, source: "limited" }), {
+      return new Response(JSON.stringify({ articles: rankedGnews, source: "limited" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -105,8 +133,8 @@ serve(async (req) => {
       parsed = { articles: [] };
     }
 
-    // Merge real + AI-generated
-    const combined = [...newsApiResults, ...(parsed.articles || [])].slice(0, limit);
+    // Merge real + AI-generated, then prefer fresher items
+    const combined = sortNewsByRecency([...rankedGnews, ...(parsed.articles || [])], limit);
 
     return new Response(JSON.stringify({ articles: combined, source: "ai-enhanced" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

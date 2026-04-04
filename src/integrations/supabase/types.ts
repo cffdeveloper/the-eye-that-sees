@@ -502,6 +502,126 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          id: string
+          user_id: string
+          path: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          path: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          path?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      api_integrations: {
+        Row: {
+          id: string
+          key_code: string
+          display_name: string
+          description: string | null
+          secret_value: string | null
+          source_file_hint: string | null
+          sort_order: number
+          health_status: string
+          last_health_message: string | null
+          last_checked_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          key_code: string
+          display_name: string
+          description?: string | null
+          secret_value?: string | null
+          source_file_hint?: string | null
+          sort_order?: number
+          health_status?: string
+          last_health_message?: string | null
+          last_checked_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          key_code?: string
+          display_name?: string
+          description?: string | null
+          secret_value?: string | null
+          source_file_hint?: string | null
+          sort_order?: number
+          health_status?: string
+          last_health_message?: string | null
+          last_checked_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_usage_events: {
+        Row: {
+          id: string
+          user_id: string | null
+          edge_function: string
+          tokens_in: number
+          tokens_out: number
+          metadata: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          edge_function?: string
+          tokens_in?: number
+          tokens_out?: number
+          metadata?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          edge_function?: string
+          tokens_in?: number
+          tokens_out?: number
+          metadata?: Json | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      api_health_history: {
+        Row: {
+          id: string
+          integration_id: string
+          status: string
+          message: string | null
+          checked_at: string
+        }
+        Insert: {
+          id?: string
+          integration_id: string
+          status: string
+          message?: string | null
+          checked_at?: string
+        }
+        Update: {
+          id?: string
+          integration_id?: string
+          status?: string
+          message?: string | null
+          checked_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

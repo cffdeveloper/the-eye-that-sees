@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { PanelLeftClose, PanelLeft, LogOut, Layers } from "lucide-react";
+import { PanelLeftClose, PanelLeft, LogOut, Layers, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { GeoSelector } from "@/components/intel/GeoSelector";
 import { useGeoContext } from "@/contexts/GeoContext";
@@ -20,6 +20,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import { getGeoNavLabel } from "@/lib/geoData";
 import { deskNavLabel } from "@/lib/profileDisplayName";
+import { isAdminEmail } from "@/lib/adminConstants";
 
 export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
   const { isGlobal, geoString, selections } = useGeoContext();
@@ -88,6 +89,18 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
             </Link>
           );
         })}
+        {isAdminEmail(user?.email) && (
+          <Link
+            to="/admin"
+            className={cn(
+              appNavLinkClass(location.pathname.startsWith("/admin"), "header"),
+              "shrink-0 border border-border/50",
+            )}
+          >
+            <Shield className={appNavIconClass(location.pathname.startsWith("/admin"))} />
+            <span className="whitespace-nowrap">Admin</span>
+          </Link>
+        )}
       </nav>
 
       <Sheet open={industriesOpen} onOpenChange={setIndustriesOpen}>

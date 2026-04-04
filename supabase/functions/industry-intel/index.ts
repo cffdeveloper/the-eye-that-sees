@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { recentInsightCutoffIso, recencyAnchoringUserLine, temporalIntelRules } from "../_shared/temporalPrompt.ts";
+
+/** Avoid injecting long old insight text that models echo as "current". */
+const INSIGHT_CONTEXT_MAX_CHARS = 320;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,15 +33,18 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       if (supabaseUrl && supabaseKey) {
         const sb = createClient(supabaseUrl, supabaseKey);
+        const insightSince = recentInsightCutoffIso(90);
         const { data: pastInsights } = await sb
           .from("intel_insights")
           .select("title, detail, insight_type, estimated_value, created_at")
           .eq("source_industry", industry)
           .eq("still_relevant", true)
+          .gte("created_at", insightSince)
           .order("created_at", { ascending: false })
-          .limit(10);
+          .limit(8);
         if (pastInsights?.length) {
-          historicalContext = `\n\nPRIOR STORED INSIGHTS — REFERENCE ONLY (do not treat as live news; use to show change vs today):\n${pastInsights.map(i => `- [${i.insight_type}] ${i.title}: ${i.detail} (Value: ${i.estimated_value || 'N/A'}, Date: ${i.created_at})`).join("\n")}`;
+          const clip = (s: string) => (s || "").slice(0, INSIGHT_CONTEXT_MAX_CHARS);
+          historicalContext = `\n\nPRIOR STORED INSIGHTS (last ~90 days only; REFERENCE ONLY — not live news; use for trend vs ${new Date().toISOString().slice(0, 10)}):\n${pastInsights.map(i => `- [${i.insight_type}] ${i.title}: ${clip(String(i.detail || ""))} (Value: ${i.estimated_value || "N/A"}, Date: ${i.created_at})`).join("\n")}`;
         }
       }
     } catch (e) {
@@ -84,7 +90,9 @@ KEY PRINCIPLES:
 COMPLIANCE & ACCURACY: This output is intelligence and research synthesis, NOT personalized investment, legal, tax, or trading advice. Do not present buy/sell/hold as certainties — frame as hypotheses tied to cited facts. Encourage users to verify prices, filings, and regulations independently and to consult licensed professionals before allocating capital. When data may be stale or uncertain, say so.${historicalContext}`;
 
     const userPrompt = detailed
-      ? `Provide COMPREHENSIVE INTELLIGENCE on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market specifically.` : ""} Keywords: ${keywordStr}.
+      ? `${recencyAnchoringUserLine()}
+
+Provide COMPREHENSIVE INTELLIGENCE on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market specifically.` : ""} Keywords: ${keywordStr}.
 
 Return JSON with these exact keys:
 {
@@ -96,7 +104,9 @@ Return JSON with these exact keys:
   "alerts": [{"title": "...", "detail": "...", "level": "critical|high|medium|info"}] (4 time-sensitive alerts),
   "liveData": {"metric_name": value} (8 relevant quantitative metrics${!isGlobal ? ` for ${geoStr}` : ""})
 }`
-      : `Give comprehensive intelligence on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market.` : ""} Keywords: ${keywordStr}.
+      : `${recencyAnchoringUserLine()}
+
+Give comprehensive intelligence on ${scope}.${!isGlobal ? ` Focus on the ${geoStr} market.` : ""} Keywords: ${keywordStr}.
 
 Return JSON:
 {
