@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export type AuthResult =
   | { ok: true; userId: string }
@@ -35,7 +35,7 @@ export async function requireAuthUser(req: Request, anonKey: string, supabaseUrl
 }
 
 export async function debitCreditsOrResponse(
-  sb: SupabaseClient,
+  sb: any,
   userId: string,
   amountUsd: number,
   reason: string,

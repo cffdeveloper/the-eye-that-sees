@@ -1,6 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { creditsFromPayment } from "../_shared/creditsConfig.ts";
-import { creditsFromPayment } from "../_shared/creditsConfig.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -496,8 +496,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
-          credit_balance_usd: number
           created_at: string | null
+          credit_balance_usd: number
           display_name: string | null
           experience_level: string | null
           full_name: string | null
@@ -518,8 +518,8 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
-          credit_balance_usd?: number
           created_at?: string | null
+          credit_balance_usd?: number
           display_name?: string | null
           experience_level?: string | null
           full_name?: string | null
@@ -540,8 +540,8 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
-          credit_balance_usd?: number
           created_at?: string | null
+          credit_balance_usd?: number
           display_name?: string | null
           experience_level?: string | null
           full_name?: string | null
@@ -704,9 +704,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_credit_topup: {
+        Args: {
+          p_amount_paid_usd: number
+          p_credits_granted_usd: number
+          p_paystack_ref: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      consume_user_credits: {
+        Args: { p_amount: number; p_reason: string; p_user_id: string }
+        Returns: Json
+      }
       cron_invoke_edge_function: {
         Args: { function_path: string }
         Returns: undefined
+      }
+      record_donation_event: {
+        Args: {
+          p_amount_paid_usd: number
+          p_paystack_ref: string
+          p_user_id: string
+        }
+        Returns: Json
       }
     }
     Enums: {
