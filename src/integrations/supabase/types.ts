@@ -14,6 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage_events: {
+        Row: {
+          created_at: string
+          edge_function: string
+          id: string
+          metadata: Json | null
+          tokens_in: number
+          tokens_out: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          edge_function?: string
+          id?: string
+          metadata?: Json | null
+          tokens_in?: number
+          tokens_out?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          edge_function?: string
+          id?: string
+          metadata?: Json | null
+          tokens_in?: number
+          tokens_out?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      api_health_history: {
+        Row: {
+          checked_at: string
+          id: string
+          integration_id: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          checked_at?: string
+          id?: string
+          integration_id: string
+          message?: string | null
+          status: string
+        }
+        Update: {
+          checked_at?: string
+          id?: string
+          integration_id?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_health_history_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "api_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_integrations: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string
+          health_status: string
+          id: string
+          key_code: string
+          last_checked_at: string | null
+          last_health_message: string | null
+          secret_value: string | null
+          sort_order: number
+          source_file_hint: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name: string
+          health_status?: string
+          id?: string
+          key_code: string
+          last_checked_at?: string | null
+          last_health_message?: string | null
+          secret_value?: string | null
+          sort_order?: number
+          source_file_hint?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          health_status?: string
+          id?: string
+          key_code?: string
+          last_checked_at?: string | null
+          last_health_message?: string | null
+          secret_value?: string | null
+          sort_order?: number
+          source_file_hint?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       geo_intel_cache: {
         Row: {
           alerts: Json | null
@@ -246,6 +353,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_views: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       proactive_gaps: {
         Row: {
@@ -499,126 +627,6 @@ export type Database = {
           kind?: string
           metadata?: Json
           user_id?: string
-        }
-        Relationships: []
-      }
-      page_views: {
-        Row: {
-          id: string
-          user_id: string
-          path: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          path: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          path?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      api_integrations: {
-        Row: {
-          id: string
-          key_code: string
-          display_name: string
-          description: string | null
-          secret_value: string | null
-          source_file_hint: string | null
-          sort_order: number
-          health_status: string
-          last_health_message: string | null
-          last_checked_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          key_code: string
-          display_name: string
-          description?: string | null
-          secret_value?: string | null
-          source_file_hint?: string | null
-          sort_order?: number
-          health_status?: string
-          last_health_message?: string | null
-          last_checked_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          key_code?: string
-          display_name?: string
-          description?: string | null
-          secret_value?: string | null
-          source_file_hint?: string | null
-          sort_order?: number
-          health_status?: string
-          last_health_message?: string | null
-          last_checked_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      ai_usage_events: {
-        Row: {
-          id: string
-          user_id: string | null
-          edge_function: string
-          tokens_in: number
-          tokens_out: number
-          metadata: Json | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          edge_function?: string
-          tokens_in?: number
-          tokens_out?: number
-          metadata?: Json | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          edge_function?: string
-          tokens_in?: number
-          tokens_out?: number
-          metadata?: Json | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      api_health_history: {
-        Row: {
-          id: string
-          integration_id: string
-          status: string
-          message: string | null
-          checked_at: string
-        }
-        Insert: {
-          id?: string
-          integration_id: string
-          status: string
-          message?: string | null
-          checked_at?: string
-        }
-        Update: {
-          id?: string
-          integration_id?: string
-          status?: string
-          message?: string | null
-          checked_at?: string
         }
         Relationships: []
       }
