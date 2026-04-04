@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { creditsFromPayment } from "../_shared/creditsConfig.ts";
+import { creditsFromPayment } from "../_shared/creditsConfig.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,8 +65,14 @@ Deno.serve(async (req) => {
       data.metadata?.custom_fields?.find((f: any) => f.variable_name === "user_id")?.value ||
       null;
 
+    const getKind = (data: any): string | undefined => {
+      const m = data.metadata;
+      if (m?.kind) return String(m.kind);
+      return m?.custom_fields?.find((f: any) => f.variable_name === "kind")?.value;
+    };
+
     switch (event.event) {
-      // ─── First charge & every recurring charge ───
+      // ─── One-time credits / donations / legacy subscription renewals ───
       case "charge.success": {
         const data = event.data;
         const userId = getUserId(data);
@@ -74,28 +82,84 @@ Deno.serve(async (req) => {
           break;
         }
 
-        const now = new Date();
-        const periodEnd = new Date(now);
-        periodEnd.setDate(periodEnd.getDate() + 30);
+        const ref = data.reference as string;
+        const amountCents = Number(data.amount) || 0;
+        const amountPaidUsd = amountCents / 100;
+        const kind = getKind(data);
 
-        await adminClient.from("subscriptions").upsert(
-          {
-            user_id: userId,
-            paystack_customer_code: data.customer?.customer_code || null,
-            paystack_subscription_code: data.plan_object?.subscription_code || data.reference,
-            paystack_email: data.customer?.email,
-            plan_code: data.plan_object?.plan_code || data.plan || null,
-            status: "active",
-            amount: 3000,
-            currency: "USD",
-            current_period_start: now.toISOString(),
-            current_period_end: periodEnd.toISOString(),
-            updated_at: now.toISOString(),
-          },
-          { onConflict: "user_id" }
-        );
+        if (kind === "donation") {
+          await adminClient.rpc("record_donation_event", {
+            p_user_id: userId,
+            p_paystack_ref: ref,
+            p_amount_paid_usd: amountPaidUsd,
+          });
+          console.log(`✅ Donation recorded for user ${userId}`);
+          break;
+        }
 
-        console.log(`✅ Subscription activated for user ${userId}`);
+        if (kind === "credits") {
+          const granted = creditsFromPayment(amountPaidUsd);
+          await adminClient.rpc("apply_credit_topup", {
+            p_user_id: userId,
+            p_paystack_ref: ref,
+            p_amount_paid_usd: amountPaidUsd,
+            p_credits_granted_usd: granted,
+          });
+          console.log(`✅ Credits top-up for user ${userId}`);
+          break;
+        }
+
+        // Recurring / plan-linked subscription (legacy)
+        if (data.plan_object?.plan_code || data.plan) {
+          const now = new Date();
+          const periodEnd = new Date(now);
+          periodEnd.setDate(periodEnd.getDate() + 30);
+
+          await adminClient.from("subscriptions").upsert(
+            {
+              user_id: userId,
+              paystack_customer_code: data.customer?.customer_code || null,
+              paystack_subscription_code: data.plan_object?.subscription_code || data.reference,
+              paystack_email: data.customer?.email,
+              plan_code: data.plan_object?.plan_code || data.plan || null,
+              status: "active",
+              amount: 3000,
+              currency: "USD",
+              current_period_start: now.toISOString(),
+              current_period_end: periodEnd.toISOString(),
+              updated_at: now.toISOString(),
+            },
+            { onConflict: "user_id" },
+          );
+
+          console.log(`✅ Subscription activated for user ${userId}`);
+          break;
+        }
+
+        if (amountCents === 3000) {
+          const now = new Date();
+          const periodEnd = new Date(now);
+          periodEnd.setDate(periodEnd.getDate() + 30);
+          await adminClient.from("subscriptions").upsert(
+            {
+              user_id: userId,
+              paystack_customer_code: data.customer?.customer_code || null,
+              paystack_subscription_code: ref,
+              paystack_email: data.customer?.email,
+              status: "active",
+              amount: 3000,
+              currency: "USD",
+              current_period_start: now.toISOString(),
+              current_period_end: periodEnd.toISOString(),
+              updated_at: now.toISOString(),
+            },
+            { onConflict: "user_id" },
+          );
+          console.log(`✅ Legacy $30 subscription for user ${userId}`);
+          break;
+        }
+
+        console.log("charge.success: unhandled shape", { kind, amountCents });
         break;
       }
 

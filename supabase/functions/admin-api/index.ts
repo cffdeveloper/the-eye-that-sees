@@ -79,9 +79,10 @@ serve(async (req) => {
     const action = (req.method === "GET" ? new URL(req.url).searchParams.get("action") : body.action) as string;
 
     if (action === "dashboard" || action === "overview") {
-      const [{ count: userCount }, { count: subActive }] = await Promise.all([
+      const [{ count: userCount }, { count: subActive }, { data: billRows }] = await Promise.all([
         sb.from("profiles").select("*", { count: "exact", head: true }),
         sb.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
+        sb.from("billing_events").select("event_type, amount_paid_usd, credits_granted_usd"),
       ]);
 
       const { data: usageSums } = await sb.from("ai_usage_events").select("user_id, tokens_in, tokens_out");
@@ -93,12 +94,40 @@ serve(async (req) => {
         tokenByUser.set(uid, (tokenByUser.get(uid) || 0) + t);
       }
 
+      let creditPurchasesUsd = 0;
+      let creditsGrantedUsd = 0;
+      let donationsUsd = 0;
+      for (const r of billRows || []) {
+        const ap = Number((r as { amount_paid_usd: unknown }).amount_paid_usd) || 0;
+        const cg = Number((r as { credits_granted_usd: unknown }).credits_granted_usd) || 0;
+        const et = String((r as { event_type: string }).event_type);
+        if (et === "credit_purchase") {
+          creditPurchasesUsd += ap;
+          creditsGrantedUsd += cg;
+        } else if (et === "donation") {
+          donationsUsd += ap;
+        }
+      }
+      const impliedMarginUsd = Math.round((creditPurchasesUsd - creditsGrantedUsd) * 10_000) / 10_000;
+      const totalPaidUsd = Math.round((creditPurchasesUsd + donationsUsd) * 10_000) / 10_000;
+
       return json({
         profileCount: userCount ?? 0,
         activeSubscriptions: subActive ?? 0,
         totalTokenUnitsLogged: [...tokenByUser.values()].reduce((a, b) => a + b, 0),
+        billing: {
+          /** Gross USD users paid for credit top-ups (before your margin). */
+          creditPurchasesUsd: Math.round(creditPurchasesUsd * 10_000) / 10_000,
+          /** USD-equivalent credits issued to wallets (≈ 0.65 × paid for purchases). */
+          creditsGrantedUsd: Math.round(creditsGrantedUsd * 10_000) / 10_000,
+          /** Donations only — no credits; reconcile in Paystack. */
+          donationsUsd: Math.round(donationsUsd * 10_000) / 10_000,
+          impliedMarginUsd,
+          /** All successful Paystack charges we recorded (credits + donations). */
+          totalPaidUsd,
+        },
         note:
-          "Token totals come from ai_usage_events when Edge Functions log usage. Enable instrumentation to populate.",
+          "Token totals come from ai_usage_events when Edge Functions log usage. Enable instrumentation to populate. Billing sums come from billing_events (credit purchases vs donations).",
       });
     }
 

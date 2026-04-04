@@ -21,10 +21,19 @@ import { cn } from "@/lib/utils";
 import { useMinimumSkeleton } from "@/hooks/useMinimumSkeleton";
 import { AdminDashboardSkeleton } from "@/components/ui/PageSkeletons";
 
+type BillingOverview = {
+  creditPurchasesUsd: number;
+  creditsGrantedUsd: number;
+  donationsUsd: number;
+  impliedMarginUsd: number;
+  totalPaidUsd: number;
+};
+
 type DashboardOverview = {
   profileCount: number;
   activeSubscriptions: number;
   totalTokenUnitsLogged: number;
+  billing?: BillingOverview;
   note?: string;
 };
 
@@ -203,7 +212,8 @@ export default function AdminPage() {
               <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">Admin</h1>
             </div>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground leading-relaxed">
-              Users, subscriptions, page traffic, API registry, and health checks. Edge Function <code className="text-xs">admin-api</code>{" "}
+              Users, legacy subscriptions, credit/donation totals, page traffic, API registry, and health checks. Edge Function{" "}
+              <code className="text-xs">admin-api</code>{" "}
               enforces access; keep secrets out of client bundles — values here live in Supabase DB and are only loaded over this
               endpoint.
             </p>
@@ -238,7 +248,7 @@ export default function AdminPage() {
               <p className="mt-2 font-display text-3xl font-bold tabular-nums">{overview?.profileCount ?? "—"}</p>
             </div>
             <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Active subscriptions</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Legacy active subs</p>
               <p className="mt-2 font-display text-3xl font-bold tabular-nums text-primary">{overview?.activeSubscriptions ?? "—"}</p>
             </div>
             <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
@@ -246,6 +256,42 @@ export default function AdminPage() {
               <p className="mt-2 font-display text-3xl font-bold tabular-nums">{overview?.totalTokenUnitsLogged ?? 0}</p>
             </div>
           </div>
+
+          {overview?.billing && (
+            <div className="rounded-2xl border border-primary/25 bg-primary/[0.04] p-5 shadow-sm space-y-3">
+              <p className="text-sm font-bold text-foreground">Paystack / credits (reconcile with Lovable AI)</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">Total recorded charges</span> includes credit purchases and donations.
+                <span className="font-medium text-foreground"> Credits issued</span> is what was added to user wallets (~65% of credit purchase
+                gross). The difference on credit purchases is implied platform margin before your AI spend.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-xl border border-border/50 bg-card/80 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Total paid (all)</p>
+                  <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.totalPaidUsd.toLocaleString()}</p>
+                </div>
+                <div className="rounded-xl border border-border/50 bg-card/80 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Credit purchases (gross)</p>
+                  <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.creditPurchasesUsd.toLocaleString()}</p>
+                </div>
+                <div className="rounded-xl border border-border/50 bg-card/80 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Credits issued to wallets</p>
+                  <p className="mt-1 font-display text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+                    ${overview.billing.creditsGrantedUsd.toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/50 bg-card/80 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Donations (no credits)</p>
+                  <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.donationsUsd.toLocaleString()}</p>
+                </div>
+                <div className="rounded-xl border border-border/50 bg-card/80 p-4 sm:col-span-2 lg:col-span-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Implied margin (on credit purchases only)</p>
+                  <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.impliedMarginUsd.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {overview?.note && <p className="text-sm text-muted-foreground leading-relaxed">{overview.note}</p>}
         </TabsContent>
 

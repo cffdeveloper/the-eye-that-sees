@@ -1,6 +1,5 @@
 import { useSubscription } from "@/hooks/useSubscription";
 import { Zap, Lock, ArrowUpRight } from "lucide-react";
-import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
 import { useState } from "react";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { PaymentModal } from "@/components/PaymentModal";
@@ -10,7 +9,7 @@ interface SubscriptionGateProps {
   feature?: string;
 }
 
-/** Wraps premium features — shows upgrade prompt when the user is not on Pro. */
+/** Wraps premium features — shows add-credits prompt when the user has no balance. */
 export function SubscriptionGate({ children, feature }: SubscriptionGateProps) {
   const { isPro, loading } = useSubscription();
 
@@ -26,11 +25,11 @@ export function SubscriptionGate({ children, feature }: SubscriptionGateProps) {
         <div className="text-center p-6 max-w-sm">
           <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-foreground mb-1">
-            Upgrade to Pro
+            AI credits required
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
             {feature ||
-              "This capability is included with Pro. Upgrade for full access across Infinitygap."}
+              "Add credits to run this flow. Credits are spent when you generate AI intel."}
           </p>
           <UpgradeButton size="default" />
         </div>
@@ -46,13 +45,13 @@ export function FullPagePaywall() {
       <div className="text-center p-8 max-w-lg">
         <BrandHexMark size="xl" className="mx-auto mb-6" />
         <h2 className="text-2xl font-bold text-foreground mb-2 font-display">
-          Upgrade to unlock this page
+          Add credits to unlock this page
         </h2>
         <p className="text-base text-muted-foreground mb-8 leading-relaxed">
-          This area is part of the Pro plan. Upgrade for full access to live feeds, cross-industry scans, Infinity Lab, and the rest of the platform.
+          Buy AI credits to use the live feed, cross-industry scans, Infinity Lab, and the rest of the platform. Credits are used when you run AI-powered features.
         </p>
         <UpgradeButton size="default" className="mx-auto" />
-        <p className="text-xs text-muted-foreground mt-4">Cancel anytime · Instant access</p>
+        <p className="text-xs text-muted-foreground mt-4">Minimum purchase $5 · Top up anytime</p>
       </div>
     </div>
   );
@@ -84,7 +83,7 @@ export function UpgradeButton({
         className={`inline-flex items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors ${sizeClasses} ${className}`}
       >
         <ArrowUpRight className={size === "sm" ? "w-3.5 h-3.5" : "w-4 h-4"} />
-        Upgrade — ${SUBSCRIPTION_USD_MONTHLY}/mo
+        Add credits
       </button>
       <PaymentModal open={modalOpen} onOpenChange={setModalOpen} />
     </>
@@ -92,22 +91,22 @@ export function UpgradeButton({
 }
 
 export function SubscriptionBadge() {
-  const { isPro, subscription, loading } = useSubscription();
+  const { isPro, creditBalanceUsd, legacySubActive, loading } = useSubscription();
 
   if (loading) return null;
 
   if (isPro) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25 font-medium">
-        <Zap className="w-3 h-3" />
-        Pro
+      <span className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+        <Zap className="h-3 w-3" />
+        {legacySubActive && creditBalanceUsd < 0.01 ? "Legacy Pro" : `$${creditBalanceUsd.toFixed(2)} credits`}
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-medium">
-      Free
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+      No credits
     </span>
   );
 }

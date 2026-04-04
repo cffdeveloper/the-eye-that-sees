@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { recentInsightCutoffIso, recencyAnchoringUserLine, temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { requireAuthUser, debitCreditsOrResponse } from "../_shared/authUser.ts";
+import { USAGE_COST_USD } from "../_shared/creditsConfig.ts";
 
 /** Avoid injecting long old insight text that models echo as "current". */
 const INSIGHT_CONTEXT_MAX_CHARS = 320;
@@ -16,10 +18,27 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthUser(
+      req,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      Deno.env.get("SUPABASE_URL")!,
+    );
+    if (!auth.ok) return auth.response;
+
     const { industry, subFlow, keywords, detailed, geoContext, geoScopeId: rawGeoScope } = await req.json();
     const geoScopeId = typeof rawGeoScope === "string" && rawGeoScope.trim() ? rawGeoScope.trim() : "global";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const sbAuth = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const paywall = await debitCreditsOrResponse(
+      sbAuth,
+      auth.userId,
+      USAGE_COST_USD.industry_intel,
+      "industry_intel",
+      corsHeaders,
+    );
+    if (paywall) return paywall;
 
     const keywordStr = (keywords || []).slice(0, 8).join(", ");
     const scope = subFlow ? `the "${subFlow}" money flow within the ${industry} industry` : `the ${industry} industry broadly`;

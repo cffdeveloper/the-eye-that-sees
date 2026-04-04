@@ -115,23 +115,23 @@ export function GeoSelector() {
           </button>
         </div>
 
-        {/* Tier strip — correct view for Pro vs free while subscription loads */}
+        {/* Tier strip — credits vs no balance */}
         <div className="shrink-0 border-b border-border/50 px-3 py-2.5 sm:py-2.5">
           {subscriptionLoading ? (
             <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
-              <span>Checking subscription…</span>
+              <span>Checking access…</span>
             </div>
           ) : isPro ? (
             <div className="flex items-center gap-2 text-[11px] font-semibold text-primary">
               <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/15">
                 <BadgeCheck className="h-3.5 w-3.5" />
               </span>
-              <span>Pro — full regional intel & feeds</span>
+              <span>Full intel — credits or legacy access</span>
             </div>
           ) : (
             <p className="text-[11px] leading-snug text-muted-foreground">
-              Free plan — regions still apply to your view.{" "}
+              Regions still apply to your view.{" "}
               <button
                 type="button"
                 className="font-semibold text-primary underline-offset-2 hover:underline"
@@ -140,7 +140,7 @@ export function GeoSelector() {
                   setPaymentOpen(true);
                 }}
               >
-                Upgrade to Pro
+                Add credits
               </button>{" "}
               for news, social intel, and deep analysis.
             </p>

@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { requireAuthUser, debitCreditsOrResponse } from "../_shared/authUser.ts";
+import { USAGE_COST_USD } from "../_shared/creditsConfig.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +31,13 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthUser(
+      req,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      Deno.env.get("SUPABASE_URL")!,
+    );
+    if (!auth.ok) return auth.response;
+
     const body = await req.json().catch(() => ({}));
     const trainingCorpus = String(body.trainingCorpus || "").trim().slice(0, 24_000);
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
@@ -56,6 +66,16 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const sbAuth = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const paywall = await debitCreditsOrResponse(
+      sbAuth,
+      auth.userId,
+      USAGE_COST_USD.alfred_deep_dive,
+      "alfred_deep_dive",
+      corsHeaders,
+    );
+    if (paywall) return paywall;
 
     const system = `You are Infinitygap's opportunity desk in deep-dive mode — produce a long-form, analyst-style brief.
 

@@ -121,6 +121,72 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_events: {
+        Row: {
+          amount_paid_usd: number
+          created_at: string
+          credits_granted_usd: number
+          currency: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          paystack_reference: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid_usd: number
+          created_at?: string
+          credits_granted_usd?: number
+          currency?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          paystack_reference: string
+          user_id: string
+        }
+        Update: {
+          amount_paid_usd?: number
+          created_at?: string
+          credits_granted_usd?: number
+          currency?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          paystack_reference?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_ledger: {
+        Row: {
+          balance_after_usd: number
+          created_at: string
+          delta_usd: number
+          id: string
+          paystack_reference: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          balance_after_usd: number
+          created_at?: string
+          delta_usd: number
+          id?: string
+          paystack_reference?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          balance_after_usd?: number
+          created_at?: string
+          delta_usd?: number
+          id?: string
+          paystack_reference?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       geo_intel_cache: {
         Row: {
           alerts: Json | null
@@ -430,6 +496,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          credit_balance_usd: number
           created_at: string | null
           display_name: string | null
           experience_level: string | null
@@ -451,6 +518,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          credit_balance_usd?: number
           created_at?: string | null
           display_name?: string | null
           experience_level?: string | null
@@ -472,6 +540,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          credit_balance_usd?: number
           created_at?: string | null
           display_name?: string | null
           experience_level?: string | null

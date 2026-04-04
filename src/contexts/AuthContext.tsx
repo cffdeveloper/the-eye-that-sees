@@ -21,6 +21,8 @@ export type Profile = {
   prefers_business_that_employs?: boolean | null;
   proactive_monitoring?: string | null;
   primary_market?: string | null;
+  /** Spendable AI credits (USD-equivalent); synced from DB. */
+  credit_balance_usd?: number | null;
 };
 
 type AuthContextType = {

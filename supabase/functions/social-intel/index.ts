@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireAuthUser, debitCreditsOrResponse } from "../_shared/authUser.ts";
+import { USAGE_COST_USD } from "../_shared/creditsConfig.ts";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GDELT_DOMAIN_BATCHES, RSS_FEEDS_BY_COUNTRY } from "./outlet_feeds.ts";
@@ -465,9 +467,26 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const auth = await requireAuthUser(
+      req,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      Deno.env.get("SUPABASE_URL")!,
+    );
+    if (!auth.ok) return auth.response;
+
     const { industry, subFlow, keywords, geoContext, geoScopeId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const sbAuth = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const paywall = await debitCreditsOrResponse(
+      sbAuth,
+      auth.userId,
+      USAGE_COST_USD.social_intel,
+      "social_intel",
+      corsHeaders,
+    );
+    if (paywall) return paywall;
 
     const countryCodes = resolveCountriesFromScope(geoContext || "global", geoScopeId);
 

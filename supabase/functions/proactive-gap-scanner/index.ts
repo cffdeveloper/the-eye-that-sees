@@ -69,13 +69,17 @@ serve(async (req) => {
     const xBearer = Deno.env.get("TWITTER_BEARER_TOKEN") || Deno.env.get("X_BEARER_TOKEN") || undefined;
     const grokApiKey = Deno.env.get("GROK_API_KEY") || undefined;
 
-    const { data: subs, error: subErr } = await sb
-      .from("subscriptions")
-      .select("user_id, status")
-      .eq("status", "active");
+    const [{ data: subs, error: subErr }, { data: credited, error: credErr }] = await Promise.all([
+      sb.from("subscriptions").select("user_id, status").eq("status", "active"),
+      sb.from("profiles").select("id, credit_balance_usd").gte("credit_balance_usd", 0.005),
+    ]);
 
     if (subErr) throw subErr;
-    const userIds = [...new Set((subs || []).map((s: { user_id: string }) => s.user_id))].slice(0, 12);
+    if (credErr) throw credErr;
+
+    const fromSubs = (subs || []).map((s: { user_id: string }) => s.user_id);
+    const fromCredits = (credited || []).map((p: { id: string }) => p.id);
+    const userIds = [...new Set([...fromSubs, ...fromCredits])].slice(0, 12);
 
     const batchId = `batch_${Date.now()}`;
     const results: { user_id: string; inserted: number }[] = [];

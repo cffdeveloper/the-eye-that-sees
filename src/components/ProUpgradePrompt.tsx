@@ -4,7 +4,7 @@ import { UpgradeButton } from "@/components/SubscriptionGate";
 import { useSubscription } from "@/hooks/useSubscription";
 import { SubscriptionGateSkeleton } from "@/components/ui/PageSkeletons";
 
-/** Shown while subscription tier is loading so we do not flash empty-state copy before upgrade prompts. */
+/** Shown while access state is loading so we do not flash empty-state copy before prompts. */
 export function ProGateLoading({ compact, className }: { compact?: boolean; className?: string }) {
   return (
     <div
@@ -29,7 +29,7 @@ interface ProUpgradePromptProps {
 }
 
 /**
- * Inline upgrade prompt shown inside data cards when user is on free plan.
+ * Inline prompt when the user has no credits (and no legacy access).
  * Use this instead of "No data" / "No gaps detected" messages.
  */
 export function ProUpgradePrompt({ feature, compact, className }: ProUpgradePromptProps) {
@@ -40,11 +40,11 @@ export function ProUpgradePrompt({ feature, compact, className }: ProUpgradeProm
       </div>
       <div>
         <p className={`font-semibold text-foreground ${compact ? "text-xs" : "text-sm"}`}>
-          Full access required
+          Credits required
         </p>
         <p className={`text-muted-foreground mt-0.5 max-w-xs ${compact ? "text-[10px]" : "text-xs"}`}>
           {feature ||
-            "Upgrade to Pro for full access to AI analysis, live data, and advanced workflows."}
+            "Add AI credits for full access to analysis, live data, and advanced workflows."}
         </p>
       </div>
       <UpgradeButton size="sm" />
@@ -53,7 +53,7 @@ export function ProUpgradePrompt({ feature, compact, className }: ProUpgradeProm
 }
 
 /**
- * Hook helper — returns true if the user is on free plan (i.e. should show upgrade prompts).
+ * Hook helper — true when the user has no paid access (no credits / legacy / admin).
  */
 export function useIsFreeUser() {
   const { isPro, loading: subscriptionLoading } = useSubscription();

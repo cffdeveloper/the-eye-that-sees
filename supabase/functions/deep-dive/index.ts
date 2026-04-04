@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { temporalIntelRules } from "../_shared/temporalPrompt.ts";
+import { requireAuthUser, debitCreditsOrResponse } from "../_shared/authUser.ts";
+import { USAGE_COST_USD } from "../_shared/creditsConfig.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,10 +60,27 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireAuthUser(
+      req,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      Deno.env.get("SUPABASE_URL")!,
+    );
+    if (!auth.ok) return auth.response;
+
     const { topic, context, industryName, subFlowName, geoContext, socialIntelContext } = await req.json();
     const isGlobalGeo = !geoContext || geoContext === "global";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const sbAuth = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const paywall = await debitCreditsOrResponse(
+      sbAuth,
+      auth.userId,
+      USAGE_COST_USD.deep_dive,
+      "deep_dive",
+      corsHeaders,
+    );
+    if (paywall) return paywall;
 
     const systemPrompt = `You are Infinitygap, an elite intelligence engine that produces COMPREHENSIVE industry reports worth $100,000. Your reports are intelligence-first: you map the ENTIRE landscape of players, activities, relationships, and money flows BEFORE identifying opportunities.
 

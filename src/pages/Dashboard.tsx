@@ -24,7 +24,7 @@ import { DashboardIntelMap } from "@/components/intel/DashboardIntelMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
+import { MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { cn } from "@/lib/utils";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeButton, SubscriptionBadge } from "@/components/SubscriptionGate";
@@ -47,7 +47,14 @@ const stagger = {
 export default function Dashboard() {
   const { profile } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isPro, verifyPayment, loading: subLoading, subscription } = useSubscription();
+  const {
+    isPro,
+    verifyPayment,
+    loading: subLoading,
+    subscription,
+    creditBalanceUsd,
+    legacySubActive,
+  } = useSubscription();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const { requestNotificationPermission } = useAlertNotifications([], alertsEnabled);
   const [dbStats, setDbStats] = useState({ rawData: 0, insights: 0, matches: 0 });
@@ -89,10 +96,15 @@ export default function Dashboard() {
     if (searchParams.get("payment") === "verify") {
       const ref = localStorage.getItem("paystack_reference");
       if (ref) {
+        const kind = localStorage.getItem("paystack_expected_kind");
         verifyPayment(ref)
           .then((result) => {
             if (result?.verified) {
-              toast.success("Payment successful! Welcome to Pro 🎉");
+              if (kind === "donation") {
+                toast.success("Thank you — your support means a lot.");
+              } else {
+                toast.success("Credits added to your wallet.");
+              }
             } else {
               toast.error("Payment verification failed. Please try again.");
             }
@@ -100,6 +112,7 @@ export default function Dashboard() {
           .catch(() => toast.error("Could not verify payment"))
           .finally(() => {
             localStorage.removeItem("paystack_reference");
+            localStorage.removeItem("paystack_expected_kind");
             setSearchParams({}, { replace: true });
           });
       }
@@ -194,20 +207,20 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Subscription card */}
+          {/* Credits CTA */}
           {!isPro && (
             <div className="w-full lg:w-[300px] shrink-0">
               <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-card to-muted/20 p-6 shadow-sm">
                 <div className="flex items-center gap-2.5 mb-4">
                   <ArrowUpRight className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-bold text-foreground">Upgrade to Pro</span>
+                  <span className="text-sm font-bold text-foreground">AI credits</span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-3">
-                  <span className="font-display text-4xl font-bold tabular-nums text-foreground">${SUBSCRIPTION_USD_MONTHLY}</span>
-                  <span className="text-sm text-muted-foreground font-medium">/mo</span>
+                  <span className="font-display text-4xl font-bold tabular-nums text-foreground">${MIN_CREDIT_PURCHASE_USD}</span>
+                  <span className="text-sm text-muted-foreground font-medium">min</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                  Unlock deep dives, cross-industry analysis, and Infinity Lab.
+                  Buy credits for deep dives, cross-industry analysis, and Infinity Lab. Top up anytime.
                 </p>
                 <div className="flex flex-col gap-2.5">
                   <Button
@@ -230,13 +243,17 @@ export default function Dashboard() {
               <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-6">
                 <div className="flex items-center gap-2.5 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-bold text-foreground">Pro Active</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {legacySubActive && creditBalanceUsd < 0.01 ? "Legacy Pro" : "Credits active"}
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Full access to all features.
+                  {legacySubActive && creditBalanceUsd < 0.01
+                    ? "Full access via your existing subscription."
+                    : `Balance about ${creditBalanceUsd.toFixed(2)} USD in AI credits. Usage deducts from this wallet.`}
                 </p>
-                {subscription?.current_period_end && (
-                  <p className="mt-3 text-xs text-primary font-semibold">
+                {subscription?.current_period_end && legacySubActive && creditBalanceUsd < 0.01 && (
+                  <p className="mt-3 text-xs font-semibold text-primary">
                     Renews {new Date(subscription.current_period_end).toLocaleDateString()}
                   </p>
                 )}

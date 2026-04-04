@@ -1,22 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
-import { BrandHexMark } from "@/components/BrandHexMark";
 import { UpgradeButton } from "@/components/SubscriptionGate";
-import { User, Crown, Mail, Building2, Briefcase, MapPin, Save, Loader2, CreditCard, Shield } from "lucide-react";
+import { User, Zap, Mail, Building2, Briefcase, Save, Loader2, CreditCard, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
+import { CREDIT_PAYOUT_RATIO, formatMoneyUsd, MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
+type LedgerRow = Database["public"]["Tables"]["credit_ledger"]["Row"];
+
 export default function ProfilePage() {
   const { user, profile, refreshProfile } = useAuth();
-  const { isPro, subscription, loading: subLoading } = useSubscription();
+  const { subscription, loading: subLoading, creditBalanceUsd, legacySubActive, refresh } = useSubscription();
   const [saving, setSaving] = useState(false);
+  const [ledger, setLedger] = useState<LedgerRow[]>([]);
+  const [ledgerLoading, setLedgerLoading] = useState(false);
+
+  const loadLedger = useCallback(async () => {
+    if (!user) return;
+    setLedgerLoading(true);
+    const { data, error } = await supabase
+      .from("credit_ledger")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(25);
+    if (error) {
+      console.error(error);
+    } else {
+      setLedger((data as LedgerRow[]) || []);
+    }
+    setLedgerLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    void loadLedger();
+  }, [loadLedger]);
 
   const [form, setForm] = useState({
     display_name: "",
@@ -65,15 +89,11 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  const handleDowngrade = async () => {
-    toast.info("To cancel your subscription, please contact support at support@infinitygap.onrender.com. We'll process your request within 24 hours.");
-  };
-
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-0 sm:space-y-8">
       <div>
         <h1 className="font-display text-xl font-bold text-foreground sm:text-2xl">My Profile</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your account details and subscription</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage your account, AI credits, and profile</p>
       </div>
 
       <PageIntro eyebrow="Personalize Infinitygap" title="Why this page matters">
@@ -101,11 +121,11 @@ export default function ProfilePage() {
         </p>
       </PageIntro>
 
-      {/* Subscription Card */}
+      {/* AI credits wallet */}
       <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
         <div className="mb-6 flex items-center gap-3">
-          <Crown className="h-5 w-5 shrink-0 text-brand-orange" />
-          <h2 className="text-lg font-bold text-foreground">Subscription</h2>
+          <Zap className="h-5 w-5 shrink-0 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">AI credits</h2>
         </div>
 
         {subLoading ? (
@@ -113,76 +133,75 @@ export default function ProfilePage() {
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading…
           </div>
-        ) : isPro ? (
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-                <Crown className="h-3.5 w-3.5" />
-                Pro Plan
-              </span>
-              <span className="text-sm text-muted-foreground">${SUBSCRIPTION_USD_MONTHLY}/month</span>
-            </div>
-            {subscription?.current_period_end && (
-              <p className="text-sm text-muted-foreground">
-                Next billing: {new Date(subscription.current_period_end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-              </p>
-            )}
-            <Button variant="outline" size="sm" onClick={handleDowngrade} className="text-destructive border-destructive/30 hover:bg-destructive/5">
-              Cancel plan
-            </Button>
-          </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full bg-muted text-muted-foreground border border-border font-semibold">
-                Free Plan
-              </span>
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Current balance</p>
+              <p className="mt-1 font-display text-3xl font-bold tabular-nums text-foreground">{formatMoneyUsd(creditBalanceUsd)}</p>
+              {legacySubActive && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  You also have legacy subscription access
+                  {subscription?.current_period_end
+                    ? ` (renews ${new Date(subscription.current_period_end).toLocaleDateString()})`
+                    : ""}
+                  . Credits are used first when you run AI features.
+                </p>
+              )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              Upgrade to Pro for full access to AI intelligence, deep dives, and real-time data across all industries.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Top-ups from {formatMoneyUsd(MIN_CREDIT_PURCHASE_USD)}. Each payment adds about{" "}
+              <span className="font-medium text-foreground">{Math.round(CREDIT_PAYOUT_RATIO * 100)}%</span> of what you pay as spendable
+              credits (USD-equivalent).
             </p>
-            <UpgradeButton size="default" />
+            <div className="flex flex-wrap gap-2">
+              <UpgradeButton size="default" />
+              <Button type="button" variant="outline" size="sm" disabled={ledgerLoading} onClick={() => void refresh().then(() => loadLedger())}>
+                {ledgerLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh balance"}
+              </Button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Billing / Card Management — only for Pro users */}
-      {isPro && (
-        <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <CreditCard className="h-5 w-5 shrink-0 text-primary" />
-            <h2 className="text-lg font-bold text-foreground">Billing & Payment</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Payment method</span>
-                <span className="font-medium text-foreground flex items-center gap-1.5">
-                  <CreditCard className="h-3.5 w-3.5" />
-                  Card on file via Paystack
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Billing email</span>
-                <span className="font-medium text-foreground truncate max-w-[200px]">{user?.email}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Monthly charge</span>
-                <span className="font-bold text-foreground">${SUBSCRIPTION_USD_MONTHLY}.00 USD</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-              <Shield className="h-3.5 w-3.5 shrink-0" />
-              <span>
-                Card details are securely managed by Paystack (PCI-DSS compliant). 
-                To update your card, contact support at support@infinitygap.onrender.com.
-              </span>
-            </div>
-          </div>
+      {/* Recent credit activity */}
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
+        <div className="mb-6 flex items-center gap-3">
+          <CreditCard className="h-5 w-5 shrink-0 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">Credit activity</h2>
         </div>
-      )}
+        {ledgerLoading && ledger.length === 0 ? (
+          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading ledger…
+          </div>
+        ) : ledger.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No entries yet. Purchases and usage will appear here.</p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {ledger.map((row) => (
+              <li
+                key={row.id}
+                className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border border-border/50 bg-muted/20 px-3 py-2"
+              >
+                <span className="text-muted-foreground">
+                  {new Date(row.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                  <span className="mx-1.5 text-border">·</span>
+                  <span className="text-foreground">{row.reason.replace(/_/g, " ")}</span>
+                </span>
+                <span className={row.delta_usd >= 0 ? "font-semibold text-emerald-600 dark:text-emerald-400" : "font-semibold text-foreground"}>
+                  {row.delta_usd >= 0 ? "+" : ""}
+                  {formatMoneyUsd(row.delta_usd)}
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">→ {formatMoneyUsd(row.balance_after_usd)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-4 flex items-start gap-2 text-[11px] text-muted-foreground">
+          <Shield className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>Payments are processed by Paystack. Donations do not add credits.</span>
+        </div>
+      </div>
 
       {/* Profile Details */}
       <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
