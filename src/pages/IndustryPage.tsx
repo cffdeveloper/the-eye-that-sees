@@ -1,6 +1,6 @@
-﻿import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { getIndustryBySlug, subFlowIdToPathSegment } from "@/lib/industryData";
-import { ArrowRight, TrendingUp, Loader2, Users, Handshake, Database, Clock } from "lucide-react";
+import { ArrowRight, TrendingUp, Users, Handshake, Database, Clock } from "lucide-react";
 import { useIndustryIntel } from "@/hooks/useIndustryIntel";
 import { useIndustryNews } from "@/hooks/useIndustryNews";
 import { useSocialIntel } from "@/hooks/useSocialIntel";
@@ -16,13 +16,14 @@ import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { getIndustryIntelCopy } from "@/lib/pageIntelMessages";
+import { IndustryBriefSkeleton } from "@/components/ui/PageSkeletons";
 
 export default function IndustryPage() {
   const { slug } = useParams<{ slug: string }>();
   const industry = slug ? getIndustryBySlug(slug) : undefined;
   const keywords = industry?.subFlows.flatMap(sf => sf.keywords).slice(0, 10) || [];
   const { geoString, geoScopeId, selections } = useGeoContext();
-  const { data, loading } = useIndustryIntel(industry?.name || "", keywords, geoString, geoScopeId);
+  const { data, loading, refreshing } = useIndustryIntel(industry?.name || "", keywords, geoString, geoScopeId);
   const { articles, loading: newsLoading } = useIndustryNews(keywords);
   const { data: socialData, loading: socialLoading } = useSocialIntel(
     industry?.name || "",
@@ -99,6 +100,9 @@ export default function IndustryPage() {
                 Auto-updated {new Date(cachedReport.created_at).toLocaleString()}
               </span>
             )}
+            {refreshing && (data?.analysis || cachedReport?.summary) && (
+              <span className="text-[9px] font-medium text-primary [animation-duration:400ms] animate-pulse">Updating…</span>
+            )}
             <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
           </div>
         </div>
@@ -106,11 +110,8 @@ export default function IndustryPage() {
           <ProGateLoading compact />
         ) : isFree ? (
           <ProUpgradePrompt feature="Upgrade for full access to unlock AI-powered industry analysis and reports." compact />
-        ) : (loading && cacheLoading) ? (
-          <div className="flex items-center gap-2 py-4">
-            <Loader2 className="w-4 h-4 text-primary animate-spin" />
-            <span className="text-xs text-muted-foreground">Analyzing {industry.name} landscape...</span>
-          </div>
+        ) : (loading || cacheLoading) && !(data?.analysis || cachedReport?.summary) ? (
+          <IndustryBriefSkeleton />
         ) : (data?.analysis || cachedReport?.summary) ? (
           <div className="text-xs text-card-foreground leading-relaxed line-clamp-4">
             <BlockMarkdown content={data?.analysis || cachedReport?.summary || ""} />

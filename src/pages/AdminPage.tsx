@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { invokeAdminApi } from "@/lib/adminApi";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,8 +16,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Loader2, RefreshCw, Shield, Trash2, Stethoscope, Plus } from "lucide-react";
+import { RefreshCw, Shield, Trash2, Stethoscope, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMinimumSkeleton } from "@/hooks/useMinimumSkeleton";
+import { AdminDashboardSkeleton } from "@/components/ui/PageSkeletons";
 
 type DashboardOverview = {
   profileCount: number;
@@ -55,6 +56,7 @@ type IntegrationRow = {
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [paths, setPaths] = useState<PathStat[]>([]);
@@ -65,8 +67,13 @@ export default function AdminPage() {
   const [editing, setEditing] = useState<Partial<IntegrationRow> & { secret_value?: string } | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
+  const overviewRef = useRef<DashboardOverview | null>(null);
+  overviewRef.current = overview;
+
+  const loadAll = useCallback(async (opts?: { silent?: boolean }) => {
+    const silent = Boolean(opts?.silent && overviewRef.current);
+    if (silent) setRefreshing(true);
+    else setLoading(true);
     try {
       const [dash, u, pa, integ, hist] = await Promise.all([
         invokeAdminApi<DashboardOverview>({ action: "dashboard" }),
@@ -85,6 +92,7 @@ export default function AdminPage() {
       toast.error(e instanceof Error ? e.message : "Failed to load admin data");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -141,7 +149,7 @@ export default function AdminPage() {
       toast.success("Saved");
       setEditOpen(false);
       setEditing(null);
-      await loadAll();
+      await loadAll({ silent: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Save failed");
     }
@@ -151,7 +159,7 @@ export default function AdminPage() {
     try {
       const r = await invokeAdminApi<{ ok: boolean; message: string }>({ action: "api_health_check", id });
       toast[r.ok ? "success" : "error"](r.message);
-      await loadAll();
+      await loadAll({ silent: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Health check failed");
     }
@@ -163,42 +171,59 @@ export default function AdminPage() {
       await invokeAdminApi({ action: "api_integration_delete", id: deleteId });
       toast.success("Deleted");
       setDeleteId(null);
-      await loadAll();
+      await loadAll({ silent: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Delete failed");
     }
   };
 
-  if (loading && !overview) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
+  const bootstrapping = loading && !overview;
+  const showBootSkeleton = useMinimumSkeleton(bootstrapping);
+
+  if (showBootSkeleton) {
+    return <AdminDashboardSkeleton />;
   }
 
+  /** Viewport minus top bar (~60px), main padding, mobile bottom nav (~4.5rem). Keeps header/tabs fixed; tab body scrolls. */
+  const adminChrome =
+    "h-[calc(100dvh-7.85rem-env(safe-area-inset-bottom,0px))] max-h-[calc(100dvh-7.85rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-5.35rem)] md:max-h-[calc(100dvh-5.35rem)]";
+
   return (
-    <div className="mx-auto max-w-6xl space-y-6 pb-16">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-primary">
-            <Shield className="h-6 w-6" />
-            <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">Admin</h1>
+    <div
+      className={cn(
+        "mx-auto flex max-w-6xl min-h-0 flex-col overflow-hidden",
+        adminChrome,
+      )}
+    >
+      <div className="shrink-0 space-y-3 border-b border-border/40 bg-background pb-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-primary">
+              <Shield className="h-6 w-6 shrink-0" />
+              <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">Admin</h1>
+            </div>
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground leading-relaxed">
+              Users, subscriptions, page traffic, API registry, and health checks. Edge Function <code className="text-xs">admin-api</code>{" "}
+              enforces access; keep secrets out of client bundles — values here live in Supabase DB and are only loaded over this
+              endpoint.
+            </p>
           </div>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground leading-relaxed">
-            Users, subscriptions, page traffic, API registry, and health checks. Edge Function <code className="text-xs">admin-api</code>{" "}
-            enforces access; keep secrets out of client bundles — values here live in Supabase DB and are only loaded over this
-            endpoint.
-          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2 shrink-0"
+            disabled={refreshing}
+            onClick={() => void loadAll({ silent: true })}
+          >
+            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin text-primary")} />
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </Button>
         </div>
-        <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => void loadAll()}>
-          <RefreshCw className="h-4 w-4" />
-          Refresh
-        </Button>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1">
+      <Tabs defaultValue="overview" className="flex min-h-0 flex-1 flex-col gap-0 pt-3">
+        <TabsList className="h-auto shrink-0 flex flex-wrap justify-start gap-1 bg-muted/60 p-1.5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="traffic">Page traffic</TabsTrigger>
@@ -206,7 +231,7 @@ export default function AdminPage() {
           <TabsTrigger value="audit">Health log</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="mt-4 space-y-4">
+        <TabsContent value="overview" className="mt-0 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pt-4 space-y-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Profiles</p>
@@ -224,8 +249,8 @@ export default function AdminPage() {
           {overview?.note && <p className="text-sm text-muted-foreground leading-relaxed">{overview.note}</p>}
         </TabsContent>
 
-        <TabsContent value="users" className="mt-4">
-          <ScrollArea className="h-[min(70vh,560px)] rounded-2xl border border-border/60">
+        <TabsContent value="users" className="mt-0 min-h-0 flex-1 overflow-y-auto overscroll-contain pt-4 pr-1 outline-none">
+          <div className="rounded-2xl border border-border/60">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
@@ -254,14 +279,14 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
-          </ScrollArea>
+          </div>
         </TabsContent>
 
-        <TabsContent value="traffic" className="mt-4">
+        <TabsContent value="traffic" className="mt-0 min-h-0 flex-1 overflow-y-auto overscroll-contain pt-4 pr-1 outline-none">
           <p className="mb-3 text-sm text-muted-foreground">
             Counts from authenticated page views only (see <code className="text-xs">RoutePageViewTracker</code> in layout).
           </p>
-          <ScrollArea className="h-[min(70vh,560px)] rounded-2xl border border-border/60">
+          <div className="rounded-2xl border border-border/60">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
@@ -280,10 +305,10 @@ export default function AdminPage() {
                 ))}
               </tbody>
             </table>
-          </ScrollArea>
+          </div>
         </TabsContent>
 
-        <TabsContent value="apis" className="mt-4 space-y-4">
+        <TabsContent value="apis" className="mt-0 min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pt-4 pr-1 outline-none">
           <div className="flex flex-wrap gap-2">
             <Button type="button" size="sm" className="gap-2" onClick={openNew}>
               <Plus className="h-4 w-4" />
@@ -344,22 +369,37 @@ export default function AdminPage() {
           </p>
         </TabsContent>
 
-        <TabsContent value="audit" className="mt-4">
-          <ScrollArea className="h-[min(70vh,480px)] rounded-2xl border border-border/60 p-3">
-            <ul className="space-y-2 text-xs font-mono">
-              {history.map((h) => (
-                <li key={String(h.id)} className="border-b border-border/30 pb-2">
-                  <span className="text-muted-foreground">{String(h.checked_at)}</span>{" "}
-                  <span className={cn(h.status === "ok" ? "text-emerald-600" : "text-destructive")}>{String(h.status)}</span>{" "}
-                  {String(h.message || "")}
-                </li>
-              ))}
-            </ul>
-          </ScrollArea>
+        <TabsContent value="audit" className="mt-0 min-h-0 flex-1 overflow-y-auto overscroll-contain pt-4 pr-1 outline-none">
+          <p className="mb-3 text-sm text-muted-foreground leading-relaxed">
+            Entries appear after you click <strong className="text-foreground">Test</strong> on an integration under{" "}
+            <strong className="text-foreground">APIs &amp; health</strong>. Until then this list is empty. If it stays empty after
+            testing, confirm the migration <code className="text-xs">20260403120000_admin_dashboard.sql</code> ran and{" "}
+            <code className="text-xs">admin-api</code> is deployed.
+          </p>
+          <div className="rounded-2xl border border-border/60 p-3">
+            {history.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No health checks recorded yet.</p>
+            ) : (
+              <ul className="space-y-2 text-xs font-mono">
+                {history.map((h) => {
+                  const rel = h.api_integrations as { key_code?: string; display_name?: string } | null | undefined;
+                  const label = rel?.display_name || rel?.key_code || String(h.integration_id || "").slice(0, 8);
+                  return (
+                    <li key={String(h.id)} className="border-b border-border/30 pb-2 last:border-0">
+                      <span className="text-muted-foreground">{String(h.checked_at)}</span>{" "}
+                      <span className="font-semibold text-foreground">[{label}]</span>{" "}
+                      <span className={cn(h.status === "ok" ? "text-emerald-600" : "text-destructive")}>{String(h.status)}</span>{" "}
+                      {String(h.message || "")}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 
-      <p className="text-center text-sm">
+      <p className="shrink-0 pt-4 text-center text-sm">
         <Link to="/dashboard" className="text-primary font-medium hover:underline">
           ← Back to dashboard
         </Link>

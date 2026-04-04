@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { Trash2, Bookmark, ChevronRight, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Trash2, Bookmark, ChevronRight, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { FullPagePaywall } from "@/components/SubscriptionGate";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import {
 } from "@/lib/savedIntelStorage";
 import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
 import { cn } from "@/lib/utils";
+import { SavedLibraryListSkeleton } from "@/components/ui/PageSkeletons";
+import { useMinimumSkeleton } from "@/hooks/useMinimumSkeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,11 +46,16 @@ export default function SavedLibraryPage() {
   const { isPro, loading: subLoading } = useSubscription();
   const [items, setItems] = useState<SavedContentRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listRefreshing, setListRefreshing] = useState(false);
   const [selected, setSelected] = useState<SavedContentRecord | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const itemsRef = useRef<SavedContentRecord[]>([]);
+  itemsRef.current = items;
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (opts?: { silent?: boolean }) => {
+    const silent = Boolean(opts?.silent && itemsRef.current.length > 0);
+    if (silent) setListRefreshing(true);
+    else setLoading(true);
     try {
       const list = await listIntelItems();
       setItems(list);
@@ -57,17 +65,21 @@ export default function SavedLibraryPage() {
       });
     } finally {
       setLoading(false);
+      setListRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, [refresh]);
+
+  const showListSkeleton = useMinimumSkeleton(loading);
 
   if (subLoading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4">
+        <SavedLibraryListSkeleton className="w-full max-w-sm" />
+        <p className="text-xs text-muted-foreground">Loading access…</p>
       </div>
     );
   }
@@ -77,10 +89,20 @@ export default function SavedLibraryPage() {
   }
 
   const onDelete = async (id: string) => {
-    await deleteIntelItem(id);
+    const prevItems = items;
+    const prevSelected = selected;
     setDeleteId(null);
+    setItems((cur) => cur.filter((x) => x.id !== id));
     if (selected?.id === id) setSelected(null);
-    await refresh();
+    try {
+      await deleteIntelItem(id);
+      toast.success("Removed from library.");
+    } catch (e) {
+      console.error(e);
+      setItems(prevItems);
+      setSelected(prevSelected);
+      toast.error("Could not delete. Try again.");
+    }
   };
 
   return (
@@ -95,13 +117,22 @@ export default function SavedLibraryPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_1fr]">
         <div className="rounded-2xl border border-border/50 bg-card/50 p-3 shadow-sm">
-          <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Library ({items.length})
-          </p>
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
+          <div className="flex items-center justify-between gap-2 px-2 pb-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Library ({items.length})
+            </p>
+            <button
+              type="button"
+              onClick={() => void refresh({ silent: true })}
+              disabled={loading || listRefreshing}
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-40"
+              title="Refresh list"
+            >
+              <RefreshCw className={cn("h-3.5 w-3.5", listRefreshing && "animate-spin text-primary")} />
+            </button>
+          </div>
+          {showListSkeleton ? (
+            <SavedLibraryListSkeleton />
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border/60 px-4 py-10 text-center text-sm text-muted-foreground">
               Nothing saved yet. Open a brief and tap <strong className="text-foreground">Save</strong>.

@@ -27,6 +27,7 @@ import { intelLabIntelCopy } from "@/lib/pageIntelMessages";
 import { cn } from "@/lib/utils";
 import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
 import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
+import { CustomIntelGeneratingSkeleton } from "@/components/ui/PageSkeletons";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -523,12 +524,14 @@ Answer the user's follow-up with the same structured block style when analytical
       </div>
 
       {loading && (
-        <div className="glass-panel p-12 flex flex-col items-center gap-3 border border-border/40">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-xs font-bold text-foreground">Generating custom intelligence brief…</p>
-          <p className="text-[10px] text-muted-foreground text-center max-w-md">
-            Cross-linking primary / secondary with your region scope.
-          </p>
+        <div className="space-y-3">
+          <div className="space-y-1 text-center">
+            <p className="text-xs font-semibold text-foreground">Generating custom intelligence brief…</p>
+            <p className="mx-auto max-w-md text-[10px] text-muted-foreground">
+              Cross-linking primary / secondary with your region scope.
+            </p>
+          </div>
+          <CustomIntelGeneratingSkeleton />
         </div>
       )}
 

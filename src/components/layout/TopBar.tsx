@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { PanelLeftClose, PanelLeft, LogOut, Layers, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { GeoSelector } from "@/components/intel/GeoSelector";
-import { useGeoContext } from "@/contexts/GeoContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { BrandWordmark } from "@/components/BrandWordmark";
@@ -18,12 +17,10 @@ import {
 } from "@/components/layout/appNavConfig";
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
-import { getGeoNavLabel } from "@/lib/geoData";
 import { deskNavLabel } from "@/lib/profileDisplayName";
 import { isAdminEmail } from "@/lib/adminConstants";
 
 export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; toggleSidebar: () => void }) {
-  const { isGlobal, geoString, selections } = useGeoContext();
   const { profile, signOut, user } = useAuth();
   const { isPro } = useSubscription();
   const navItems = getAppNavItems(isPro, deskNavLabel(profile, user?.email));
@@ -119,10 +116,6 @@ export function TopBar({ sidebarOpen, toggleSidebar }: { sidebarOpen: boolean; t
           </div>
         </SheetContent>
       </Sheet>
-
-      <span className="hidden max-w-[14rem] truncate text-xs font-medium text-muted-foreground lg:inline shrink-0" title={!isGlobal ? selections.map((s) => s.label).join(", ") : undefined}>
-        {getGeoNavLabel(selections)}
-      </span>
 
       <div className="ml-auto flex min-w-0 max-w-[min(100%,calc(100vw-11rem))] shrink items-center gap-1 sm:gap-2 sm:max-w-none md:gap-3">
         <ThemeToggle size="sm" className="shrink-0" />

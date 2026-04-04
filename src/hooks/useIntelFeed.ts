@@ -8,16 +8,23 @@ const REFRESH_INTERVAL = 60_000;
 export function useIntelFeed() {
   const [feed, setFeed] = useState<IntelFeed | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const feedRef = useRef<IntelFeed | null>(null);
   const { isPro } = useSubscription();
+
+  feedRef.current = feed;
 
   const fetchFeed = useCallback(async () => {
     if (!isPro) {
       setLoading(false);
+      setRefreshing(false);
       return;
     }
+    const background = feedRef.current !== null;
+    if (background) setRefreshing(true);
     try {
       setError(null);
       const { data, error: fnError } = await supabase.functions.invoke("intel-feed");
@@ -28,6 +35,7 @@ export function useIntelFeed() {
       setError(e instanceof Error ? e.message : "Failed to fetch intel");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [isPro]);
 
@@ -40,5 +48,5 @@ export function useIntelFeed() {
     };
   }, [fetchFeed, isPro]);
 
-  return { feed, loading, error, lastRefresh, refresh: fetchFeed };
+  return { feed, loading, refreshing, error, lastRefresh, refresh: fetchFeed };
 }

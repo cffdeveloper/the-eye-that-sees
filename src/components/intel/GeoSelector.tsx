@@ -69,7 +69,7 @@ export function GeoSelector() {
         <button
           type="button"
           className={cn(
-            "flex min-w-0 max-w-[7.25rem] min-h-10 touch-manipulation items-center gap-1 rounded-lg border px-1.5 py-1.5 text-left text-[10px] leading-tight transition-all sm:max-w-[220px] sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2 sm:text-xs",
+            "flex min-w-0 max-w-[9.5rem] min-h-10 touch-manipulation items-center gap-1 rounded-lg border px-1.5 py-1.5 text-left text-[10px] leading-tight transition-all sm:max-w-[11rem] sm:min-h-0 sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2 sm:text-xs",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             selections.length > 0
               ? "border-primary/45 bg-primary/[0.08] text-primary shadow-sm"
@@ -77,11 +77,7 @@ export function GeoSelector() {
           )}
           aria-expanded={open}
           aria-haspopup="dialog"
-          aria-label={
-            selections.length <= 1
-              ? `Region: ${getGeoNavLabel(selections)}. Open to change.`
-              : `Region: ${selections.length} selected — ${selections.map((s) => s.label).join(", ")}. Open to change.`
-          }
+          aria-label={`Region: ${getGeoNavLabel(selections)}. Open to change.`}
         >
           <Globe className="h-3.5 w-3.5 shrink-0 opacity-90" />
           <span className="min-w-0 flex-1 truncate font-medium">{getGeoNavLabel(selections)}</span>

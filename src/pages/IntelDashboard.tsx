@@ -1,4 +1,4 @@
-﻿import { useIntelFeed } from "@/hooks/useIntelFeed";
+import { useIntelFeed } from "@/hooks/useIntelFeed";
 import { AlertsBanner } from "@/components/intel/AlertsBanner";
 import { CryptoPanel } from "@/components/intel/CryptoPanel";
 import { ForexPanel } from "@/components/intel/ForexPanel";
@@ -12,10 +12,14 @@ import { Link } from "react-router-dom";
 import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { liveFeedIntelCopy } from "@/lib/pageIntelMessages";
+import { useMinimumSkeleton } from "@/hooks/useMinimumSkeleton";
+import { IntelFeedGridSkeleton } from "@/components/ui/PageSkeletons";
+import { cn } from "@/lib/utils";
 
 export default function IntelDashboard() {
-  const { feed, loading, error, lastRefresh, refresh } = useIntelFeed();
+  const { feed, loading, refreshing, error, lastRefresh, refresh } = useIntelFeed();
   const { isFree, subscriptionLoading } = useIsFreeUser();
+  const showFeedSkeleton = useMinimumSkeleton(loading && !feed);
 
   return (
     <div className="space-y-3 max-w-[1600px] mx-auto">
@@ -44,12 +48,31 @@ export default function IntelDashboard() {
           <Radio className="w-4 h-4 text-primary" />
           <span className="text-sm font-semibold text-foreground">Live market feed</span>
           <span className="text-xs text-muted-foreground">11+ sources · refresh 60s</span>
-          <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse" />
+          <span
+            className={cn(
+              "h-2 w-2 rounded-full bg-brand-orange",
+              refreshing ? "animate-pulse [animation-duration:400ms]" : "animate-pulse",
+            )}
+            title={refreshing ? "Refreshing feed…" : "Live"}
+          />
+          {refreshing && feed && (
+            <span className="text-[10px] text-muted-foreground tabular-nums">Updating…</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {feed?.sources_status && <SourcesStatus status={feed.sources_status} timestamp={feed.timestamp} />}
-          <button onClick={refresh} disabled={loading || isFree} className="p-1 rounded border border-border/50 hover:bg-muted/30 transition-colors text-muted-foreground disabled:opacity-50">
-            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+          <button
+            onClick={() => void refresh()}
+            disabled={(loading && !feed) || isFree}
+            className="p-1 rounded border border-border/50 hover:bg-muted/30 transition-colors text-muted-foreground disabled:opacity-50"
+          >
+            {loading && !feed ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : refreshing ? (
+              <Loader2 className="w-3 h-3 animate-spin text-primary/80" />
+            ) : (
+              <RefreshCw className="w-3 h-3" />
+            )}
           </button>
         </div>
       </div>
@@ -74,7 +97,7 @@ export default function IntelDashboard() {
       ) : feed ? (
         <>
           <AlertsBanner alerts={feed.alerts} />
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+          <div className="intel-feed-stagger grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
             <div className="xl:row-span-2"><CryptoPanel data={feed.intel.crypto} /></div>
             <div><CommoditiesPanel data={feed.intel.commodities} /></div>
             <div className="xl:row-span-2"><VCPanel data={feed.intel.vc_signals} /></div>

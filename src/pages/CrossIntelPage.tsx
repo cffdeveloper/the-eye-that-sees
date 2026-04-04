@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { industries } from "@/lib/industryData";
 import { Loader2, Network, RefreshCw, AlertTriangle, Lightbulb, TrendingUp, Users, Handshake } from "lucide-react";
@@ -14,6 +14,9 @@ import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { crossIndustryIntelCopy } from "@/lib/pageIntelMessages";
+import { useMinimumSkeleton } from "@/hooks/useMinimumSkeleton";
+import { CrossIntelPageSkeleton, SubscriptionGateSkeleton } from "@/components/ui/PageSkeletons";
+import { cn } from "@/lib/utils";
 
 type CrossIntel = {
   cross_industry_players?: { name: string; industries: string[]; activity: string; strategy: string }[];
@@ -26,15 +29,21 @@ type CrossIntel = {
 
 export default function CrossIntelPage() {
   const [data, setData] = useState<CrossIntel | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { geoString, isGlobal, geoScopeId } = useGeoContext();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const dataRef = useRef<CrossIntel | null>(null);
+  const { geoString, geoScopeId } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all", geoScopeId);
   const { isPro, loading: subscriptionLoading } = useSubscription();
   useAlertNotifications(data?.alerts || [], true);
 
+  dataRef.current = data;
+
   const fetchIntel = useCallback(async () => {
     if (!isPro) return;
-    setLoading(true);
+    const background = dataRef.current !== null;
+    if (background) setRefreshing(true);
+    else setLoading(true);
     try {
       const { data: result, error } = await supabase.functions.invoke("cross-intel", {
         body: {
@@ -53,10 +62,20 @@ export default function CrossIntelPage() {
       console.error("Cross-intel error:", e);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [geoString, geoScopeId, isPro]);
 
-  useEffect(() => { fetchIntel(); }, [fetchIntel]);
+  useEffect(() => {
+    if (!isPro) {
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+    void fetchIntel();
+  }, [fetchIntel, isPro]);
+
+  const showPageSkeleton = useMinimumSkeleton(isPro && loading && !data);
 
   return (
     <div className="space-y-5 max-w-6xl mx-auto">
@@ -69,8 +88,18 @@ export default function CrossIntelPage() {
             Infinitygap runs one coordinated pass across mapped industries and money flows for your geography—refresh after you change region so gaps and links stay relevant.
           </p>
         </div>
-        <button onClick={fetchIntel} disabled={loading || subscriptionLoading || !isPro} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0">
-          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+        <button
+          onClick={() => void fetchIntel()}
+          disabled={(loading && !data) || subscriptionLoading || !isPro}
+          className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 text-muted-foreground disabled:opacity-50 shrink-0"
+        >
+          {loading && !data ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : refreshing ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-primary/80" />
+          ) : (
+            <RefreshCw className="w-3.5 h-3.5" />
+          )}
         </button>
       </div>
 
@@ -96,23 +125,23 @@ export default function CrossIntelPage() {
       </PageIntro>
 
       {subscriptionLoading ? (
-        <div className="glass-panel p-6 flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <div className="glass-panel flex flex-col items-center justify-center gap-3 p-6 py-16">
+          <SubscriptionGateSkeleton />
           <p className="text-sm text-muted-foreground">Loading access…</p>
         </div>
       ) : !isPro ? (
         <div className="glass-panel p-6">
           <ProUpgradePrompt feature={`Upgrade for full access to cross-industry AI analysis — gaps, connections, and opportunities across all ${industries.length} industries.`} />
         </div>
-      ) : loading && !data ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-sm text-muted-foreground">
+      ) : showPageSkeleton ? (
+        <div className="space-y-3">
+          <p className="text-center text-sm text-muted-foreground">
             Analyzing {industries.length} industries and {industries.reduce((n, i) => n + i.subFlows.length, 0)} money flows…
           </p>
+          <CrossIntelPageSkeleton />
         </div>
       ) : data ? (
-        <>
+        <div className={cn("space-y-5 transition-opacity duration-300", refreshing && "opacity-[0.92]")}>
           {/* Summary */}
           <ClickableItem
             title="Cross-Industry Executive Intelligence Report"
@@ -238,7 +267,7 @@ export default function CrossIntelPage() {
           </div>
 
           <SnapshotTimeline snapshots={snapshots} loading={snapsLoading} />
-        </>
+        </div>
       ) : (
         <p className="text-xs text-muted-foreground text-center py-20">Failed to load cross-industry intel. Try refreshing.</p>
       )}

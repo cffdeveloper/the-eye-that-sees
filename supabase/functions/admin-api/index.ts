@@ -254,12 +254,23 @@ serve(async (req) => {
     }
 
     if (action === "api_health_history") {
-      const id = body.integration_id as string | undefined;
+      const filterId = body.integration_id as string | undefined;
       let q = sb.from("api_health_history").select("*").order("checked_at", { ascending: false }).limit(50);
-      if (id) q = q.eq("integration_id", id);
-      const { data, error } = await q;
+      if (filterId) q = q.eq("integration_id", filterId);
+      const { data: hist, error } = await q;
       if (error) return json({ error: error.message }, 500);
-      return json({ history: data || [] });
+      const rows = hist || [];
+      const integIds = [...new Set(rows.map((r: { integration_id: string }) => r.integration_id).filter(Boolean))];
+      let integMap = new Map<string, { key_code: string; display_name: string }>();
+      if (integIds.length) {
+        const { data: integs } = await sb.from("api_integrations").select("id, key_code, display_name").in("id", integIds);
+        integMap = new Map((integs || []).map((i: { id: string; key_code: string; display_name: string }) => [i.id, i]));
+      }
+      const history = rows.map((r: Record<string, unknown>) => {
+        const meta = integMap.get(r.integration_id as string);
+        return { ...r, api_integrations: meta || null };
+      });
+      return json({ history });
     }
 
     return json({ error: "Unknown action" }, 400);

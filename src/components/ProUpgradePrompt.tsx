@@ -1,20 +1,21 @@
-import { Lock, Loader2 } from "lucide-react";
+import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UpgradeButton } from "@/components/SubscriptionGate";
 import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionGateSkeleton } from "@/components/ui/PageSkeletons";
 
 /** Shown while subscription tier is loading so we do not flash empty-state copy before upgrade prompts. */
 export function ProGateLoading({ compact, className }: { compact?: boolean; className?: string }) {
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-2 text-muted-foreground",
+        "flex w-full flex-col justify-center text-muted-foreground",
         compact ? "py-4" : "py-8",
         className,
       )}
     >
-      <Loader2 className={cn("animate-spin text-primary", compact ? "h-4 w-4" : "h-5 w-5")} />
-      <span className={cn(compact ? "text-xs" : "text-sm")}>Loading access…</span>
+      <SubscriptionGateSkeleton compact={compact} />
+      <span className={cn("mt-2 text-center opacity-80", compact ? "text-[10px]" : "text-xs")}>Loading access…</span>
     </div>
   );
 }

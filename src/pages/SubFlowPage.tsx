@@ -1,4 +1,4 @@
-﻿import { useParams, Navigate, Link } from "react-router-dom";
+import { useParams, Navigate, Link } from "react-router-dom";
 import { getSubFlow } from "@/lib/industryData";
 import { ArrowLeft, TrendingUp, Lightbulb, RefreshCw, Loader2, AlertTriangle, Database, Clock } from "lucide-react";
 import { useSubFlowIntel } from "@/hooks/useSubFlowIntel";
@@ -16,12 +16,13 @@ import { BlockMarkdown, InlineMarkdown } from "@/components/InlineMarkdown";
 import { ProUpgradePrompt, ProGateLoading, useIsFreeUser } from "@/components/ProUpgradePrompt";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 import { buildSubFlowIntelCopy } from "@/lib/pageIntelMessages";
+import { IndustryBriefSkeleton } from "@/components/ui/PageSkeletons";
 
 export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
   const result = slug && subFlowId ? getSubFlow(slug, subFlowId) : undefined;
   const { geoString, geoScopeId, selections } = useGeoContext();
-  const { data, loading, refresh } = useSubFlowIntel(
+  const { data, loading, refreshing, refresh } = useSubFlowIntel(
     result?.subFlow.name || "",
     result?.subFlow.keywords || [],
     result?.industry.name || "",
@@ -58,8 +59,18 @@ export default function SubFlowPage() {
             <h1 className="text-2xl font-semibold text-foreground tracking-tight mt-0.5">{subFlow.name}</h1>
             <p className="text-sm text-muted-foreground mt-1">{subFlow.description}</p>
           </div>
-          <button onClick={refresh} disabled={loading || subscriptionLoading || isFree} className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          <button
+            onClick={() => void refresh()}
+            disabled={(loading && !data && !cachedReport) || subscriptionLoading || isFree}
+            className="p-2 rounded-lg border border-border/60 hover:bg-muted/40 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 shrink-0"
+          >
+            {loading && !data && !cachedReport ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : refreshing ? (
+              <RefreshCw className="h-4 w-4 animate-spin text-primary/80" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
           </button>
         </div>
         <div className="mt-4 p-4 rounded-xl bg-muted/25 border border-border/50 border-l-4 border-l-brand-orange">
@@ -107,6 +118,9 @@ export default function SubFlowPage() {
                   <Database className="w-2.5 h-2.5" /> {new Date(cachedReport.created_at).toLocaleString()}
                 </span>
               )}
+              {refreshing && (data?.analysis || cachedReport?.summary) && (
+                <span className="text-[9px] font-medium text-primary [animation-duration:400ms] animate-pulse">Updating…</span>
+              )}
               <span className="text-[8px] text-muted-foreground/50">Click for deep dive →</span>
             </div>
           </div>
@@ -115,10 +129,7 @@ export default function SubFlowPage() {
           ) : isFree ? (
             <ProUpgradePrompt feature="Upgrade for full access to unlock AI deep analysis for this money flow." compact />
           ) : loading && !data && !cachedReport ? (
-            <div className="flex items-center gap-2 py-6">
-              <Loader2 className="w-4 h-4 text-primary animate-spin" />
-              <span className="text-xs text-muted-foreground">Analyzing {subFlow.name}...</span>
-            </div>
+            <IndustryBriefSkeleton className="py-4" />
           ) : (data?.analysis || cachedReport?.summary) ? (
             <div className="text-[11px] text-card-foreground leading-relaxed line-clamp-6">
               <BlockMarkdown content={data?.analysis || cachedReport?.summary || ""} />
