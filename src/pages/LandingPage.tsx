@@ -623,6 +623,20 @@ export default function LandingPage() {
                 </Button>
               </div>
             </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-600 mb-3">Support the project</p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-white gap-2"
+                asChild
+              >
+                <Link to="/auth?mode=signup&next=donate">
+                  <Coffee className="h-3.5 w-3.5 text-amber-400" />
+                  Buy us a coffee
+                </Link>
+              </Button>
+            </div>
             <p className="text-xs text-zinc-600">© 2026 Infinitygap · Not financial advice.</p>
           </div>
         </div>
