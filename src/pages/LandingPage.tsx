@@ -632,7 +632,7 @@ export default function LandingPage() {
                 asChild
               >
                 <Link to="/auth?mode=signup&next=donate">
-                  <Coffee className="h-3.5 w-3.5 text-amber-400" />
+                  <Heart className="h-3.5 w-3.5 text-amber-400" />
                   Buy us a coffee
                 </Link>
               </Button>
