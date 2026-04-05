@@ -89,6 +89,7 @@ serve(async (req) => {
       USAGE_COST_USD.custom_intel,
       "custom_intel",
       corsHeaders,
+      auth.email,
     );
     if (paywall) return paywall;
 

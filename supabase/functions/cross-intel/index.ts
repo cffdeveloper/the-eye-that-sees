@@ -36,6 +36,7 @@ serve(async (req) => {
       USAGE_COST_USD.cross_intel,
       "cross_intel",
       corsHeaders,
+      auth.email,
     );
     if (paywall) return paywall;
 

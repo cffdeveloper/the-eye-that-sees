@@ -74,6 +74,7 @@ serve(async (req) => {
       USAGE_COST_USD.alfred_deep_dive,
       "alfred_deep_dive",
       corsHeaders,
+      auth.email,
     );
     if (paywall) return paywall;
 
