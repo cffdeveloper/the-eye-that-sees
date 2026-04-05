@@ -32,8 +32,6 @@ export default function CrossIntelPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [insufficientCredits, setInsufficientCredits] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const dataRef = useRef<CrossIntel | null>(null);
   const { geoString, geoScopeId } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all", geoScopeId);
