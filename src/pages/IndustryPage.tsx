@@ -23,15 +23,16 @@ export default function IndustryPage() {
   const industry = slug ? getIndustryBySlug(slug) : undefined;
   const keywords = industry?.subFlows.flatMap(sf => sf.keywords).slice(0, 10) || [];
   const { geoString, geoScopeId, selections } = useGeoContext();
-  const { data, loading, refreshing } = useIndustryIntel(industry?.name || "", keywords, geoString, geoScopeId);
+  const { data, loading, refreshing, insufficientCredits: intelNoCredits } = useIndustryIntel(industry?.name || "", keywords, geoString, geoScopeId);
   const { articles, loading: newsLoading } = useIndustryNews(keywords);
-  const { data: socialData, loading: socialLoading } = useSocialIntel(
+  const { data: socialData, loading: socialLoading, insufficientCredits: socialNoCredits } = useSocialIntel(
     industry?.name || "",
     null,
     keywords,
     geoString,
     geoScopeId,
   );
+  const noCredits = intelNoCredits || socialNoCredits;
   const { snapshots, loading: snapsLoading } = useSnapshots("industry", industry?.name || "", geoScopeId);
   const { report: cachedReport, loading: cacheLoading } = useCachedIntel("industry", industry?.name || "", geoScopeId);
   const { isFree, subscriptionLoading } = useIsFreeUser();
@@ -108,8 +109,8 @@ export default function IndustryPage() {
         </div>
         {subscriptionLoading ? (
           <ProGateLoading compact />
-        ) : isFree ? (
-          <ProUpgradePrompt feature="Upgrade for full access to unlock AI-powered industry analysis and reports." compact />
+        ) : isFree || noCredits ? (
+          <ProUpgradePrompt feature={noCredits ? "Your credits have run out. Top up to continue AI industry analysis." : "Add AI credits to unlock AI-powered industry analysis and reports."} compact />
         ) : (loading || cacheLoading) && !(data?.analysis || cachedReport?.summary) ? (
           <IndustryBriefSkeleton />
         ) : (data?.analysis || cachedReport?.summary) ? (
