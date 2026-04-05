@@ -10,6 +10,7 @@ export function useIntelFeed() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const feedRef = useRef<IntelFeed | null>(null);
@@ -29,6 +30,11 @@ export function useIntelFeed() {
       setError(null);
       const { data, error: fnError } = await supabase.functions.invoke("intel-feed");
       if (fnError) throw fnError;
+      if (data?.code === "INSUFFICIENT_CREDITS") {
+        setInsufficientCredits(true);
+        return;
+      }
+      setInsufficientCredits(false);
       setFeed(data as IntelFeed);
       setLastRefresh(new Date());
     } catch (e) {
@@ -48,5 +54,5 @@ export function useIntelFeed() {
     };
   }, [fetchFeed, isPro]);
 
-  return { feed, loading, refreshing, error, lastRefresh, refresh: fetchFeed };
+  return { feed, loading, refreshing, error, insufficientCredits, lastRefresh, refresh: fetchFeed };
 }
