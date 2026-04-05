@@ -28,6 +28,7 @@ import {
   Workflow,
   CreditCard,
   BadgePercent,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
