@@ -485,6 +485,7 @@ serve(async (req) => {
       USAGE_COST_USD.social_intel,
       "social_intel",
       corsHeaders,
+      auth.email,
     );
     if (paywall) return paywall;
 

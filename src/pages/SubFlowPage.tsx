@@ -22,7 +22,7 @@ export default function SubFlowPage() {
   const { slug, subFlowId } = useParams<{ slug: string; subFlowId: string }>();
   const result = slug && subFlowId ? getSubFlow(slug, subFlowId) : undefined;
   const { geoString, geoScopeId, selections } = useGeoContext();
-  const { data, loading, refreshing, refresh } = useSubFlowIntel(
+  const { data, loading, refreshing, refresh, insufficientCredits: intelNoCredits } = useSubFlowIntel(
     result?.subFlow.name || "",
     result?.subFlow.keywords || [],
     result?.industry.name || "",
@@ -30,13 +30,14 @@ export default function SubFlowPage() {
     geoScopeId
   );
   const { articles, loading: newsLoading } = useIndustryNews(result?.subFlow.keywords || []);
-  const { data: socialData, loading: socialLoading } = useSocialIntel(
+  const { data: socialData, loading: socialLoading, insufficientCredits: socialNoCredits } = useSocialIntel(
     result?.industry.name || "",
     result?.subFlow.name || null,
     result?.subFlow.keywords || [],
     geoString,
     geoScopeId,
   );
+  const noCredits = intelNoCredits || socialNoCredits;
   const scopeKey = result ? `${result.industry.name}::${result.subFlow.name}` : "";
   const { snapshots, loading: snapsLoading } = useSnapshots("subflow", scopeKey, geoScopeId);
   const { report: cachedReport } = useCachedIntel("subflow", scopeKey, geoScopeId);
@@ -126,8 +127,8 @@ export default function SubFlowPage() {
           </div>
           {subscriptionLoading ? (
             <ProGateLoading compact />
-          ) : isFree ? (
-            <ProUpgradePrompt feature="Upgrade for full access to unlock AI deep analysis for this money flow." compact />
+          ) : isFree || noCredits ? (
+            <ProUpgradePrompt feature={noCredits ? "Your credits have run out. Top up to continue." : "Add AI credits to unlock AI deep analysis for this money flow."} compact />
           ) : loading && !data && !cachedReport ? (
             <IndustryBriefSkeleton className="py-4" />
           ) : (data?.analysis || cachedReport?.summary) ? (

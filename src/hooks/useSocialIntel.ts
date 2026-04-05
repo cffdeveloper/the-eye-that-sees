@@ -11,6 +11,7 @@ export function useSocialIntel(
 ) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
   const { isPro } = useSubscription();
 
   const fetch_ = useCallback(async () => {
@@ -31,6 +32,11 @@ export function useSocialIntel(
         },
       });
       if (error) throw error;
+      if (result?.code === "INSUFFICIENT_CREDITS") {
+        setInsufficientCredits(true);
+        return;
+      }
+      setInsufficientCredits(false);
       setData(result);
     } catch (e) {
       console.error("Social intel error:", e);
@@ -46,5 +52,5 @@ export function useSocialIntel(
     return () => clearInterval(id);
   }, [fetch_, isPro]);
 
-  return { data, loading, refresh: fetch_ };
+  return { data, loading, refresh: fetch_, insufficientCredits };
 }

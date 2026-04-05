@@ -46,6 +46,7 @@ serve(async (req) => {
       USAGE_COST_USD.alfred_opportunities,
       "alfred_opportunities",
       corsHeaders,
+      auth.email,
     );
     if (paywall) return paywall;
 

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { industries } from "@/lib/industryData";
-import { SUBSCRIPTION_USD_MONTHLY } from "@/lib/pricing";
+import { MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
 import { HeroSplineRobot } from "@/components/motion/HeroSplineRobot";
 import {
@@ -28,6 +28,7 @@ import {
   Workflow,
   CreditCard,
   BadgePercent,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -227,22 +228,22 @@ export default function LandingPage() {
                       <AccordionTrigger className="px-3 py-3 text-left hover:no-underline hover:bg-muted/40 [&[data-state=open]]:bg-muted/25 rounded-none gap-2">
                         <span className="flex flex-col items-start gap-0.5">
                           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            Pro plan
+                            AI credits
                           </span>
                           <span className="text-sm font-bold text-foreground">
-                            ${SUBSCRIPTION_USD_MONTHLY}
-                            <span className="text-muted-foreground font-semibold">/month</span>
+                            From ${MIN_CREDIT_PURCHASE_USD}
+                            <span className="text-muted-foreground font-semibold"> · pay as you go</span>
                           </span>
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 space-y-3">
                         <p>
-                          Pro is the full desk: unlimited live global pulse, deep sector & money-flow workspaces,{" "}
-                          cross-industry relationship maps, Infinity Lab sessions, and geo-scoped snapshots — the same stack
-                          serious operators use to stay ahead of headlines.
+                          Buy AI credits to run intel — live feeds, deep dives, cross-industry scans, Infinity Lab, and geo
+                          snapshots. Credits are deducted per query so you only pay for what you use. Top up any amount from
+                          ${MIN_CREDIT_PURCHASE_USD}.
                         </p>
                         <p className="text-xs text-muted-foreground/90">
-                          Start free; upgrade when you want the full firehose and Infinitygap without limits.
+                          Start free; add credits when you want the full firehose.
                         </p>
                         <Button size="sm" className="w-full font-bold rounded-lg" asChild>
                           <Link to="/auth?mode=signup">
@@ -260,7 +261,7 @@ export default function LandingPage() {
                       <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 gap-2">
                         <span className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-signal-emerald shrink-0" />
-                          What&apos;s included in Pro
+                          What credits unlock
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
@@ -294,9 +295,9 @@ export default function LandingPage() {
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 leading-relaxed">
                         <p className="pt-2">
-                          Subscriptions are billed monthly. Checkout runs through{" "}
-                          <span className="font-semibold text-foreground">Paystack</span> — the same flow you&apos;ll use
-                          after you sign in. You can manage billing from your profile once you&apos;re on Pro.
+                          Payments run through{" "}
+                          <span className="font-semibold text-foreground">Paystack</span>. Buy credits any time,
+                          top up when you need more. Manage billing from your profile.
                         </p>
                         <p className="mt-2 text-xs">
                           <Link to="/auth" className="text-primary font-semibold hover:underline">
@@ -622,6 +623,20 @@ export default function LandingPage() {
                   <Link to="/auth?mode=signup">Get started</Link>
                 </Button>
               </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-zinc-600 mb-3">Support the project</p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-white gap-2"
+                asChild
+              >
+                <Link to="/auth?mode=signup&next=donate">
+                  <Heart className="h-3.5 w-3.5 text-amber-400" />
+                  Buy us a coffee
+                </Link>
+              </Button>
             </div>
             <p className="text-xs text-zinc-600">© 2026 Infinitygap · Not financial advice.</p>
           </div>

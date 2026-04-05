@@ -10,6 +10,7 @@ export function useIndustryIntel(industryName: string, keywords: string[], geoCo
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
   const dataRef = useRef<any>(null);
   const { isPro } = useSubscription();
 
@@ -36,6 +37,11 @@ export function useIndustryIntel(industryName: string, keywords: string[], geoCo
           },
         });
         if (error) throw error;
+        if (result?.code === "INSUFFICIENT_CREDITS") {
+          setInsufficientCredits(true);
+          return;
+        }
+        setInsufficientCredits(false);
         setData(result);
       } catch (e) {
         console.error("Industry intel error:", e);
@@ -56,5 +62,5 @@ export function useIndustryIntel(industryName: string, keywords: string[], geoCo
 
   const refresh = useCallback(() => void fetch_(dataRef.current != null ? "background" : "full"), [fetch_]);
 
-  return { data, loading, refreshing, refresh };
+  return { data, loading, refreshing, refresh, insufficientCredits };
 }

@@ -17,8 +17,9 @@ import { IntelFeedGridSkeleton } from "@/components/ui/PageSkeletons";
 import { cn } from "@/lib/utils";
 
 export default function IntelDashboard() {
-  const { feed, loading, refreshing, error, lastRefresh, refresh } = useIntelFeed();
+  const { feed, loading, refreshing, error, insufficientCredits, lastRefresh, refresh } = useIntelFeed();
   const { isFree, subscriptionLoading } = useIsFreeUser();
+  const showNoCredits = insufficientCredits && !isFree;
   const showFeedSkeleton = useMinimumSkeleton(loading && !feed);
 
   return (
@@ -81,9 +82,9 @@ export default function IntelDashboard() {
         <div className="glass-panel p-6 min-h-[240px] flex items-center justify-center">
           <ProGateLoading />
         </div>
-      ) : isFree ? (
+      ) : isFree || showNoCredits ? (
         <div className="glass-panel p-6">
-          <ProUpgradePrompt feature="Upgrade for full access to real-time market data from 11+ sources including crypto, forex, commodities, VC signals, and supply chain intelligence." />
+          <ProUpgradePrompt feature={showNoCredits ? "Your credits have run out. Top up to continue using the live market feed." : "Add AI credits to access real-time market data from 11+ sources including crypto, forex, commodities, VC signals, and supply chain intelligence."} />
         </div>
       ) : loading && !feed ? (
         <div className="flex items-center justify-center py-20">

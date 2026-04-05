@@ -31,6 +31,7 @@ export default function CrossIntelPage() {
   const [data, setData] = useState<CrossIntel | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [insufficientCredits, setInsufficientCredits] = useState(false);
   const dataRef = useRef<CrossIntel | null>(null);
   const { geoString, geoScopeId } = useGeoContext();
   const { snapshots, loading: snapsLoading } = useSnapshots("cross-industry", "all", geoScopeId);
@@ -57,6 +58,11 @@ export default function CrossIntelPage() {
         },
       });
       if (error) throw error;
+      if (result?.code === "INSUFFICIENT_CREDITS") {
+        setInsufficientCredits(true);
+        return;
+      }
+      setInsufficientCredits(false);
       setData(result as CrossIntel);
     } catch (e) {
       console.error("Cross-intel error:", e);
@@ -129,9 +135,9 @@ export default function CrossIntelPage() {
           <SubscriptionGateSkeleton />
           <p className="text-sm text-muted-foreground">Loading access…</p>
         </div>
-      ) : !isPro ? (
+      ) : !isPro || insufficientCredits ? (
         <div className="glass-panel p-6">
-          <ProUpgradePrompt feature={`Upgrade for full access to cross-industry AI analysis — gaps, connections, and opportunities across all ${industries.length} industries.`} />
+          <ProUpgradePrompt feature={insufficientCredits ? `Your credits have run out. Top up to continue cross-industry analysis across all ${industries.length} industries.` : `Add AI credits for cross-industry AI analysis — gaps, connections, and opportunities across all ${industries.length} industries.`} />
         </div>
       ) : showPageSkeleton ? (
         <div className="space-y-3">
