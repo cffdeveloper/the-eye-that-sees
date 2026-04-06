@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { BookOpen, Download, Loader2, RefreshCw, Timer } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BookOpen, ChevronDown, Download, Loader2, RefreshCw, Timer } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
@@ -15,12 +15,14 @@ import { downloadIntelBriefPdf } from "@/lib/exportIntelBriefPdf";
 import { normalizeMarkdownInput } from "@/lib/markdownNormalize";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { industries as allIndustries } from "@/lib/industryData";
 
 type BriefRow = Database["public"]["Tables"]["user_read_briefs"]["Row"];
 
-/** Match server: 60 waves × 2min spacing ≈ 2h research, then one compile tick. */
 const TICK_MS = 120_000;
 const RESEARCH_WAVES = 60;
+
+type ScopeMode = "all" | "industries" | "custom";
 
 export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: boolean }) {
   const { user } = useAuth();
@@ -35,6 +37,12 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   const [jobStep, setJobStep] = useState(0);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
   const tickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Custom scope
+  const [scopeMode, setScopeMode] = useState<ScopeMode>("all");
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [customTopic, setCustomTopic] = useState("");
+  const [showScopeDropdown, setShowScopeDropdown] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -140,12 +148,22 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
     return () => clearTickTimer();
   }, [jobId, jobStatus, runTick]);
 
+  const buildScopePayload = () => {
+    if (scopeMode === "industries" && selectedIndustries.length > 0) {
+      return { focusIndustries: selectedIndustries };
+    }
+    if (scopeMode === "custom" && customTopic.trim()) {
+      return { customFocus: customTopic.trim() };
+    }
+    return {};
+  };
+
   const generateStandard = async () => {
     setGenerating(true);
     try {
       const trainingCorpus = getTrainingCorpus();
       const { data, error } = await supabase.functions.invoke("daily-read-brief", {
-        body: { action: "standard", trainingCorpus, geoHint },
+        body: { action: "standard", trainingCorpus, geoHint, ...buildScopePayload() },
       });
       if (error) throw error;
       if (data?.code === "INSUFFICIENT_CREDITS") {
@@ -171,7 +189,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
     try {
       const trainingCorpus = getTrainingCorpus();
       const { data, error } = await supabase.functions.invoke("daily-read-brief", {
-        body: { action: "start_extended", trainingCorpus, geoHint },
+        body: { action: "start_extended", trainingCorpus, geoHint, ...buildScopePayload() },
       });
       if (error) throw error;
       if (data?.code === "JOB_ACTIVE") {
@@ -187,7 +205,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
         setJobId(data.jobId);
         setJobStep(0);
         setJobStatus("running");
-        toast.success("Extended research started — runs ~2 hours (60 waves every 2 minutes), then compiles. Keep this tab open or come back; progress is saved.");
+        toast.success("Extended research started — runs ~2 hours (60 waves), then compiles. Keep this tab open or come back.");
         void runTick(data.jobId);
       }
     } catch (e) {
@@ -220,12 +238,18 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   const wavesLeft = Math.max(0, RESEARCH_WAVES - jobStep);
   const etaResearchMin = wavesLeft * (TICK_MS / 60_000);
 
+  const toggleIndustry = (slug: string) => {
+    setSelectedIndustries((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+    );
+  };
+
   if (!isPro) {
     return (
       <div className="rounded-2xl border border-border/50 bg-muted/10 p-6">
         <p className="text-sm font-semibold text-foreground mb-2">Daily read</p>
         <p className="text-xs text-muted-foreground mb-4">
-          Standard digests or an optional extended ~50-page research pack (multi-hour pipeline). PDF export for any edition.
+          Standard digests or extended ~50-page research packs. PDF export for any edition.
         </p>
         <ProUpgradePrompt feature="Add credits to generate and store research digests." />
       </div>
@@ -239,15 +263,68 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
           <div>
             <h2 className="font-display text-lg font-bold text-foreground">Read</h2>
             <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-              <strong className="text-foreground">Standard</strong> — one pass, ready in a few minutes.{" "}
-              <strong className="text-foreground">Extended ~50 pages</strong> — 60 separate research waves (unique queries) on a{" "}
-              <strong className="text-foreground">2-minute cadence</strong> (~2 hours), then compilation; not the same as a simple daily refresh.
+              <strong className="text-foreground">Standard</strong> — one-pass digest.{" "}
+              <strong className="text-foreground">Extended ~50 pages</strong> — 60 unique research waves over ~2 hours, then compiled into a deep narrative research pack.
             </p>
           </div>
           <Button type="button" variant="outline" size="sm" className="rounded-lg gap-1.5 shrink-0" disabled={loading} onClick={() => void load()}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Reload list
           </Button>
+        </div>
+
+        {/* Research scope picker */}
+        <div className="rounded-xl border border-border/40 bg-muted/20 p-3 space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Research scope</p>
+          <div className="flex flex-wrap gap-2">
+            {([
+              ["all", "All my industries"],
+              ["industries", "Pick industries"],
+              ["custom", "Custom topic"],
+            ] as const).map(([k, label]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => { setScopeMode(k); setShowScopeDropdown(k !== "all"); }}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                  scopeMode === k ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-muted-foreground hover:bg-muted/40",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {scopeMode === "industries" && (
+            <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto">
+              {allIndustries.map((ind) => (
+                <button
+                  key={ind.slug}
+                  type="button"
+                  onClick={() => toggleIndustry(ind.slug)}
+                  className={cn(
+                    "rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors",
+                    selectedIndustries.includes(ind.slug)
+                      ? "border-primary bg-primary/15 text-primary"
+                      : "border-border/50 text-muted-foreground hover:bg-muted/30",
+                  )}
+                >
+                  {ind.icon} {ind.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {scopeMode === "custom" && (
+            <input
+              type="text"
+              value={customTopic}
+              onChange={(e) => setCustomTopic(e.target.value)}
+              placeholder="e.g. Bitcoin price analysis, Kenyan presidential race, organic farming in East Africa…"
+              className="w-full rounded-lg border border-border/50 bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          )}
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -258,7 +335,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
                 Extended ~50-page pack (multi-hour pipeline)
               </Label>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Off = fast standard digest. On = 60 research waves, then compile — keep tab open for automatic ticks every 2 minutes.
+                Off = fast standard digest. On = 60 research waves, then compile — keep tab open.
               </p>
             </div>
           </div>
@@ -270,7 +347,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
             onClick={() => void handleGenerate()}
           >
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookOpen className="h-4 w-4" />}
-            {extendedPack ? "Start extended research" : "Generate standard digest"}
+            {extendedPack ? "Start extended research" : "Generate digest"}
           </Button>
         </div>
 
@@ -282,8 +359,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
                 Extended pipeline running — wave {jobStep} / {RESEARCH_WAVES}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                ~{etaResearchMin} min remaining in research phase (2 min between waves), then final compile. You can leave and return; we
-                resume polling while this page is open.
+                ~{etaResearchMin} min remaining in research phase, then final compile.
               </p>
             </div>
           </div>
@@ -296,7 +372,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-          No briefs yet. Generate a standard digest or start extended research.
+          No briefs yet. Pick a scope and generate your first digest.
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">

@@ -14,7 +14,11 @@ const corsHeaders: Record<string, string> = {
 export type NetworkEvent = {
   title: string;
   start_date: string | null;
+  end_date: string | null;
   location: string | null;
+  venue: string | null;
+  format: "in-person" | "online" | "hybrid" | "unknown";
+  entrance_fee: string | null;
   url: string | null;
   source_hint: string;
   relevance_note: string;
@@ -67,17 +71,22 @@ serve(async (req) => {
 
     const topicLine = industries.length ? industries.map((s) => s.replace(/-/g, " ")).join(", ") : "technology, business, innovation";
 
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const nextYear = currentYear + 1;
+
     const queries = [
-      `networking events conferences summits ${primary} ${topicLine} 2025 2026`,
-      `tech startup meetups hackathons pitch events ${primary}`,
-      `agriculture agritech trade shows field days ${primary} 2025 2026`,
-      `finance fintech banking conferences seminars ${primary} 2025 2026`,
+      `networking events conferences summits ${primary} ${topicLine} ${currentYear} ${nextYear} upcoming`,
+      `tech startup meetups hackathons pitch events ${primary} ${currentYear} ${nextYear}`,
+      `trade shows exhibitions ${topicLine} ${primary} ${currentYear} schedule registration`,
+      `finance fintech blockchain conferences ${primary} ${currentYear} ${nextYear} upcoming dates`,
+      `agriculture health innovation summits ${primary} ${currentYear} registration tickets`,
     ];
 
     let evidence = "";
     if (TAVILY_API_KEY) {
       const chunks = await Promise.all(queries.map((q) => tavilySearch(q, TAVILY_API_KEY)));
-      evidence = chunks.join("\n---\n").slice(0, 24_000);
+      evidence = chunks.join("\n---\n").slice(0, 28_000);
     } else {
       evidence =
         "(No Tavily key: synthesize from public knowledge only; flag uncertainty. Prefer well-known recurring events and verifiable URLs when possible.)";
@@ -85,6 +94,12 @@ serve(async (req) => {
 
     const system = `You are a networking research assistant for Infinitygap users.
 They want to FIND IN-PERSON AND ONLINE EVENTS to meet people and learn — conferences, meetups, summits, trade shows, workshops, pitch nights, hackathons, sector forums.
+
+CRITICAL DATE RULES:
+- Today's date is ${now.toISOString().slice(0, 10)}.
+- ONLY include events from ${currentYear} or ${nextYear} that are UPCOMING (start_date >= today or unknown).
+- NEVER return events from past years (2024 or earlier). If evidence mentions a 2024 event, find its ${currentYear}/${nextYear} edition instead.
+- If you cannot find an upcoming date for an event, set start_date to null and note "Date TBC — check website" in relevance_note.
 
 USER CONTEXT (respect geography and industries):
 - Region/market lens: ${primary}
@@ -98,20 +113,24 @@ ${evidence}
 
 RULES:
 1. Output VALID JSON ONLY — a single object: { "events": NetworkEvent[] }
-2. Each NetworkEvent:
-   - title: string (specific event name if known, else descriptive)
-   - start_date: ISO date string YYYY-MM-DD or null if unknown
-   - location: city/region or "Online" or null
-   - url: registration or official page URL if inferable from evidence, else null
-   - source_hint: short label e.g. "Conference site", "Association", "Event platform"
-   - relevance_note: 1-2 sentences why this fits THIS user
-   - topics: string[] 1-4 tags e.g. ["fintech", "Nairobi"]
-3. Prefer events that match their industries and region; include a mix of tech / business / their sectors.
-4. Do NOT claim you scraped LinkedIn or any private platform — events may come from public web listings; if unsure, lower confidence in relevance_note.
-5. Return 12–20 events. Sort is done client-side; include diverse dates.
-6. If evidence is thin, still return plausible public events and note verification in relevance_note.`;
+2. Each NetworkEvent MUST have ALL these fields:
+   - title: string (specific event name)
+   - start_date: ISO date string YYYY-MM-DD or null if unknown (MUST be ${currentYear} or ${nextYear})
+   - end_date: ISO date string YYYY-MM-DD or null if unknown
+   - location: city/country e.g. "Nairobi, Kenya" or "Online" or null
+   - venue: specific venue name e.g. "KICC" or "Zoom" or null if unknown
+   - format: one of "in-person" | "online" | "hybrid" | "unknown"
+   - entrance_fee: string describing cost e.g. "Free", "$50-$200", "KES 5,000", "Free for students, $100 general" or null if unknown
+   - url: registration or official page URL if available, else null
+   - source_hint: short label e.g. "Conference website", "Eventbrite", "Meetup.com"
+   - relevance_note: 2-3 sentences explaining why this event matters for THIS specific user based on their profile, and what they could gain from attending
+   - topics: string[] 2-5 tags e.g. ["fintech", "Nairobi", "AI"]
+3. Prefer events that match their industries and region; include a mix across their sectors.
+4. Return 15–25 events. Sort by date ascending (soonest first), nulls last.
+5. For each event, try hard to find: the venue name, whether it's free or paid, and exact dates.
+6. If evidence is thin for an event, note "Verify on official website" in relevance_note.`;
 
-    const userMsg = `Produce the JSON object with "events" array now.`;
+    const userMsg = `Produce the JSON object with "events" array now. Remember: ONLY ${currentYear}/${nextYear} events, with venue, fee, and format details.`;
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -121,8 +140,8 @@ RULES:
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        temperature: 0.35,
-        max_tokens: 8192,
+        temperature: 0.3,
+        max_tokens: 10_000,
         messages: [
           { role: "system", content: system },
           { role: "user", content: userMsg },
@@ -155,7 +174,7 @@ RULES:
     }
     const events = Array.isArray(parsed.events) ? parsed.events : [];
 
-    return new Response(JSON.stringify({ events, disclaimer: "Verify dates and links before booking. Sources are public web signals, not private inboxes." }), {
+    return new Response(JSON.stringify({ events, disclaimer: "Verify dates, venues, and fees on official websites before booking. Sources are public web signals." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

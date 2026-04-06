@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Calendar, ExternalLink, Loader2, MapPin, RefreshCw, Sparkles } from "lucide-react";
+import { Calendar, DollarSign, ExternalLink, Globe, Loader2, MapPin, Monitor, RefreshCw, Sparkles, Users } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,11 @@ import { getTrainingCorpus } from "@/lib/alfredStorage";
 export type NetworkEventRow = {
   title: string;
   start_date: string | null;
+  end_date: string | null;
   location: string | null;
+  venue: string | null;
+  format: "in-person" | "online" | "hybrid" | "unknown";
+  entrance_fee: string | null;
   url: string | null;
   source_hint: string;
   relevance_note: string;
@@ -23,6 +27,33 @@ function parseTime(s: string | null): number {
   if (!s) return Number.POSITIVE_INFINITY;
   const t = Date.parse(s);
   return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+}
+
+function formatDate(d: string | null): string {
+  if (!d) return "Date TBC";
+  try {
+    return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return d;
+  }
+}
+
+function formatBadgeIcon(format: string) {
+  switch (format) {
+    case "in-person": return <Users className="h-3 w-3" />;
+    case "online": return <Monitor className="h-3 w-3" />;
+    case "hybrid": return <Globe className="h-3 w-3" />;
+    default: return null;
+  }
+}
+
+function formatBadgeLabel(format: string) {
+  switch (format) {
+    case "in-person": return "In-person";
+    case "online": return "Online";
+    case "hybrid": return "Hybrid";
+    default: return "TBC";
+  }
 }
 
 export function AlfredEventsPanel({ geoHint, isPro }: { geoHint: string; isPro: boolean }) {
@@ -86,8 +117,7 @@ export function AlfredEventsPanel({ geoHint, isPro }: { geoHint: string; isPro: 
           </Button>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Uses your profile, industries, geography, and training notes, plus live web research (Tavily when configured). We do not access
-          private inboxes; verify every date and link before you travel or pay.
+          Personalized event discovery based on your profile, industries, and geography. Always verify dates, venues, and fees on official event websites before committing.
         </p>
         <div className="flex flex-wrap gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground self-center">Sort</span>
@@ -135,6 +165,7 @@ export function AlfredEventsPanel({ geoHint, isPro }: { geoHint: string; isPro: 
             key={`${ev.title}-${i}`}
             className="rounded-2xl border border-border/50 bg-card/80 p-4 sm:p-5 shadow-sm"
           >
+            {/* Header row */}
             <div className="flex flex-wrap items-start justify-between gap-2">
               <h3 className="font-display text-sm font-bold text-foreground sm:text-base min-w-0 flex-1">{ev.title}</h3>
               {ev.url && (
@@ -144,25 +175,61 @@ export function AlfredEventsPanel({ geoHint, isPro }: { geoHint: string; isPro: 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 shrink-0 text-xs font-semibold text-primary hover:underline"
                 >
-                  Link <ExternalLink className="h-3 w-3" />
+                  Register <ExternalLink className="h-3 w-3" />
                 </a>
               )}
             </div>
-            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
-              {ev.start_date && (
-                <span className="inline-flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {ev.start_date}
+
+            {/* Key details grid */}
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {/* Date */}
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="font-medium">
+                  {formatDate(ev.start_date)}
+                  {ev.end_date && ev.end_date !== ev.start_date && ` — ${formatDate(ev.end_date)}`}
                 </span>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center gap-2 text-xs text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="font-medium">{ev.location || "Location TBC"}</span>
+              </div>
+
+              {/* Venue */}
+              {ev.venue && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/70 w-12 shrink-0">Venue</span>
+                  <span>{ev.venue}</span>
+                </div>
               )}
-              {ev.location && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {ev.location}
-                </span>
-              )}
-              {ev.source_hint && <span className="text-muted-foreground/90">Source: {ev.source_hint}</span>}
+
+              {/* Fee */}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <DollarSign className="h-3.5 w-3.5 shrink-0" />
+                <span>{ev.entrance_fee || "Fee info not available — check website"}</span>
+              </div>
             </div>
+
+            {/* Format badge + source */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <span className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+                ev.format === "in-person" && "bg-green-500/10 text-green-600 dark:text-green-400",
+                ev.format === "online" && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                ev.format === "hybrid" && "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+                ev.format === "unknown" && "bg-muted text-muted-foreground",
+              )}>
+                {formatBadgeIcon(ev.format)}
+                {formatBadgeLabel(ev.format)}
+              </span>
+              {ev.source_hint && (
+                <span className="text-[10px] text-muted-foreground/80">via {ev.source_hint}</span>
+              )}
+            </div>
+
+            {/* Topics */}
             {ev.topics && ev.topics.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {ev.topics.map((t) => (
@@ -172,7 +239,9 @@ export function AlfredEventsPanel({ geoHint, isPro }: { geoHint: string; isPro: 
                 ))}
               </div>
             )}
-            <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">{ev.relevance_note}</p>
+
+            {/* Relevance */}
+            <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed border-t border-border/30 pt-2.5">{ev.relevance_note}</p>
           </li>
         ))}
       </ul>
