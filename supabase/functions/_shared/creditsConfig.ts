@@ -16,6 +16,8 @@ export const USAGE_COST_USD = {
   alfred_deep_dive: 0.14,
   network_events: 0.1,
   daily_read_brief: 0.35,
+  /** Charged once when extended (~50-page) pipeline starts; covers 60 research waves + compile. */
+  daily_read_brief_extended: 2.5,
 } as const;
 
 export function creditsFromPayment(amountPaidUsd: number): number {

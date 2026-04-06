@@ -672,9 +672,58 @@ export type Database = {
         }
         Relationships: []
       }
+      user_read_brief_jobs: {
+        Row: {
+          created_at: string
+          error: string | null
+          geo_hint: string | null
+          id: string
+          max_steps: number
+          queries_used: string[] | null
+          research_waves: Json
+          result_brief_id: string | null
+          status: string
+          step: number
+          training_corpus_snapshot: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          geo_hint?: string | null
+          id?: string
+          max_steps?: number
+          queries_used?: string[] | null
+          research_waves?: Json
+          result_brief_id?: string | null
+          status?: string
+          step?: number
+          training_corpus_snapshot?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          geo_hint?: string | null
+          id?: string
+          max_steps?: number
+          queries_used?: string[] | null
+          research_waves?: Json
+          result_brief_id?: string | null
+          status?: string
+          step?: number
+          training_corpus_snapshot?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_read_briefs: {
         Row: {
           body_markdown: string
+          brief_kind: string
           created_at: string
           id: string
           title: string
@@ -682,6 +731,7 @@ export type Database = {
         }
         Insert: {
           body_markdown: string
+          brief_kind?: string
           created_at?: string
           id?: string
           title: string
@@ -689,6 +739,7 @@ export type Database = {
         }
         Update: {
           body_markdown?: string
+          brief_kind?: string
           created_at?: string
           id?: string
           title?: string
