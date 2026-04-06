@@ -672,6 +672,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_memory: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_read_brief_jobs: {
         Row: {
           created_at: string
@@ -679,7 +706,7 @@ export type Database = {
           geo_hint: string | null
           id: string
           max_steps: number
-          queries_used: string[] | null
+          queries_used: string[]
           research_waves: Json
           result_brief_id: string | null
           status: string
@@ -694,7 +721,7 @@ export type Database = {
           geo_hint?: string | null
           id?: string
           max_steps?: number
-          queries_used?: string[] | null
+          queries_used?: string[]
           research_waves?: Json
           result_brief_id?: string | null
           status?: string
@@ -709,7 +736,7 @@ export type Database = {
           geo_hint?: string | null
           id?: string
           max_steps?: number
-          queries_used?: string[] | null
+          queries_used?: string[]
           research_waves?: Json
           result_brief_id?: string | null
           status?: string
@@ -718,7 +745,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_read_brief_jobs_result_brief_id_fkey"
+            columns: ["result_brief_id"]
+            isOneToOne: false
+            referencedRelation: "user_read_briefs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_read_briefs: {
         Row: {
@@ -743,33 +778,6 @@ export type Database = {
           created_at?: string
           id?: string
           title?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_memory: {
-        Row: {
-          content: string
-          created_at: string
-          id: string
-          kind: string
-          metadata: Json
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          id?: string
-          kind?: string
-          metadata?: Json
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          id?: string
-          kind?: string
-          metadata?: Json
           user_id?: string
         }
         Relationships: []
