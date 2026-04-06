@@ -11,12 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import {
-  CREDIT_PAYOUT_RATIO,
   MIN_CREDIT_PURCHASE_USD,
   MAX_CREDIT_PURCHASE_USD,
   MIN_DONATION_USD,
   creditsFromPayment,
-  platformMarginUsd,
   formatMoneyUsd,
 } from "@/lib/creditsConfig";
 import { useAuth } from "@/contexts/AuthContext";
@@ -163,9 +161,8 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
               Buy AI credits
             </div>
             <p className="text-[11px] leading-relaxed text-muted-foreground">
-              Minimum {formatMoneyUsd(MIN_CREDIT_PURCHASE_USD)}. You receive about{" "}
-              <span className="font-semibold text-foreground">{Math.round(CREDIT_PAYOUT_RATIO * 100)}%</span> of what you
-              pay as spendable AI credits (USD-equivalent). The rest covers platform costs.
+              Minimum purchase {formatMoneyUsd(MIN_CREDIT_PURCHASE_USD)}. The amount below is what is credited to your wallet
+              for this payment.
             </p>
             <div className="space-y-1.5">
               <Label htmlFor="credit-amt" className="text-xs">
@@ -183,8 +180,9 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
               />
               {Number.isFinite(parsedCredit) && parsedCredit >= MIN_CREDIT_PURCHASE_USD && (
                 <p className="text-[11px] text-muted-foreground">
-                  You&apos;ll get ~<span className="font-semibold text-foreground">{formatMoneyUsd(creditsPreview)}</span>{" "}
-                  in credits for {formatMoneyUsd(parsedCredit)} paid.
+                  Credits added to your wallet:{" "}
+                  <span className="font-semibold text-foreground">{formatMoneyUsd(creditsPreview)}</span>{" "}
+                  <span className="text-muted-foreground/80">(for a {formatMoneyUsd(parsedCredit)} payment)</span>
                 </p>
               )}
             </div>
@@ -288,10 +286,6 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
             </div>
           </div>
 
-          <p className="text-center text-[10px] text-muted-foreground">
-            Economics reference: payout ratio {CREDIT_PAYOUT_RATIO} → example margin on $100 paid ≈{" "}
-            {formatMoneyUsd(platformMarginUsd(100))}.
-          </p>
         </div>
       </DialogContent>
     </Dialog>

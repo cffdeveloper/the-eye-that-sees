@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bot, BrainCircuit, Clock, Loader2, RefreshCw, ScanSearch, Sparkles } from "lucide-react";
+import { Bot, BrainCircuit, CalendarDays, Clock, Loader2, RefreshCw, ScanSearch, Sparkles, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
@@ -40,6 +40,10 @@ import {
 } from "@/lib/alfredStorage";
 import { useProactiveGaps } from "@/hooks/useProactiveGaps";
 import { formatDistanceToNow } from "date-fns";
+import { AlfredEventsPanel } from "@/components/desk/AlfredEventsPanel";
+import { AlfredReadPanel } from "@/components/desk/AlfredReadPanel";
+
+type DeskSection = "desk" | "events" | "read";
 
 const FREE_INSIGHT_LIMIT = 2;
 const FREE_EXEC_SUMMARY_CHARS = 480;
@@ -161,6 +165,7 @@ export default function OpportunityDeskPage() {
   const [cache, setCache] = useState<AlfredInsightsBundle | null>(() => loadInsightsCache());
   const [loading, setLoading] = useState(false);
   const [autoRan, setAutoRan] = useState(false);
+  const [deskSection, setDeskSection] = useState<DeskSection>("desk");
 
   const pageTitle = opportunityDeskTitle(profile, user?.email);
   const addressAs = profileFirstName(profile, user?.email);
@@ -259,26 +264,28 @@ export default function OpportunityDeskPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 pb-12">
-      <PageIntro eyebrow="Personal opportunity desk" title="What this page does">
-        <ol className="list-decimal list-inside space-y-1.5 [&>li]:pl-0.5">
-          <li>
-            <strong className="text-foreground">Train</strong> Infinitygap on your goals, skills, capital, and time — same notes
-            power every run.
-          </li>
-          <li>
-            <strong className="text-foreground">Get a ranked deck</strong> of cross-industry ideas and gaps you could monetize or
-            position on (refreshes every 24h).
-          </li>
-          <li>
-            <strong className="text-foreground">Deep dive</strong> any card for a long-form analyst-style brief —{" "}
-            <strong className="text-foreground">Pro</strong> unlocks full deep dives and the full opportunity list.
-          </li>
-        </ol>
-        <p>
-          Free accounts see a <strong className="text-foreground">preview</strong> of the executive read and the top {FREE_INSIGHT_LIMIT}{" "}
-          ideas. Upgrade for the full deck, complete summaries, and deep dives.
-        </p>
-      </PageIntro>
+      {deskSection === "desk" && (
+        <PageIntro eyebrow="Personal opportunity desk" title="What this page does">
+          <ol className="list-decimal list-inside space-y-1.5 [&>li]:pl-0.5">
+            <li>
+              <strong className="text-foreground">Train</strong> Infinitygap on your goals, skills, capital, and time — same notes
+              power every run.
+            </li>
+            <li>
+              <strong className="text-foreground">Get a ranked deck</strong> of cross-industry ideas and gaps you could monetize or
+              position on (refreshes every 24h).
+            </li>
+            <li>
+              <strong className="text-foreground">Deep dive</strong> any card for a long-form analyst-style brief —{" "}
+              <strong className="text-foreground">Pro</strong> unlocks full deep dives and the full opportunity list.
+            </li>
+          </ol>
+          <p>
+            Free accounts see a <strong className="text-foreground">preview</strong> of the executive read and the top {FREE_INSIGHT_LIMIT}{" "}
+            ideas. Upgrade for the full deck, complete summaries, and deep dives.
+          </p>
+        </PageIntro>
+      )}
 
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -357,16 +364,45 @@ export default function OpportunityDeskPage() {
             </span>
           </div>
         </div>
+
+        <div className="flex flex-wrap gap-1.5 rounded-xl border border-border/50 bg-muted/30 p-1.5">
+          {(
+            [
+              ["desk", "Opportunities", Bot],
+              ["events", "Events", CalendarDays],
+              ["read", "Read", BookOpen],
+            ] as const
+          ).map(([id, label, Icon]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setDeskSection(id)}
+              className={cn(
+                "inline-flex flex-1 min-w-[7rem] items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-colors sm:text-sm",
+                deskSection === id
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+              )}
+            >
+              <Icon className="h-4 w-4 shrink-0 opacity-90" />
+              {label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      {loading && !cache?.insights?.length && (
+      {deskSection === "events" && <AlfredEventsPanel geoHint={geoHint} isPro={isPro} />}
+
+      {deskSection === "read" && <AlfredReadPanel geoHint={geoHint} isPro={isPro} />}
+
+      {deskSection === "desk" && loading && !cache?.insights?.length && (
         <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
           <p className="text-sm font-medium">Building your opportunity deck…</p>
         </div>
       )}
 
-      {!loading && (!cache || !cache.insights?.length) && (
+      {deskSection === "desk" && !loading && (!cache || !cache.insights?.length) && (
         <div className="rounded-2xl border border-dashed border-border/60 bg-muted/20 p-8 text-center space-y-3">
           <p className="text-sm text-muted-foreground">
             No deck yet. We&apos;ll generate one when you open this page, or tap <strong>Refresh insights now</strong>.
@@ -374,7 +410,7 @@ export default function OpportunityDeskPage() {
         </div>
       )}
 
-      {isPro && (
+      {deskSection === "desk" && isPro && (
         <section className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-4 sm:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-base font-bold text-foreground">Proactive gaps</h2>
@@ -414,7 +450,7 @@ export default function OpportunityDeskPage() {
         </section>
       )}
 
-      {isFree && (
+      {deskSection === "desk" && isFree && (
         <div className="rounded-2xl border border-border/50 bg-muted/10 p-4">
           <p className="text-xs font-semibold text-foreground mb-1">Proactive 24/7 gap scanning</p>
           <p className="text-xs text-muted-foreground mb-3">
@@ -424,7 +460,7 @@ export default function OpportunityDeskPage() {
         </div>
       )}
 
-      {cache && cache.insights.length > 0 && (
+      {deskSection === "desk" && cache && cache.insights.length > 0 && (
         <section className="space-y-4">
           {cache.executiveSummary && (
             <div className="rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5">

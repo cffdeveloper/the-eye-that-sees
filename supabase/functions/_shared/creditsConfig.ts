@@ -1,4 +1,4 @@
-/** Share with src/lib/creditsConfig.ts — keep values in sync. */
+/** Share with src/lib/creditsConfig.ts — keep values in sync. Not shown to end users in product copy. */
 export const CREDIT_PAYOUT_RATIO = 0.65;
 /** Gross payment must be at least this (USD). */
 export const MIN_CREDIT_PURCHASE_USD = 5;
@@ -14,6 +14,8 @@ export const USAGE_COST_USD = {
   deep_dive: 0.1,
   alfred_opportunities: 0.12,
   alfred_deep_dive: 0.14,
+  network_events: 0.1,
+  daily_read_brief: 0.35,
 } as const;
 
 export function creditsFromPayment(amountPaidUsd: number): number {

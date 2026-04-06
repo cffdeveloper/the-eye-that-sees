@@ -672,6 +672,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_read_briefs: {
+        Row: {
+          body_markdown: string
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body_markdown: string
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          body_markdown?: string
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_memory: {
         Row: {
           content: string

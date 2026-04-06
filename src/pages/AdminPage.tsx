@@ -261,9 +261,9 @@ export default function AdminPage() {
             <div className="rounded-2xl border border-primary/25 bg-primary/[0.04] p-5 shadow-sm space-y-3">
               <p className="text-sm font-bold text-foreground">Paystack / credits (reconcile with Lovable AI)</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="font-medium text-foreground">Total recorded charges</span> includes credit purchases and donations.
-                <span className="font-medium text-foreground"> Credits issued</span> is what was added to user wallets (~65% of credit purchase
-                gross). The difference on credit purchases is implied platform margin before your AI spend.
+                <span className="font-medium text-foreground">Total recorded charges</span> includes credit purchases and donations.{" "}
+                <span className="font-medium text-foreground">Credits issued</span> is the USD-equivalent amount credited to wallets from
+                those purchases. Compare both to your AI provider spend and Paystack payouts.
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-xl border border-border/50 bg-card/80 p-4">
@@ -285,7 +285,9 @@ export default function AdminPage() {
                   <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.donationsUsd.toLocaleString()}</p>
                 </div>
                 <div className="rounded-xl border border-border/50 bg-card/80 p-4 sm:col-span-2 lg:col-span-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Implied margin (on credit purchases only)</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                    Purchases minus credits issued (credit lines only)
+                  </p>
                   <p className="mt-1 font-display text-2xl font-bold tabular-nums">${overview.billing.impliedMarginUsd.toLocaleString()}</p>
                 </div>
               </div>

@@ -9,7 +9,7 @@ import { User, Zap, Mail, Building2, Briefcase, Save, Loader2, CreditCard, Shiel
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CREDIT_PAYOUT_RATIO, formatMoneyUsd, MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
+import { formatMoneyUsd, MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { Link } from "react-router-dom";
 import { PageIntro } from "@/components/marketing/ProductWayfinding";
 
@@ -149,9 +149,7 @@ export default function ProfilePage() {
               )}
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Top-ups from {formatMoneyUsd(MIN_CREDIT_PURCHASE_USD)}. Each payment adds about{" "}
-              <span className="font-medium text-foreground">{Math.round(CREDIT_PAYOUT_RATIO * 100)}%</span> of what you pay as spendable
-              credits (USD-equivalent).
+              Top-ups from {formatMoneyUsd(MIN_CREDIT_PURCHASE_USD)}. Each purchase shows the exact credit amount before you pay.
             </p>
             <div className="flex flex-wrap gap-2">
               <UpgradeButton size="default" />
