@@ -180,9 +180,9 @@ export function PaymentModal({ open, onOpenChange, onSuccess }: PaymentModalProp
               />
               {Number.isFinite(parsedCredit) && parsedCredit >= MIN_CREDIT_PURCHASE_USD && (
                 <p className="text-[11px] text-muted-foreground">
-                  Credits added to your wallet:{" "}
+                  You will receive{" "}
                   <span className="font-semibold text-foreground">{formatMoneyUsd(creditsPreview)}</span>{" "}
-                  <span className="text-muted-foreground/80">(for a {formatMoneyUsd(parsedCredit)} payment)</span>
+                  in AI credits.
                 </p>
               )}
             </div>
