@@ -11,7 +11,6 @@ const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-/** 60 research waves + 1 compile tick ≈ 61 client calls at 2min spacing ≈ 2h wall clock. */
 const EXTENDED_RESEARCH_STEPS = 60;
 
 type Body = {
@@ -19,6 +18,8 @@ type Body = {
   trainingCorpus?: string;
   geoHint?: string;
   jobId?: string;
+  focusIndustries?: string[];
+  customFocus?: string;
 };
 
 function buildUniqueQuery(
@@ -27,79 +28,85 @@ function buildUniqueQuery(
   primary: string,
   geo: string,
   used: string[],
+  customFocus?: string,
 ): string {
   const lenses = [
     "policy regulatory developments",
     "venture capital startup funding",
-    "commodity trade flows",
-    "labor market skills hiring",
-    "competitive dynamics M&A",
-    "consumer demand retail",
-    "infrastructure projects",
-    "healthcare delivery innovation",
-    "agriculture food systems",
-    "fintech payments rails",
-    "real estate commercial",
-    "manufacturing capacity",
-    "logistics freight",
-    "climate transition investment",
-    "AI adoption enterprise",
-    "cybersecurity incidents",
-    "education upskilling",
-    "energy grid transition",
-    "telecom spectrum connectivity",
-    "water resources",
-    "defense industrial base",
-    "insurance underwriting",
-    "pharma clinical trials",
-    "automotive EV supply chain",
-    "chemicals feedstocks",
-    "ocean shipping rates",
-    "mining exploration",
-    "hospitality travel recovery",
-    "media streaming advertising",
-    "public sector procurement",
-    "ESG disclosure",
-    "cross-border sanctions",
-    "currency volatility emerging markets",
-    "sovereign debt issuance",
-    "private credit direct lending",
-    "warehouse automation",
-    "semiconductor capacity",
-    "battery metals",
-    "carbon credits markets",
-    "biodiversity finance",
-    "digital identity",
-    "open-source ecosystem",
-    "patent litigation",
-    "franchise expansion",
-    "DTC brand economics",
-    "B2B marketplace liquidity",
-    "last-mile delivery",
-    "cold chain food",
-    "microfinance inclusion",
-    "remittance corridors",
-    "tourism visas mobility",
-    "space commercialization",
-    "synthetic biology",
-    "quantum computing roadmap",
-    "data center power",
-    "rare earth processing",
-    "steel decarbonization",
-    "aviation SAF mandates",
-    "rail freight investment",
-    "crop yields climate",
-    "fisheries quotas",
-    "urban mobility fares",
-    "student debt workforce",
-    "elder care demand",
-    "pet care premiumization",
-    "gaming monetization",
-    "creator economy tools",
+    "commodity trade flows price trends",
+    "labor market skills hiring trends",
+    "competitive dynamics M&A consolidation",
+    "consumer demand retail patterns",
+    "infrastructure projects megaprojects",
+    "healthcare delivery innovation biotech",
+    "agriculture food systems sustainable",
+    "fintech payments digital banking",
+    "real estate commercial residential trends",
+    "manufacturing capacity reshoring",
+    "logistics freight supply disruptions",
+    "climate transition green investment",
+    "AI adoption enterprise use cases stories",
+    "cybersecurity incidents breaches response",
+    "education upskilling workforce training",
+    "energy grid transition renewables",
+    "telecom spectrum 5G connectivity",
+    "water resources sanitation access",
+    "defense procurement military tech",
+    "insurance underwriting actuarial",
+    "pharma clinical trials drug pricing",
+    "automotive EV battery supply chain",
+    "chemicals feedstocks plastics",
+    "ocean shipping container rates",
+    "mining exploration critical minerals",
+    "hospitality travel tourism recovery",
+    "media streaming advertising revenue",
+    "public sector procurement digital",
+    "ESG disclosure sustainability ratings",
+    "cross-border sanctions geopolitics",
+    "currency forex emerging markets volatility",
+    "sovereign debt bonds fiscal policy",
+    "private credit direct lending growth",
+    "warehouse automation robotics",
+    "semiconductor chip capacity fab",
+    "battery metals lithium cobalt",
+    "carbon credits voluntary markets",
+    "biodiversity nature finance",
+    "digital identity biometrics",
+    "open-source ecosystem developer",
+    "patent litigation IP disputes",
+    "franchise expansion models",
+    "DTC brand economics margins",
+    "B2B marketplace SaaS platforms",
+    "last-mile delivery gig economy",
+    "cold chain perishable logistics",
+    "microfinance financial inclusion",
+    "remittance corridors diaspora",
+    "tourism visas mobility trends",
+    "space commercialization satellites",
+    "synthetic biology fermentation",
+    "quantum computing enterprise readiness",
+    "data center power consumption",
+    "rare earth processing supply",
+    "steel decarbonization hydrogen",
+    "aviation sustainable fuel SAF",
+    "rail freight intermodal investment",
+    "crop yields climate adaptation",
+    "fisheries aquaculture blue economy",
+    "urban mobility transit fares",
+    "student education workforce pipelines",
+    "elder care aging population demand",
+    "pet care premiumization D2C",
+    "gaming esports monetization",
+    "creator economy tools platforms",
+    "blockchain DeFi tokenization real-world",
+    "sports business media rights",
+    "luxury goods market emerging",
   ];
+
+  const focus = customFocus ? customFocus : "";
   const ind = industries.length ? industries[step % industries.length] : "business";
   const lens = lenses[step % lenses.length];
-  let q = `${ind.replace(/-/g, " ")} ${lens} ${primary} ${geo}`.replace(/\s+/g, " ").trim();
+  let q = `${focus} ${ind.replace(/-/g, " ")} ${lens} ${primary} ${geo} latest developments analysis`.replace(/\s+/g, " ").trim();
   q = `${q} wave ${step}`;
   if (used.includes(q)) q = `${q} alt ${step}-${Date.now()}`;
   return q.slice(0, 420);
@@ -112,8 +119,9 @@ async function compileExtendedBrief(params: {
   primary: string;
   topicLine: string;
   waves: { step: number; query: string; snippet: string }[];
+  customFocus?: string;
 }): Promise<string> {
-  const { LOVABLE_API_KEY, profile, trainingCorpus, primary, topicLine, waves } = params;
+  const { LOVABLE_API_KEY, profile, trainingCorpus, primary, topicLine, waves, customFocus } = params;
   const bio = String(profile?.bio || "").slice(0, 800);
   const goals = Array.isArray(profile?.goals) ? (profile!.goals as string[]).join(", ") : "";
   const dayStr = new Date().toISOString().slice(0, 10);
@@ -123,9 +131,25 @@ async function compileExtendedBrief(params: {
     .join("\n\n---\n\n")
     .slice(0, 120_000);
 
-  const system = `You are Infinitygap's chief research editor. Produce ONE Markdown document for ONE executive reader.
+  const focusNote = customFocus
+    ? `SPECIAL FOCUS TOPIC: "${customFocus}" — weave this theme throughout every section as the primary lens.\n`
+    : "";
 
-TARGET SCALE: approximately **50 printed pages** of substantive content — exhaustive sections, subsections, data callouts, scenario tables where useful, and cross-linked themes. This is not a blog post; it is a private research pack.
+  const system = `You are Infinitygap's chief research editor producing a PREMIUM private research pack.
+
+${focusNote}TARGET SCALE: approximately **50 printed pages** (~20,000-25,000 words) of substantive, narrative-driven content. This is NOT a summary or blog post — it is an immersive research document that reads like a premium industry report mixed with investigative journalism.
+
+WRITING STYLE REQUIREMENTS:
+- Write in a NARRATIVE style with stories, case studies, and real examples woven throughout
+- Start sections with compelling hooks — a story about a company, a striking data point, a historical parallel
+- Use concrete examples: "When Company X launched Y in Z market, they discovered…"
+- Include scenario analysis: "If oil prices reach $X, here's what happens to…"
+- Add "What this means for YOU" callouts specific to the reader
+- Use analogies and metaphors to make complex ideas accessible
+- Include contrarian views and debates — don't just present consensus
+- Add "Deep dive" subsections that explore one angle exhaustively
+- Include tables for comparisons, timelines for developments, and bullet lists for action items
+- Every section should feel like a chapter in a book, not a bullet summary
 
 READER:
 - Market: ${primary}
@@ -135,16 +159,26 @@ READER:
 - Goals: ${goals || "(none)"}
 - Training notes: ${trainingCorpus.slice(0, 8000) || "(none)"}
 
-MULTI-WAVE RESEARCH NOTES (unique queries; do not repeat the same claim without synthesis):
+MULTI-WAVE RESEARCH NOTES (60 unique queries — each wave explored a different angle):
 ${corpus}
 
-REQUIREMENTS:
-1. First line: "# " + title including ${dayStr} and "Extended research pack"
-2. Then a "## Executive overview" and "## Table of contents" with links to sections.
-3. Minimum **25** top-level ## sections (you may use ### liberally under each). Cover macro, sector, geography, risks, opportunities, and personal relevance.
-4. Cite uncertainty; no fabricated statistics.
-5. Markdown only.
-6. Push length: aim for ~15,000–25,000 words total if the gateway allows — keep writing until you exhaust the research angles.`;
+STRUCTURE REQUIREMENTS:
+1. First line: "# " + compelling title including ${dayStr}
+2. "## Executive Summary" — 500-word narrative overview with key takeaways
+3. "## Table of Contents" with all sections listed
+4. Minimum **30** top-level ## sections organized into thematic parts:
+   - Part I: Macro landscape & geopolitics
+   - Part II: Sector-by-sector deep dives (one ## per industry)
+   - Part III: Cross-sector patterns & convergences
+   - Part IV: Opportunities, risks & action items for the reader
+   - Part V: Forward-looking scenarios & predictions
+5. Use ### liberally under each section for depth
+6. Include at least 5 "🔍 Deep Dive" callout boxes (use > blockquotes)
+7. Include at least 3 comparison tables
+8. End with "## Sources & Verification" and "## Personal Action Items for [Name]"
+9. Cite uncertainty — no fabricated statistics
+10. Markdown only — no JSON
+11. PUSH LENGTH: keep writing until you exhaust every angle from the research waves. Aim for maximum depth.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -153,16 +187,16 @@ REQUIREMENTS:
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "google/gemini-2.5-pro",
       messages: [
         { role: "system", content: system },
         {
           role: "user",
-          content: `Write the complete Markdown pack now. Begin with the # title line.`,
+          content: `Write the complete ~50-page Markdown research pack now. Begin with the # title line. Write comprehensively with stories, examples, and deep analysis. Do NOT stop early — fill every section with rich narrative content.`,
         },
       ],
-      temperature: 0.4,
-      max_tokens: 32_768,
+      temperature: 0.45,
+      max_tokens: 65_536,
     }),
   });
 
@@ -192,6 +226,8 @@ serve(async (req) => {
     const action = String(body.action || "standard").toLowerCase();
     const trainingCorpus = String(body.trainingCorpus || "").trim().slice(0, 24_000);
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
+    const focusIndustries = Array.isArray(body.focusIndustries) ? body.focusIndustries.slice(0, 12) : [];
+    const customFocus = typeof body.customFocus === "string" ? body.customFocus.trim().slice(0, 500) : "";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TAVILY_API_KEY = Deno.env.get("TAVILY_API_KEY") || "";
@@ -235,7 +271,7 @@ serve(async (req) => {
       if (active && active.length > 0) {
         return new Response(
           JSON.stringify({
-            error: "An extended research job is already in progress. Wait for it to finish or open Read to see progress.",
+            error: "An extended research job is already in progress.",
             code: "JOB_ACTIVE",
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -280,8 +316,7 @@ serve(async (req) => {
           jobId: job.id,
           step: job.step,
           maxSteps: job.max_steps,
-          message:
-            "Extended research started. Call tick every 2 minutes (120s). After 60 research waves, the next tick compiles your ~50-page pack.",
+          message: "Extended research started.",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -329,7 +364,8 @@ serve(async (req) => {
         .eq("id", auth.userId)
         .maybeSingle();
 
-      const industries = (profile?.industries_of_interest as string[] | null)?.slice(0, 12) ?? [];
+      let industries = (profile?.industries_of_interest as string[] | null)?.slice(0, 12) ?? [];
+      if (focusIndustries.length > 0) industries = focusIndustries;
       const primary = String(profile?.primary_market || "").trim() || job.geo_hint || geoHint;
       const topicLine = industries.length
         ? industries.map((s) => s.replace(/-/g, " ")).join(", ")
@@ -356,7 +392,7 @@ serve(async (req) => {
           });
         }
 
-        const query = buildUniqueQuery(step, industries, primary, job.geo_hint || geoHint, used);
+        const query = buildUniqueQuery(step, industries, primary, job.geo_hint || geoHint, used, customFocus);
         used.push(query);
         let snippet = "";
         try {
@@ -382,13 +418,13 @@ serve(async (req) => {
             step: step + 1,
             maxSteps: EXTENDED_RESEARCH_STEPS,
             phase: "research",
-            message: `Research wave ${step + 1}/${EXTENDED_RESEARCH_STEPS} stored. Next tick in ~2 minutes.`,
+            message: `Research wave ${step + 1}/${EXTENDED_RESEARCH_STEPS} stored.`,
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
-      // step === EXTENDED_RESEARCH_STEPS → compile once
+      // step === EXTENDED_RESEARCH_STEPS → compile
       await sb
         .from("user_read_brief_jobs")
         .update({ status: "compiling", updated_at: new Date().toISOString() })
@@ -402,6 +438,7 @@ serve(async (req) => {
           primary,
           topicLine,
           waves,
+          customFocus: customFocus || undefined,
         });
 
         if (bodyMarkdown.length < 2000) {
@@ -487,17 +524,24 @@ serve(async (req) => {
       .eq("id", auth.userId)
       .maybeSingle();
 
-    const industries = (profile?.industries_of_interest as string[] | null)?.slice(0, 10) ?? [];
+    let industries = (profile?.industries_of_interest as string[] | null)?.slice(0, 10) ?? [];
+    if (focusIndustries.length > 0) industries = focusIndustries;
     const primary = String(profile?.primary_market || "").trim() || geoHint;
     const bio = String(profile?.bio || "").slice(0, 800);
     const goals = Array.isArray(profile?.goals) ? (profile!.goals as string[]).join(", ") : "";
     const topicLine = industries.length ? industries.map((s) => s.replace(/-/g, " ")).join(", ") : "global markets, technology, policy";
 
+    const focusNote = customFocus
+      ? `\nSPECIAL FOCUS: The reader specifically wants to read about "${customFocus}". Make this the central theme while connecting to their broader context.\n`
+      : "";
+
     let evidence = "";
     if (TAVILY_API_KEY) {
-      const q1 = await tavilySearch(`breaking news analysis ${primary} ${topicLine} last 7 days`, TAVILY_API_KEY);
-      const q2 = await tavilySearch(`macro economy regulation ${primary} sector outlook`, TAVILY_API_KEY);
-      evidence = `${q1}\n\n${q2}`.slice(0, 28_000);
+      const searchTopic = customFocus || `${primary} ${topicLine}`;
+      const q1 = await tavilySearch(`breaking news analysis ${searchTopic} last 7 days`, TAVILY_API_KEY);
+      const q2 = await tavilySearch(`macro economy ${searchTopic} sector outlook trends`, TAVILY_API_KEY);
+      const q3 = await tavilySearch(`${searchTopic} opportunities innovation developments`, TAVILY_API_KEY);
+      evidence = `${q1}\n\n${q2}\n\n${q3}`.slice(0, 32_000);
     } else {
       evidence = "(Limited: add TAVILY_API_KEY for fresher web grounding.)";
     }
@@ -506,25 +550,33 @@ serve(async (req) => {
 
     const system = `You are Infinitygap's research editor. Write a SINGLE long-form Markdown document for ONE reader.
 
+${focusNote}WRITING STYLE:
+- Write in a NARRATIVE style — not dry summaries. Tell stories, use real examples, paint scenarios.
+- Start with a compelling hook. Each section should open with something interesting — a story, a striking fact, a question.
+- Include "What this means for YOU" analysis throughout.
+- Add contrarian perspectives and debates where relevant.
+- Use tables for comparisons, blockquotes for key insights.
+
 READER CONTEXT:
 - Geography/market: ${primary}
 - Industries: ${topicLine}
 - Role/title: ${String(profile?.title || "")} / ${String(profile?.role || "")}
 - Bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
-- Private training notes (voice, constraints): ${trainingCorpus.slice(0, 6000) || "(none)"}
+- Private training notes: ${trainingCorpus.slice(0, 6000) || "(none)"}
 
-FRESH WEB SNIPPETS (may be partial):
+FRESH WEB SNIPPETS:
 ${evidence}
 
 DOCUMENT REQUIREMENTS:
 1. Title line: first line must be "# " followed by a compelling title including ${dayStr}.
-2. Use Markdown only: ## and ### sections, bullet lists, **bold** for emphasis, tables where helpful.
-3. Length: substantial coverage — many ## sections. Prioritize depth over fluff.
-4. Content: synthesize what matters for THIS person in their industries and region.
-5. Include a short "Sources & verification" section.
-6. Do NOT fabricate specific statistics; when uncertain, say so.
-7. No JSON — Markdown body only.`;
+2. Use Markdown: ## and ### sections, bullet lists, **bold**, tables where helpful, > blockquotes for key insights.
+3. Length: aim for 3,000-5,000 words minimum. Many ## sections with real depth.
+4. Content: synthesize what matters for THIS person — with stories, examples, scenarios.
+5. Include a "## What to watch this week" section with specific things to monitor.
+6. Include a "## Sources & verification" section.
+7. Do NOT fabricate statistics; when uncertain, say so.
+8. No JSON — Markdown body only.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -538,7 +590,7 @@ DOCUMENT REQUIREMENTS:
           { role: "system", content: system },
           {
             role: "user",
-            content: `Write the full Markdown digest for ${dayStr} now. Begin with the # title line.`,
+            content: `Write the full Markdown digest for ${dayStr} now. Be narrative, deep, and story-driven. Begin with the # title line.`,
           },
         ],
         temperature: 0.45,
