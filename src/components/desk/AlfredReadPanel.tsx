@@ -217,8 +217,11 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   };
 
   const handleGenerate = () => {
-    if (extendedPack) void startExtended();
-    else void generateStandard();
+    void generateStandard();
+  };
+
+  const handleStartExtended = () => {
+    void startExtended();
   };
 
   const handlePdf = async () => {
