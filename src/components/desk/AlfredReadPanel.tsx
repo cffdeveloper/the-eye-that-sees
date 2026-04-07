@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-// Switch removed — no longer needed
 import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { getTrainingCorpus } from "@/lib/alfredStorage";
