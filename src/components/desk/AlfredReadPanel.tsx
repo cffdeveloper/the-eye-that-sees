@@ -6,8 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { getTrainingCorpus } from "@/lib/alfredStorage";
@@ -32,7 +31,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  const [extendedPack, setExtendedPack] = useState(false);
+  // extendedPack toggle removed — standard and extended are separate buttons now
   const [jobId, setJobId] = useState<string | null>(null);
   const [jobStep, setJobStep] = useState(0);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
@@ -125,7 +124,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
     setJobId(data.id);
     setJobStep(typeof data.step === "number" ? data.step : 0);
     setJobStatus(data.status);
-    setExtendedPack(true);
+    // extended job resumed
   }, [user?.id]);
 
   useEffect(() => {
@@ -205,7 +204,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
         setJobId(data.jobId);
         setJobStep(0);
         setJobStatus("running");
-        toast.success("Extended research started — runs ~2 hours (60 waves), then compiles. Keep this tab open or come back.");
+        toast.success("Extended research started — 60 waves of deep research, then compilation. You can generate standard digests while this runs.");
         void runTick(data.jobId);
       }
     } catch (e) {
@@ -217,8 +216,11 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   };
 
   const handleGenerate = () => {
-    if (extendedPack) void startExtended();
-    else void generateStandard();
+    void generateStandard();
+  };
+
+  const handleStartExtended = () => {
+    void startExtended();
   };
 
   const handlePdf = async () => {
@@ -263,8 +265,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
           <div>
             <h2 className="font-display text-lg font-bold text-foreground">Read</h2>
             <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-              <strong className="text-foreground">Standard</strong> — one-pass digest.{" "}
-              <strong className="text-foreground">Extended ~50 pages</strong> — 60 unique research waves over ~2 hours, then compiled into a deep narrative research pack.
+              Generate research digests on any topic, any time. Each generation uses credits.
             </p>
           </div>
           <Button type="button" variant="outline" size="sm" className="rounded-lg gap-1.5 shrink-0" disabled={loading} onClick={() => void load()}>
@@ -327,28 +328,49 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
           )}
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border border-border/40 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <Switch id="extended-pack" checked={extendedPack} onCheckedChange={setExtendedPack} disabled={Boolean(jobId)} />
+        {/* Standard digest — always available */}
+        <div className="flex flex-col gap-2 rounded-xl border border-border/40 bg-muted/20 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <Label htmlFor="extended-pack" className="text-sm font-semibold cursor-pointer">
-                Extended ~50-page pack (multi-hour pipeline)
-              </Label>
+              <p className="text-sm font-semibold text-foreground">Standard digest</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Off = fast standard digest. On = 60 research waves, then compile — keep tab open.
+                Quick research digest — ready in under a minute. Generate as many as you want.
               </p>
             </div>
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-lg gap-1.5 font-semibold shrink-0"
+              disabled={generating}
+              onClick={handleGenerate}
+            >
+              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookOpen className="h-4 w-4" />}
+              Generate digest
+            </Button>
           </div>
-          <Button
-            type="button"
-            size="sm"
-            className={cn("rounded-lg gap-1.5 font-semibold shrink-0", extendedPack && "bg-primary")}
-            disabled={generating || Boolean(jobId)}
-            onClick={() => void handleGenerate()}
-          >
-            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookOpen className="h-4 w-4" />}
-            {extendedPack ? "Start extended research" : "Generate digest"}
-          </Button>
+        </div>
+
+        {/* Extended pack — separate section */}
+        <div className="flex flex-col gap-2 rounded-xl border border-border/40 bg-muted/20 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Extended ~50-page research pack</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                60 unique research waves compiled into a deep narrative report. Takes longer but produces comprehensive analysis.
+              </p>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="rounded-lg gap-1.5 font-semibold shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={generating || Boolean(jobId)}
+              onClick={handleStartExtended}
+            >
+              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookOpen className="h-4 w-4" />}
+              Start extended research
+            </Button>
+          </div>
         </div>
 
         {jobId && jobStatus === "running" && (
@@ -356,10 +378,10 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
             <Timer className="h-5 w-5 text-primary shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-foreground">
-                Extended pipeline running — wave {jobStep} / {RESEARCH_WAVES}
+                Extended research in progress — wave {jobStep} / {RESEARCH_WAVES}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                ~{etaResearchMin} min remaining in research phase, then final compile.
+                {wavesLeft > 0 ? `${wavesLeft} waves remaining, then final compilation.` : "Compiling final report…"}
               </p>
             </div>
           </div>
