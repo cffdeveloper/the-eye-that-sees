@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+// Switch removed — no longer needed
 import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { getTrainingCorpus } from "@/lib/alfredStorage";
@@ -32,7 +32,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  const [extendedPack, setExtendedPack] = useState(false);
+  // extendedPack toggle removed — standard and extended are separate buttons now
   const [jobId, setJobId] = useState<string | null>(null);
   const [jobStep, setJobStep] = useState(0);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
