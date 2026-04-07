@@ -205,7 +205,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
         setJobId(data.jobId);
         setJobStep(0);
         setJobStatus("running");
-        toast.success("Extended research started — runs ~2 hours (60 waves), then compiles. Keep this tab open or come back.");
+        toast.success("Extended research started — 60 waves of deep research, then compilation. You can generate standard digests while this runs.");
         void runTick(data.jobId);
       }
     } catch (e) {
