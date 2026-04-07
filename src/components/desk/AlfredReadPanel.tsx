@@ -125,7 +125,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
     setJobId(data.id);
     setJobStep(typeof data.step === "number" ? data.step : 0);
     setJobStatus(data.status);
-    setExtendedPack(true);
+    // extended job resumed
   }, [user?.id]);
 
   useEffect(() => {
