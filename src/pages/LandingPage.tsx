@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/accordion";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { industries } from "@/lib/industryData";
-import { MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { LandingBackdrop } from "@/components/motion/LandingBackdrop";
 import { HeroSplineRobot } from "@/components/motion/HeroSplineRobot";
 import {
@@ -26,9 +25,9 @@ import {
   Rocket,
   FlaskConical,
   Workflow,
-  CreditCard,
-  BadgePercent,
+  Github,
   Heart,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -205,8 +204,8 @@ export default function LandingPage() {
                     "md:min-h-9 md:w-auto md:shrink-0 md:justify-center md:gap-1.5 md:px-2.5 md:py-1.5 lg:px-3",
                   )}
                 >
-                  <BadgePercent className="h-3.5 w-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
-                  <span className="min-w-0 text-center text-[11px] leading-snug sm:text-[13px] md:whitespace-nowrap">Pricing</span>
+                  <Github className="h-3.5 w-3.5 shrink-0 text-brand-orange/90 group-hover:text-brand-orange transition-colors" />
+                  <span className="min-w-0 text-center text-[11px] leading-snug sm:text-[13px] md:whitespace-nowrap">Open source</span>
                   <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200" />
                 </button>
               </PopoverTrigger>
@@ -216,34 +215,22 @@ export default function LandingPage() {
                 className="w-[min(92vw,22rem)] sm:w-[26rem] p-0 overflow-hidden border-border/60 shadow-xl z-[100] bg-card/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
               >
                 <div className="border-b border-border/50 bg-gradient-to-r from-brand-orange/12 via-transparent to-amber-500/10 px-4 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange">Billing</p>
-                  <p className="font-display text-base font-bold text-foreground tracking-tight">Pricing</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange">License</p>
+                  <p className="font-display text-base font-bold text-foreground tracking-tight">Open source</p>
                 </div>
                 <div className="max-h-[min(65vh,480px)] overflow-y-auto p-3">
-                  <Accordion type="single" collapsible defaultValue="price-1" className="space-y-2">
+                  <Accordion type="single" collapsible defaultValue="os-1" className="space-y-2">
                     <AccordionItem
-                      value="price-1"
+                      value="os-1"
                       className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
                     >
                       <AccordionTrigger className="px-3 py-3 text-left hover:no-underline hover:bg-muted/40 [&[data-state=open]]:bg-muted/25 rounded-none gap-2">
-                        <span className="flex flex-col items-start gap-0.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            AI credits
-                          </span>
-                          <span className="text-sm font-bold text-foreground">
-                            From ${MIN_CREDIT_PURCHASE_USD}
-                            <span className="text-muted-foreground font-semibold"> · pay as you go</span>
-                          </span>
-                        </span>
+                        <span className="text-sm font-bold text-foreground">No payment wall</span>
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 space-y-3">
                         <p>
-                          Buy AI credits to run intel — live feeds, deep dives, cross-industry scans, Infinity Lab, and geo
-                          snapshots. Credits are deducted per query so you only pay for what you use. Top up any amount from
-                          ${MIN_CREDIT_PURCHASE_USD}.
-                        </p>
-                        <p className="text-xs text-muted-foreground/90">
-                          Start free; add credits when you want the full firehose.
+                          This build has no in-app purchases or credit gates. Deploy your own instance with Supabase and your
+                          AI provider keys; all intelligence features are available to every signed-in user.
                         </p>
                         <Button size="sm" className="w-full font-bold rounded-lg" asChild>
                           <Link to="/auth?mode=signup">
@@ -255,13 +242,13 @@ export default function LandingPage() {
                     </AccordionItem>
 
                     <AccordionItem
-                      value="price-2"
+                      value="os-2"
                       className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
                     >
                       <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 gap-2">
                         <span className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-signal-emerald shrink-0" />
-                          What credits unlock
+                          What&apos;s included
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="px-3 pb-3 pt-0 border-t border-border/40">
@@ -284,20 +271,19 @@ export default function LandingPage() {
                     </AccordionItem>
 
                     <AccordionItem
-                      value="price-3"
+                      value="os-3"
                       className="rounded-xl border border-border/60 bg-background/80 shadow-sm data-[state=open]:shadow-md data-[state=open]:border-primary/25 transition-shadow overflow-hidden"
                     >
                       <AccordionTrigger className="px-3 py-3 text-left text-[13px] font-bold text-foreground hover:no-underline hover:bg-muted/40 gap-2">
                         <span className="flex items-center gap-2">
-                          <CreditCard className="w-4 h-4 text-primary shrink-0" />
-                          Payments &amp; security
+                          <Shield className="w-4 h-4 text-primary shrink-0" />
+                          Self-host &amp; privacy
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground px-3 pb-3 pt-0 border-t border-border/40 leading-relaxed">
                         <p className="pt-2">
-                          Payments run through{" "}
-                          <span className="font-semibold text-foreground">Paystack</span>. Buy credits any time,
-                          top up when you need more. Manage billing from your profile.
+                          You control the database, auth, and Edge Function secrets. Optional Paystack code remains in the repo
+                          for forks that want billing — it is not required for core intel.
                         </p>
                         <p className="mt-2 text-xs">
                           <Link to="/auth" className="text-primary font-semibold hover:underline">

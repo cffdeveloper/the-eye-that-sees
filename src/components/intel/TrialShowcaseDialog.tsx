@@ -19,13 +19,7 @@ import type { GeoOption } from "@/lib/geoData";
 import { CONTINENTS, COUNTRIES, getGeoContextString } from "@/lib/geoData";
 import { parseBlocks } from "@/lib/parseBlocks";
 import { BlockRenderer } from "@/components/BlockRenderer";
-import { UpgradeButton } from "@/components/SubscriptionGate";
-import {
-  getTrialIntelPromptCount,
-  incrementTrialIntelPromptCount,
-  trialIntelPromptsRemaining,
-  TRIAL_INTEL_MAX_PROMPTS,
-} from "@/lib/trialIntelStorage";
+import { incrementTrialIntelPromptCount } from "@/lib/trialIntelStorage";
 import { cn } from "@/lib/utils";
 import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
 import { DownloadIntelPdfButton } from "@/components/saved/DownloadIntelPdfButton";
@@ -133,11 +127,6 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
   const canStep4 = userPrompt.trim().length >= 10;
 
   const runTrial = async () => {
-    const used = getTrialIntelPromptCount();
-    if (used >= TRIAL_INTEL_MAX_PROMPTS) {
-      toast.error(`You’ve used all ${TRIAL_INTEL_MAX_PROMPTS} trial questions. Upgrade to Pro for unlimited intel.`);
-      return;
-    }
     if (!canStep4) {
       toast.error("Add a bit more detail to your question.");
       return;
@@ -186,7 +175,6 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
   };
 
   const segments = report ? parseBlocks(report) : [];
-  const remaining = trialIntelPromptsRemaining();
 
   const stepLabel = (n: number) => (
     <span
@@ -228,26 +216,18 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
             </DialogTitle>
             <DialogDescription className="text-xs sm:text-sm leading-relaxed">
               {report ? (
-                <>
-                  Your tailored intel is below — export, start over, or upgrade for unlimited questions.
-                </>
+                <>Your tailored intel is below — export PDF, save to library, or start over.</>
               ) : loading ? (
                 <>Large models can take a minute — status messages rotate so you can see the pipeline working.</>
               ) : (
                 <>
-                  One guided question on us. We calibrate to who you are, where you care about, and what you want tested — then
-                  return the same structured brief style as Pro (metrics, cards, frameworks).
+                  We calibrate to who you are, where you care about, and what you want tested — then return structured brief
+                  blocks (metrics, cards, frameworks).
                 </>
               )}
             </DialogDescription>
             <p className="text-[11px] font-semibold text-muted-foreground pt-1">
-              {remaining === 0 ? (
-                <span className="text-amber-600 dark:text-amber-400">Trial questions used ({TRIAL_INTEL_MAX_PROMPTS}/{TRIAL_INTEL_MAX_PROMPTS}).</span>
-              ) : (
-                <span>
-                  {remaining} trial question{remaining === 1 ? "" : "s"} remaining
-                </span>
-              )}
+              <span>Open-source build — no trial limit on this device.</span>
             </p>
           </DialogHeader>
           {!report && (
@@ -315,21 +295,11 @@ export function TrialShowcaseDialog({ open, onOpenChange }: Props) {
                 >
                   Start over
                 </Button>
-                <UpgradeButton className="rounded-xl font-bold w-full sm:w-auto" />
               </div>
             </div>
           )}
 
-          {!loading && !report && remaining === 0 && step === 1 && (
-            <div className="text-center py-10 space-y-3">
-              <p className="text-sm text-muted-foreground">You’ve used all trial questions on this device.</p>
-              <div className="flex justify-center">
-                <UpgradeButton className="rounded-xl font-bold" />
-              </div>
-            </div>
-          )}
-
-          {!loading && !report && remaining > 0 && (
+          {!loading && !report && (
             <>
               {step === 1 && (
                 <div className="space-y-3">

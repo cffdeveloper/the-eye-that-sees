@@ -1,5 +1,6 @@
 const KEY = "infinitygap_trial_intel_prompts_used";
-const MAX = 1;
+/** Open-source build: effectively unlimited showcase prompts per device. */
+const MAX = 999_999;
 
 export function getTrialIntelPromptCount(): number {
   try {

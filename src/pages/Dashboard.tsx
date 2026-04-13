@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { BrandHexMark } from "@/components/BrandHexMark";
 import { industries } from "@/lib/industryData";
@@ -12,23 +12,19 @@ import {
   Database,
   Radio,
   BarChart3,
-  ArrowUpRight,
   Layers,
   Network,
   Shield,
   MapPin,
-  CheckCircle2,
   Presentation,
+  Github,
 } from "lucide-react";
 import { DashboardIntelMap } from "@/components/intel/DashboardIntelMap";
 import { useAlertNotifications } from "@/hooks/useAlertNotifications";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { MIN_CREDIT_PURCHASE_USD } from "@/lib/creditsConfig";
 import { cn } from "@/lib/utils";
-import { useSubscription } from "@/hooks/useSubscription";
-import { UpgradeButton, SubscriptionBadge } from "@/components/SubscriptionGate";
-import { toast } from "sonner";
+import { SubscriptionBadge } from "@/components/SubscriptionGate";
 import { motion } from "framer-motion";
 import { IntelWorkflowGuide } from "@/components/marketing/ProductWayfinding";
 import { dashboardIntelCopy } from "@/lib/pageIntelMessages";
@@ -46,15 +42,6 @@ const stagger = {
 
 export default function Dashboard() {
   const { profile } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const {
-    isPro,
-    verifyPayment,
-    loading: subLoading,
-    subscription,
-    creditBalanceUsd,
-    legacySubActive,
-  } = useSubscription();
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const { requestNotificationPermission } = useAlertNotifications([], alertsEnabled);
   const [dbStats, setDbStats] = useState({ rawData: 0, insights: 0, matches: 0 });
@@ -91,33 +78,6 @@ export default function Dashboard() {
       if (timeoutId !== null) window.clearTimeout(timeoutId);
     };
   }, []);
-
-  useEffect(() => {
-    if (searchParams.get("payment") === "verify") {
-      const ref = localStorage.getItem("paystack_reference");
-      if (ref) {
-        const kind = localStorage.getItem("paystack_expected_kind");
-        verifyPayment(ref)
-          .then((result) => {
-            if (result?.verified) {
-              if (kind === "donation") {
-                toast.success("Thank you — your support means a lot.");
-              } else {
-                toast.success("Credits added to your wallet.");
-              }
-            } else {
-              toast.error("Payment verification failed. Please try again.");
-            }
-          })
-          .catch(() => toast.error("Could not verify payment"))
-          .finally(() => {
-            localStorage.removeItem("paystack_reference");
-            localStorage.removeItem("paystack_expected_kind");
-            setSearchParams({}, { replace: true });
-          });
-      }
-    }
-  }, [searchParams]);
 
   const handleEnableNotifications = async () => {
     await requestNotificationPermission();
@@ -207,59 +167,27 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Credits CTA */}
-          {!isPro && (
-            <div className="w-full lg:w-[300px] shrink-0">
-              <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-card to-muted/20 p-6 shadow-sm">
-                <div className="flex items-center gap-2.5 mb-4">
-                  <ArrowUpRight className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-bold text-foreground">AI credits</span>
-                </div>
-                <div className="flex items-baseline gap-1 mb-3">
-                  <span className="font-display text-4xl font-bold tabular-nums text-foreground">${MIN_CREDIT_PURCHASE_USD}</span>
-                  <span className="text-sm text-muted-foreground font-medium">min</span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                  Buy credits for deep dives, cross-industry analysis, and Infinity Lab. Top up anytime.
-                </p>
-                <div className="flex flex-col gap-2.5">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full rounded-xl h-11 font-semibold border-primary/35 bg-primary/[0.06] hover:bg-primary/10 gap-2"
-                    onClick={() => setTrialShowcaseOpen(true)}
-                  >
-                    <Presentation className="h-4 w-4 text-primary shrink-0" />
-                    Try it for free
-                  </Button>
-                  <UpgradeButton className="w-full rounded-xl h-11 font-bold" />
-                </div>
+          <div className="w-full lg:w-[300px] shrink-0">
+            <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.06] p-6 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-3">
+                <Github className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm font-bold text-foreground">Open source</span>
               </div>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                All intelligence features are free to use in this deployment. Bring your own Supabase project and AI keys;
+                there is no in-app payment wall.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl h-11 font-semibold border-primary/35 bg-primary/[0.06] hover:bg-primary/10 gap-2"
+                onClick={() => setTrialShowcaseOpen(true)}
+              >
+                <Presentation className="h-4 w-4 text-primary shrink-0" />
+                Product tour
+              </Button>
             </div>
-          )}
-
-          {isPro && (
-            <div className="w-full lg:w-[300px] shrink-0">
-              <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-6">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-bold text-foreground">
-                    {legacySubActive && creditBalanceUsd < 0.01 ? "Legacy Pro" : "Credits active"}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {legacySubActive && creditBalanceUsd < 0.01
-                    ? "Full access via your existing subscription."
-                    : `Balance about ${creditBalanceUsd.toFixed(2)} USD in AI credits. Usage deducts from this wallet.`}
-                </p>
-                {subscription?.current_period_end && legacySubActive && creditBalanceUsd < 0.01 && (
-                  <p className="mt-3 text-xs font-semibold text-primary">
-                    Renews {new Date(subscription.current_period_end).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </motion.section>
 

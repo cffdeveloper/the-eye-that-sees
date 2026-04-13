@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Trash2, Bookmark, ChevronRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { useSubscription } from "@/hooks/useSubscription";
-import { FullPagePaywall } from "@/components/SubscriptionGate";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { parseBlocks } from "@/lib/parseBlocks";
@@ -43,7 +41,6 @@ function formatWhen(ts: number) {
 }
 
 export default function SavedLibraryPage() {
-  const { isPro, loading: subLoading } = useSubscription();
   const [items, setItems] = useState<SavedContentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [listRefreshing, setListRefreshing] = useState(false);
@@ -75,19 +72,6 @@ export default function SavedLibraryPage() {
 
   const showListSkeleton = useMinimumSkeleton(loading);
 
-  if (subLoading) {
-    return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4">
-        <SavedLibraryListSkeleton className="w-full max-w-sm" />
-        <p className="text-xs text-muted-foreground">Loading access…</p>
-      </div>
-    );
-  }
-
-  if (!isPro) {
-    return <FullPagePaywall />;
-  }
-
   const onDelete = async (id: string) => {
     const prevItems = items;
     const prevSelected = selected;
@@ -111,7 +95,7 @@ export default function SavedLibraryPage() {
         <h1 className="font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">Saved</h1>
         <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
           Intel you&apos;ve saved stays on this device (IndexedDB) so you can reopen it anytime — no refetch, works offline.
-          Use <span className="font-semibold text-foreground">Save</span> when viewing a brief on Pro.
+          Use <span className="font-semibold text-foreground">Save</span> when viewing a brief.
         </p>
       </div>
 

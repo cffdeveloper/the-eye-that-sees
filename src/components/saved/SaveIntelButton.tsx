@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BookmarkCheck, BookmarkPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSubscription } from "@/hooks/useSubscription";
 import { saveIntelItem, type SavedContentSource } from "@/lib/savedIntelStorage";
 import { toast } from "sonner";
 
@@ -15,7 +14,7 @@ type Props = {
   size?: "sm" | "default";
 };
 
-/** Pro only — saves a snapshot to on-device library (IndexedDB, offline-friendly). */
+/** Saves a snapshot to on-device library (IndexedDB, offline-friendly). */
 export function SaveIntelButton({
   title,
   subtitle,
@@ -25,10 +24,7 @@ export function SaveIntelButton({
   className = "",
   size = "default",
 }: Props) {
-  const { isPro, loading: subLoading } = useSubscription();
   const [optimisticSaved, setOptimisticSaved] = useState(false);
-
-  if (subLoading || !isPro) return null;
 
   const onSave = () => {
     const body = getBody().trim();

@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { PaymentModal } from "@/components/PaymentModal";
 import { useGeoContext } from "@/contexts/GeoContext";
-import { useSubscription } from "@/hooks/useSubscription";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { CONTINENTS, COUNTRIES, getSubRegions, GeoOption, getGeoNavLabel } from "@/lib/geoData";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Globe, X, ChevronDown, MapPin, Search, BadgeCheck, Loader2 } from "lucide-react";
+import { Globe, X, ChevronDown, MapPin, Search, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TAB_LABELS: Record<"continent" | "country" | "sub", string> = {
@@ -17,10 +15,8 @@ const TAB_LABELS: Record<"continent" | "country" | "sub", string> = {
 
 export function GeoSelector() {
   const { selections, addSelection, removeSelection, clearSelections } = useGeoContext();
-  const { isPro, loading: subscriptionLoading } = useSubscription();
   const isSm = useMediaQuery("(min-width: 640px)");
   const [open, setOpen] = useState(false);
-  const [paymentOpen, setPaymentOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"continent" | "country" | "sub">("country");
 
@@ -115,36 +111,13 @@ export function GeoSelector() {
           </button>
         </div>
 
-        {/* Tier strip — credits vs no balance */}
         <div className="shrink-0 border-b border-border/50 px-3 py-2.5 sm:py-2.5">
-          {subscriptionLoading ? (
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
-              <span>Checking access…</span>
-            </div>
-          ) : isPro ? (
-            <div className="flex items-center gap-2 text-[11px] font-semibold text-primary">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/15">
-                <BadgeCheck className="h-3.5 w-3.5" />
-              </span>
-              <span>Full intel — credits or legacy access</span>
-            </div>
-          ) : (
-            <p className="text-[11px] leading-snug text-muted-foreground">
-              Regions still apply to your view.{" "}
-              <button
-                type="button"
-                className="font-semibold text-primary underline-offset-2 hover:underline"
-                onClick={() => {
-                  setOpen(false);
-                  setPaymentOpen(true);
-                }}
-              >
-                Add credits
-              </button>{" "}
-              for news, social intel, and deep analysis.
-            </p>
-          )}
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-primary">
+            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/15">
+              <BadgeCheck className="h-3.5 w-3.5" />
+            </span>
+            <span>Full regional intel — no payment required</span>
+          </div>
         </div>
 
         <div className="shrink-0 border-b border-border/40 p-2.5 sm:p-2.5">
@@ -327,7 +300,6 @@ export function GeoSelector() {
         </div>
       </PopoverContent>
     </Popover>
-    <PaymentModal open={paymentOpen} onOpenChange={setPaymentOpen} />
     </>
   );
 }

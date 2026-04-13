@@ -1,6 +1,8 @@
-﻿# Infinitygap
+# Infinitygap
 
-React + Vite frontend: **Infinitygap** is the product — AI-powered market intelligence (Supabase-backed intel pipelines, edge functions, and structured analysis).
+React + Vite frontend: **Infinitygap** is AI-powered market intelligence (Supabase-backed intel pipelines, edge functions, and structured analysis).
+
+**Open source:** this tree ships **without payment walls** — authenticated users get full access. Edge Functions **do not debit** user credits (see `supabase/functions/_shared/authUser.ts`). Optional **Paystack** functions remain for forks that want billing; they are not required to run the product. Licensed under the [MIT License](./LICENSE).
 
 ## Development
 

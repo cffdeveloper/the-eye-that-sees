@@ -1,7 +1,5 @@
-﻿import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { streamChat } from "@/lib/streaming";
-import { useSubscription } from "@/hooks/useSubscription";
-import { toast } from "sonner";
 
 export type Message = {
   id: string;
@@ -18,15 +16,9 @@ export function useIntelGoldmineChat() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<AnalysisMode>("general");
   const abortRef = useRef(false);
-  const { isPro } = useSubscription();
 
   const send = useCallback(async (input: string) => {
     if (!input.trim() || isStreaming) return;
-
-    if (!isPro) {
-      toast.error("Infinitygap chat is included with Pro. Upgrade for full access to use this feature.");
-      return;
-    }
 
     setError(null);
 
@@ -74,7 +66,7 @@ export function useIntelGoldmineChat() {
       setError("Connection failed. Please try again.");
       setIsStreaming(false);
     }
-  }, [messages, isStreaming, mode, isPro]);
+  }, [messages, isStreaming, mode]);
 
   const clear = useCallback(() => {
     abortRef.current = true;

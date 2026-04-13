@@ -16,10 +16,9 @@ function buildBaseItems(deskNavLabel: string): AppNavItem[] {
   ];
 }
 
-/** Pro: inserts Saved before Profile. `deskNavLabel` is usually the user’s first name from profile. */
-export function getAppNavItems(isPro: boolean, deskNavLabel = "My desk"): AppNavItem[] {
+/** `isPro` kept for call-site compatibility; Saved is always available (open-source build). */
+export function getAppNavItems(_isPro?: boolean, deskNavLabel = "My desk"): AppNavItem[] {
   const items = buildBaseItems(deskNavLabel);
-  if (!isPro) return items;
   const profile = items[items.length - 1];
   const rest = items.slice(0, -1);
   return [...rest, { to: "/saved", label: "Saved", icon: Bookmark }, profile];
