@@ -106,7 +106,7 @@ function buildUniqueQuery(
   const focus = customFocus ? customFocus : "";
   const ind = industries.length ? industries[step % industries.length] : "business";
   const lens = lenses[step % lenses.length];
-  let q = `${focus} ${ind.replace(/-/g, " ")} ${lens} ${primary} ${geo} latest developments analysis`.replace(/\s+/g, " ").trim();
+  let q = `${focus} ${ind.replace(/-/g, " ")} ${lens} ${primary} ${geo} market sector outlook policy data`.replace(/\s+/g, " ").trim();
   q = `${q} wave ${step}`;
   if (used.includes(q)) q = `${q} alt ${step}-${Date.now()}`;
   return q.slice(0, 420);
@@ -135,50 +135,57 @@ async function compileExtendedBrief(params: {
     ? `SPECIAL FOCUS TOPIC: "${customFocus}" — weave this theme throughout every section as the primary lens.\n`
     : "";
 
-  const system = `You are Infinitygap's chief research editor producing a PREMIUM private research pack.
+  const system = `You are Infinitygap's **head of research**. Produce an **institutional-grade extended intelligence pack** — the kind a strategy consulting team or sell-side research desk would circulate internally: dense, analytical, globally aware, and grounded in evidence.
 
-${focusNote}TARGET SCALE: approximately **50 printed pages** (~20,000-25,000 words) of substantive, narrative-driven content. This is NOT a summary or blog post — it is an immersive research document that reads like a premium industry report mixed with investigative journalism.
+${focusNote}TARGET SCALE: very long Markdown (~20,000–28,000 words target when possible). Think **sector primer + global macro cross-asset note + policy/regulatory scan**, NOT a novel, blog, or biography.
 
-WRITING STYLE REQUIREMENTS:
-- Write in a NARRATIVE style with stories, case studies, and real examples woven throughout
-- Start sections with compelling hooks — a story about a company, a striking data point, a historical parallel
-- Use concrete examples: "When Company X launched Y in Z market, they discovered…"
-- Include scenario analysis: "If oil prices reach $X, here's what happens to…"
-- Add "What this means for YOU" callouts specific to the reader
-- Use analogies and metaphors to make complex ideas accessible
-- Include contrarian views and debates — don't just present consensus
-- Add "Deep dive" subsections that explore one angle exhaustively
-- Include tables for comparisons, timelines for developments, and bullet lists for action items
-- Every section should feel like a chapter in a book, not a bullet summary
+VOICE & TONE (critical):
+- Third-person analytical voice ("The market…", "Policy makers…"). Professional memo style.
+- **Do NOT** cast the reader as a fictional protagonist, use their first name in narrative scenes, or write cinematic "day in the life" prose.
+- **Do NOT** invent named companies, products, deals, or statistics. If you lack a number, write "not disclosed in sources" or give a **qualitative** range and label it **indicative**.
+- Ground claims in the MULTI-WAVE RESEARCH NOTES below. When you infer beyond them, prefix with **Analytical inference:** and keep it clearly labeled.
+- Prefer **health systems, payer dynamics, biotech/pharma, medtech, public health, and digital health** angles when industries touch healthcare — treat them like market segments (demand, regulation, reimbursement, competition), not lifestyle copy.
 
-READER:
-- Market: ${primary}
+WHAT "INTELLIGENT" MEANS HERE:
+- **Global lens**: tie ${primary} and selected industries to **trade, rates/FX, commodities, geopolitics, cross-border regulation**, and major economies — not only one country unless the evidence is overwhelmingly local.
+- **Analyst tables**: at least **4** Markdown tables (e.g. risk matrix, scenario summary, sector snapshot with drivers/headwinds, catalyst calendar).
+- **Metrics mindset**: where possible discuss growth direction, funding climate, margin pressure, utilization, pricing, reimbursement — even qualitatively.
+- **Debate & uncertainty**: include bull vs bear / optimist vs skeptic **as analytical positions**, not fictional characters.
+- **Action**: concrete monitoring checklist and "what would change our view" — not motivational fluff.
+
+READER (use lightly — mainly for one closing section):
+- Primary market: ${primary}
 - Industries: ${topicLine}
 - Role: ${String(profile?.title || "")} / ${String(profile?.role || "")}
-- Bio: ${bio || "(none)"}
+- Bio (reference briefly only where relevant): ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
-- Training notes: ${trainingCorpus.slice(0, 8000) || "(none)"}
+- Training notes (themes only — do not quote verbatim at length): ${trainingCorpus.slice(0, 8000) || "(none)"}
 
-MULTI-WAVE RESEARCH NOTES (60 unique queries — each wave explored a different angle):
+MULTI-WAVE RESEARCH NOTES (60 Tavily-backed waves — primary factual substrate):
 ${corpus}
 
-STRUCTURE REQUIREMENTS:
-1. First line: "# " + compelling title including ${dayStr}
-2. "## Executive Summary" — 500-word narrative overview with key takeaways
-3. "## Table of Contents" with all sections listed
-4. Minimum **30** top-level ## sections organized into thematic parts:
-   - Part I: Macro landscape & geopolitics
-   - Part II: Sector-by-sector deep dives (one ## per industry)
-   - Part III: Cross-sector patterns & convergences
-   - Part IV: Opportunities, risks & action items for the reader
-   - Part V: Forward-looking scenarios & predictions
-5. Use ### liberally under each section for depth
-6. Include at least 5 "🔍 Deep Dive" callout boxes (use > blockquotes)
-7. Include at least 3 comparison tables
-8. End with "## Sources & Verification" and "## Personal Action Items for [Name]"
-9. Cite uncertainty — no fabricated statistics
-10. Markdown only — no JSON
-11. PUSH LENGTH: keep writing until you exhaust every angle from the research waves. Aim for maximum depth.`;
+STRUCTURE (minimum **28** top-level ## sections). Suggested backbone — adapt titles to the sectors above:
+1. "# " + professional title including ${dayStr}
+2. "## Executive snapshot" — **tight**: 8–12 bullet **themes** + 1 short paragraph on overall risk posture (no storytelling hook).
+3. "## Global macro & markets context" — rates, inflation/growth, FX, commodities, risk appetite as they relate to these sectors.
+4. "## Geopolitics, trade & sanctions" — supply chain, localization, export controls where relevant.
+5. "## Regulatory & policy watch" — health authorities, data privacy, digital health rules, reimbursement bodies as relevant.
+6. "## Sector-by-sector analysis" — one ## per major industry in scope; each with ### Demand, ### Supply & capacity, ### Competition, ### Technology & innovation, ### Risks.
+7. "## Healthcare & life sciences cross-cut" (if any health-related industry) — systems, payers, pharma/biotech/medtech, public health — **market structure**, not patient anecdotes.
+8. "## Cross-sector themes" — AI, energy transition, labor, cybersecurity, etc., only as **industry drivers**.
+9. "## Scenarios" — base / upside / downside with **triggers**, not fiction.
+10. "## Catalysts to monitor" — dated where possible (quarters, policy milestones).
+11. "## Key risks" — operational, regulatory, macro, technology.
+12. "## Data gaps & unknowns" — what is missing from public sources.
+13. "## Source material & methodology" — state clearly that synthesis is from web-research waves + model reasoning; no fake citations.
+14. "## Implications for the reader" — **only section** that speaks directly to their role/goals in second person; max ~800 words.
+
+FORMATTING:
+- Markdown only. Use ### subsections liberally.
+- Use **> blockquotes** for 4–6 "**Key research takeaway:**" one-liners (not emoji labels).
+- No JSON.
+
+LENGTH: exhaust the substance in the waves — maximal analytical depth, minimal prose padding.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -192,10 +199,10 @@ STRUCTURE REQUIREMENTS:
         { role: "system", content: system },
         {
           role: "user",
-          content: `Write the complete ~50-page Markdown research pack now. Begin with the # title line. Write comprehensively with stories, examples, and deep analysis. Do NOT stop early — fill every section with rich narrative content.`,
+          content: `Write the full extended Markdown pack now. Start with the # title line. Prioritize analyst-grade substance, global context, and evidence-grounded reasoning. Do not write novel-style scenes or personalized fiction. Fill all required sections with analytical depth.`,
         },
       ],
-      temperature: 0.45,
+      temperature: 0.32,
       max_tokens: 65_536,
     }),
   });
@@ -538,9 +545,9 @@ serve(async (req) => {
     let evidence = "";
     if (TAVILY_API_KEY) {
       const searchTopic = customFocus || `${primary} ${topicLine}`;
-      const q1 = await tavilySearch(`breaking news analysis ${searchTopic} last 7 days`, TAVILY_API_KEY);
-      const q2 = await tavilySearch(`macro economy ${searchTopic} sector outlook trends`, TAVILY_API_KEY);
-      const q3 = await tavilySearch(`${searchTopic} opportunities innovation developments`, TAVILY_API_KEY);
+      const q1 = await tavilySearch(`latest sector market developments ${searchTopic} last 14 days`, TAVILY_API_KEY);
+      const q2 = await tavilySearch(`global macro policy regulatory outlook ${searchTopic}`, TAVILY_API_KEY);
+      const q3 = await tavilySearch(`${searchTopic} competitive landscape investment funding trends`, TAVILY_API_KEY);
       evidence = `${q1}\n\n${q2}\n\n${q3}`.slice(0, 32_000);
     } else {
       evidence = "(Limited: add TAVILY_API_KEY for fresher web grounding.)";
@@ -548,35 +555,39 @@ serve(async (req) => {
 
     const dayStr = new Date().toISOString().slice(0, 10);
 
-    const system = `You are Infinitygap's research editor. Write a SINGLE long-form Markdown document for ONE reader.
+    const system = `You are Infinitygap's research editor. Write **one** long-form Markdown **market & sector intelligence digest** for a professional reader.
 
-${focusNote}WRITING STYLE:
-- Write in a NARRATIVE style — not dry summaries. Tell stories, use real examples, paint scenarios.
-- Start with a compelling hook. Each section should open with something interesting — a story, a striking fact, a question.
-- Include "What this means for YOU" analysis throughout.
-- Add contrarian perspectives and debates where relevant.
-- Use tables for comparisons, blockquotes for key insights.
+${focusNote}STYLE (critical):
+- **Analyst / memo tone**: clear, dense, global where relevant. NOT a novel, NOT a profile biography, NOT invented case studies with fake company names.
+- **Do NOT** write the reader as a character in a story or use their name in narrative scenes. Use bio/role only to frame **Implications** at the end.
+- Anchor claims in FRESH WEB SNIPPETS below; label stronger extrapolations **Analytical inference:**.
+- Prefer: macro/regulatory/competitive **dynamics**, **risks**, **catalysts**, **metrics directions** (even qualitative). Healthcare content should read like **sector/market analysis** (payers, providers, policy, innovation), not lifestyle magazine copy.
 
-READER CONTEXT:
+READER CONTEXT (light touch):
 - Geography/market: ${primary}
 - Industries: ${topicLine}
 - Role/title: ${String(profile?.title || "")} / ${String(profile?.role || "")}
 - Bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
-- Private training notes: ${trainingCorpus.slice(0, 6000) || "(none)"}
+- Private training notes (themes): ${trainingCorpus.slice(0, 6000) || "(none)"}
 
-FRESH WEB SNIPPETS:
+FRESH WEB SNIPPETS (evidence substrate):
 ${evidence}
 
 DOCUMENT REQUIREMENTS:
-1. Title line: first line must be "# " followed by a compelling title including ${dayStr}.
-2. Use Markdown: ## and ### sections, bullet lists, **bold**, tables where helpful, > blockquotes for key insights.
-3. Length: aim for 3,000-5,000 words minimum. Many ## sections with real depth.
-4. Content: synthesize what matters for THIS person — with stories, examples, scenarios.
-5. Include a "## What to watch this week" section with specific things to monitor.
-6. Include a "## Sources & verification" section.
-7. Do NOT fabricate statistics; when uncertain, say so.
-8. No JSON — Markdown body only.`;
+1. First line: "# " + professional title including ${dayStr}.
+2. Markdown: ## / ###, bullets, **bold**, ≥1 comparison **table**, > blockquotes for 3–5 "**Takeaway:**" lines.
+3. Length: **3,000–6,000 words** target; many ## sections with analytical depth.
+4. Required sections:
+   - "## Executive snapshot" (bullets + short wrap)
+   - "## Global & macro context" (how this ties to wider markets/policy)
+   - "## Sector developments" (by theme or industry)
+   - "## Risks & debates" (bull/bear or policy tension)
+   - "## What to watch this week" (specific monitors)
+   - "## Implications for your role" (second person OK **only here**)
+   - "## Sources & methodology" (web snippets + reasoning; no fake URLs)
+5. Do NOT fabricate statistics; when uncertain, say so.
+6. No JSON — Markdown only.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -590,10 +601,10 @@ DOCUMENT REQUIREMENTS:
           { role: "system", content: system },
           {
             role: "user",
-            content: `Write the full Markdown digest for ${dayStr} now. Be narrative, deep, and story-driven. Begin with the # title line.`,
+            content: `Write the full Markdown digest for ${dayStr}. Begin with the # title. Deliver analyst-grade intelligence: global context, evidence-grounded analysis, minimal narrative padding.`,
           },
         ],
-        temperature: 0.45,
+        temperature: 0.35,
         max_tokens: 32_768,
       }),
     });

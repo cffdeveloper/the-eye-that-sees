@@ -251,9 +251,9 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
       <div className="rounded-2xl border border-border/50 bg-muted/10 p-6">
         <p className="text-sm font-semibold text-foreground mb-2">Daily read</p>
         <p className="text-xs text-muted-foreground mb-4">
-          Standard digests or extended ~50-page research packs. PDF export for any edition.
+          Standard memos or extended institutional-style packs (macro, sector, policy). PDF export for any edition.
         </p>
-        <ProUpgradePrompt feature="Add credits to generate and store research digests." />
+        <ProUpgradePrompt feature="Sign in to generate and store research digests." />
       </div>
     );
   }
@@ -265,7 +265,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
           <div>
             <h2 className="font-display text-lg font-bold text-foreground">Read</h2>
             <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-              Generate research digests on any topic, any time. Each generation uses credits.
+              Analyst-style intelligence: global macro and sector context, grounded in live web research — not narrative filler.
             </p>
           </div>
           <Button type="button" variant="outline" size="sm" className="rounded-lg gap-1.5 shrink-0" disabled={loading} onClick={() => void load()}>
@@ -334,7 +334,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
             <div>
               <p className="text-sm font-semibold text-foreground">Standard digest</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Quick research digest — ready in under a minute. Generate as many as you want.
+                Fast memo (~3–6k words): markets, risks, catalysts, implications for your role. Usually under a minute.
               </p>
             </div>
             <Button
@@ -354,9 +354,9 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
         <div className="flex flex-col gap-2 rounded-xl border border-border/40 bg-muted/20 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-foreground">Extended ~50-page research pack</p>
+              <p className="text-sm font-semibold text-foreground">Extended institutional pack (~50 pages)</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                60 unique research waves compiled into a deep narrative report. Takes longer but produces comprehensive analysis.
+                60 web-research waves, then compilation into a dense sell-side–style pack: macro, geopolitics, sector structure, scenarios, risks — minimal fluff.
               </p>
             </div>
             <Button
@@ -381,7 +381,7 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
                 Extended research in progress — wave {jobStep} / {RESEARCH_WAVES}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {wavesLeft > 0 ? `${wavesLeft} waves remaining, then final compilation.` : "Compiling final report…"}
+                {wavesLeft > 0 ? `${wavesLeft} evidence waves left, then analyst-style compilation.` : "Compiling institutional memo…"}
               </p>
             </div>
           </div>
