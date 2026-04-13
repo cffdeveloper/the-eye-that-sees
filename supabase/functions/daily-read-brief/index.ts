@@ -131,61 +131,67 @@ async function compileExtendedBrief(params: {
     .join("\n\n---\n\n")
     .slice(0, 120_000);
 
+  const trainingSlice = trainingCorpus.slice(0, 14_000);
+
   const focusNote = customFocus
     ? `SPECIAL FOCUS TOPIC: "${customFocus}" — weave this theme throughout every section as the primary lens.\n`
     : "";
 
-  const system = `You are Infinitygap's **head of research**. Produce an **institutional-grade extended intelligence pack** — the kind a strategy consulting team or sell-side research desk would circulate internally: dense, analytical, globally aware, and grounded in evidence.
+  const system = `You are Infinitygap's **head of research**. Produce a **global intelligence gazette**: exhaustive, principal-level, and grounded in evidence — like a merged **sector primer + macro note + policy scan + cross-industry radar**.
 
-${focusNote}TARGET SCALE: very long Markdown (~20,000–28,000 words target when possible). Think **sector primer + global macro cross-asset note + policy/regulatory scan**, NOT a novel, blog, or biography.
+${focusNote}HARD LENGTH FLOOR (non-negotiable):
+- Output MUST be at least **10,000 words** of substantive prose (≈ **50 pages** at ~200 words/page). If you are under this, you have failed the task — keep writing until you exceed 10,000 words.
+- Do not pad with repetition; add real sections, tables, scenario detail, and cross-industry linkages until the floor is met.
 
-VOICE & TONE (critical):
-- Third-person analytical voice ("The market…", "Policy makers…"). Professional memo style.
-- **Do NOT** cast the reader as a fictional protagonist, use their first name in narrative scenes, or write cinematic "day in the life" prose.
-- **Do NOT** invent named companies, products, deals, or statistics. If you lack a number, write "not disclosed in sources" or give a **qualitative** range and label it **indicative**.
-- Ground claims in the MULTI-WAVE RESEARCH NOTES below. When you infer beyond them, prefix with **Analytical inference:** and keep it clearly labeled.
-- Prefer **health systems, payer dynamics, biotech/pharma, medtech, public health, and digital health** angles when industries touch healthcare — treat them like market segments (demand, regulation, reimbursement, competition), not lifestyle copy.
+GAZETTE MINDSET — "tell me everything relevant":
+- The reader expects to be **fully briefed** on what matters across **all industries listed below**, **globally**, with explicit links to **${primary}** where applicable.
+- Continuously tie analysis back to the **TRAINING NOTES** (memory): themes, priorities, and constraints the user stored — this is their personalized spine; every major part should reflect how developments intersect **their** stated context (role, goals, geography).
+- Synthesize across **waves** (web research) as your evidence base; label inference clearly as **Analytical inference:** when you go beyond snippets.
 
-WHAT "INTELLIGENT" MEANS HERE:
-- **Global lens**: tie ${primary} and selected industries to **trade, rates/FX, commodities, geopolitics, cross-border regulation**, and major economies — not only one country unless the evidence is overwhelmingly local.
-- **Analyst tables**: at least **4** Markdown tables (e.g. risk matrix, scenario summary, sector snapshot with drivers/headwinds, catalyst calendar).
-- **Metrics mindset**: where possible discuss growth direction, funding climate, margin pressure, utilization, pricing, reimbursement — even qualitatively.
-- **Debate & uncertainty**: include bull vs bear / optimist vs skeptic **as analytical positions**, not fictional characters.
-- **Action**: concrete monitoring checklist and "what would change our view" — not motivational fluff.
+VOICE & TONE:
+- Third-person analytical ("The market…", "Regulators…"). No novel scenes, no fictional named protagonists.
+- Do **not** invent named companies, deals, or precise statistics. Use ranges, "reportedly", or "not disclosed in sources".
+- Healthcare / regulated sectors: **market structure** (payers, reimbursement, compliance), not magazine lifestyle copy.
 
-READER (use lightly — mainly for one closing section):
+MARKDOWN FORMAT (critical — UI renders real bold, not asterisks):
+- Use valid CommonMark only. For labeled bullets use: \`- **Label:** explanation\` on its own line.
+- **Never** emit \`***\` triple-asterisk pseudo-bold. Never leave raw \`**\` visible — close all emphasis pairs.
+- Use \`**bold**\` for emphasis; use \`##\` / \`###\` for headings.
+
+GLOBAL + CROSS-INDUSTRY:
+- Cover trade, FX/rates, commodities, geopolitics, sanctions, climate policy, tech regulation, and labor where waves support it.
+- At least **5** Markdown tables (risk matrix, sector heatmap, scenario grid, catalyst list, etc.).
+
+READER & PERSONALIZATION:
 - Primary market: ${primary}
-- Industries: ${topicLine}
+- Industries in scope (touch **each** materially, not one-line dismissals): ${topicLine}
 - Role: ${String(profile?.title || "")} / ${String(profile?.role || "")}
-- Bio (reference briefly only where relevant): ${bio || "(none)"}
+- Bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
-- Training notes (themes only — do not quote verbatim at length): ${trainingCorpus.slice(0, 8000) || "(none)"}
+- **Training notes (memory — integrate throughout, not only at end):**
+${trainingSlice || "(none)"}
 
-MULTI-WAVE RESEARCH NOTES (60 Tavily-backed waves — primary factual substrate):
+MULTI-WAVE RESEARCH NOTES (60 Tavily-backed waves — cite as substrate):
 ${corpus}
 
-STRUCTURE (minimum **28** top-level ## sections). Suggested backbone — adapt titles to the sectors above:
-1. "# " + professional title including ${dayStr}
-2. "## Executive snapshot" — **tight**: 8–12 bullet **themes** + 1 short paragraph on overall risk posture (no storytelling hook).
-3. "## Global macro & markets context" — rates, inflation/growth, FX, commodities, risk appetite as they relate to these sectors.
-4. "## Geopolitics, trade & sanctions" — supply chain, localization, export controls where relevant.
-5. "## Regulatory & policy watch" — health authorities, data privacy, digital health rules, reimbursement bodies as relevant.
-6. "## Sector-by-sector analysis" — one ## per major industry in scope; each with ### Demand, ### Supply & capacity, ### Competition, ### Technology & innovation, ### Risks.
-7. "## Healthcare & life sciences cross-cut" (if any health-related industry) — systems, payers, pharma/biotech/medtech, public health — **market structure**, not patient anecdotes.
-8. "## Cross-sector themes" — AI, energy transition, labor, cybersecurity, etc., only as **industry drivers**.
-9. "## Scenarios" — base / upside / downside with **triggers**, not fiction.
-10. "## Catalysts to monitor" — dated where possible (quarters, policy milestones).
-11. "## Key risks" — operational, regulatory, macro, technology.
-12. "## Data gaps & unknowns" — what is missing from public sources.
-13. "## Source material & methodology" — state clearly that synthesis is from web-research waves + model reasoning; no fake citations.
-14. "## Implications for the reader" — **only section** that speaks directly to their role/goals in second person; max ~800 words.
+STRUCTURE (minimum **28** top-level ## sections). Include:
+1. "# " + professional title with ${dayStr}
+2. "## Executive snapshot" — dense bullets; map to user's training priorities.
+3. "## How to read this gazette" — scope, geography, industries, data limits.
+4. "## Global macro & markets"
+5. "## Geopolitics, trade & supply chain"
+6. "## Regulatory & policy watch"
+7. "## Cross-industry synthesis" — forces tying sectors together.
+8. One ## section per **major industry** in scope (substantive, not token).
+9. "## Healthcare & life sciences cross-cut" if health-adjacent industries present.
+10. "## Scenarios & stress cases"
+11. "## Catalysts & calendar"
+12. "## Risks & debates"
+13. "## Data gaps"
+14. "## Source material & methodology"
+15. "## Implications for the reader" — second person; connect skills, goals, and training notes to actions (may exceed 800 words if needed for clarity).
 
-FORMATTING:
-- Markdown only. Use ### subsections liberally.
-- Use **> blockquotes** for 4–6 "**Key research takeaway:**" one-liners (not emoji labels).
-- No JSON.
-
-LENGTH: exhaust the substance in the waves — maximal analytical depth, minimal prose padding.`;
+FORMATTING: Markdown only; **> blockquotes** for "Key takeaway:" lines; no JSON.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -199,7 +205,11 @@ LENGTH: exhaust the substance in the waves — maximal analytical depth, minimal
         { role: "system", content: system },
         {
           role: "user",
-          content: `Write the full extended Markdown pack now. Start with the # title line. Prioritize analyst-grade substance, global context, and evidence-grounded reasoning. Do not write novel-style scenes or personalized fiction. Fill all required sections with analytical depth.`,
+          content: `Write the COMPLETE extended Markdown gazette now. First line must be the # title.
+
+Requirements: (1) Minimum **10,000 words** — count mentally; do not stop short. (2) Valid Markdown bold only — use \`- **Label:**\` for lead-ins, never \`***\`. (3) Cover every industry in scope + global angles + training-note integration. (4) Ground claims in waves; mark **Analytical inference:** when needed.
+
+Do not end until length floor is satisfied.`,
         },
       ],
       temperature: 0.32,
@@ -448,7 +458,8 @@ serve(async (req) => {
           customFocus: customFocus || undefined,
         });
 
-        if (bodyMarkdown.length < 2000) {
+        // Obvious failure / empty compile (length target is enforced in the LLM prompt: ≥10k words)
+        if (bodyMarkdown.length < 4_000) {
           throw new Error("Compiled brief too short");
         }
 
@@ -555,39 +566,32 @@ serve(async (req) => {
 
     const dayStr = new Date().toISOString().slice(0, 10);
 
-    const system = `You are Infinitygap's research editor. Write **one** long-form Markdown **market & sector intelligence digest** for a professional reader.
+    const system = `You are Infinitygap's research editor. Write **one** Markdown **daily intelligence gazette** — comprehensive, global, cross-industry, personalized to the reader's training notes.
 
-${focusNote}STYLE (critical):
-- **Analyst / memo tone**: clear, dense, global where relevant. NOT a novel, NOT a profile biography, NOT invented case studies with fake company names.
-- **Do NOT** write the reader as a character in a story or use their name in narrative scenes. Use bio/role only to frame **Implications** at the end.
-- Anchor claims in FRESH WEB SNIPPETS below; label stronger extrapolations **Analytical inference:**.
-- Prefer: macro/regulatory/competitive **dynamics**, **risks**, **catalysts**, **metrics directions** (even qualitative). Healthcare content should read like **sector/market analysis** (payers, providers, policy, innovation), not lifestyle magazine copy.
+${focusNote}STYLE:
+- Analyst / memo tone. NOT fiction. No fake company names or fabricated stats.
+- Integrate **training notes** throughout (themes, priorities) — not only in the last section.
+- Anchor claims in FRESH WEB SNIPPETS; use **Analytical inference:** when extrapolating.
 
-READER CONTEXT (light touch):
+MARKDOWN (critical for UI):
+- Valid CommonMark bold: \`**phrase**\` or \`- **Label:** text\`. **Never** use \`***\` triple-star bullets. Close all \`**\` pairs.
+
+READER:
 - Geography/market: ${primary}
-- Industries: ${topicLine}
+- Industries (address each with substance): ${topicLine}
 - Role/title: ${String(profile?.title || "")} / ${String(profile?.role || "")}
 - Bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
-- Private training notes (themes): ${trainingCorpus.slice(0, 6000) || "(none)"}
+- Training notes (memory): ${trainingCorpus.slice(0, 9000) || "(none)"}
 
-FRESH WEB SNIPPETS (evidence substrate):
+FRESH WEB SNIPPETS:
 ${evidence}
 
-DOCUMENT REQUIREMENTS:
-1. First line: "# " + professional title including ${dayStr}.
-2. Markdown: ## / ###, bullets, **bold**, ≥1 comparison **table**, > blockquotes for 3–5 "**Takeaway:**" lines.
-3. Length: **3,000–6,000 words** target; many ## sections with analytical depth.
-4. Required sections:
-   - "## Executive snapshot" (bullets + short wrap)
-   - "## Global & macro context" (how this ties to wider markets/policy)
-   - "## Sector developments" (by theme or industry)
-   - "## Risks & debates" (bull/bear or policy tension)
-   - "## What to watch this week" (specific monitors)
-   - "## Implications for your role" (second person OK **only here**)
-   - "## Sources & methodology" (web snippets + reasoning; no fake URLs)
-5. Do NOT fabricate statistics; when uncertain, say so.
-6. No JSON — Markdown only.`;
+DOCUMENT:
+1. "# " + professional title including ${dayStr}.
+2. Minimum **3,000 words**; aim **4,000–6,000** when evidence supports. Include ≥1 table.
+3. Sections: "## Executive snapshot", "## Global & macro", "## Cross-sector & industry developments", "## Risks & debates", "## What to watch this week", "## Implications for your role", "## Sources & methodology".
+4. No JSON.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -601,7 +605,7 @@ DOCUMENT REQUIREMENTS:
           { role: "system", content: system },
           {
             role: "user",
-            content: `Write the full Markdown digest for ${dayStr}. Begin with the # title. Deliver analyst-grade intelligence: global context, evidence-grounded analysis, minimal narrative padding.`,
+            content: `Write the full Markdown digest for ${dayStr}. Begin with # title. Meet the word floor; use proper **bold** markdown; cover industries + global angles + training-note integration.`,
           },
         ],
         temperature: 0.35,
@@ -620,7 +624,7 @@ DOCUMENT REQUIREMENTS:
 
     const aiData = await response.json();
     const bodyMarkdown = String(aiData.choices?.[0]?.message?.content || "").trim();
-    if (bodyMarkdown.length < 500) {
+    if (bodyMarkdown.length < 2_000) {
       return new Response(JSON.stringify({ error: "Brief too short — try again." }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

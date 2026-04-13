@@ -121,6 +121,11 @@ export async function downloadIntelBriefPdf(options: {
     [data-pdf-export="true"] .pdf-export-blocks blockquote {
       border-left-color: hsl(var(--primary) / 0.45) !important;
     }
+    [data-pdf-export="true"] .pdf-export-blocks strong,
+    [data-pdf-export="true"] .pdf-export-blocks b {
+      font-weight: 700 !important;
+      color: hsl(var(--foreground)) !important;
+    }
   `;
   wrapper.appendChild(styleEl);
 

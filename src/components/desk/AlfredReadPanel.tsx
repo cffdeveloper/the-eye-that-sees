@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, ChevronDown, Download, Loader2, RefreshCw, Timer } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { BookOpen, Copy, Download, Loader2, RefreshCw, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -11,7 +9,7 @@ import { ProUpgradePrompt } from "@/components/ProUpgradePrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { getTrainingCorpus } from "@/lib/alfredStorage";
 import { downloadIntelBriefPdf } from "@/lib/exportIntelBriefPdf";
-import { normalizeMarkdownInput } from "@/lib/markdownNormalize";
+import { BlockMarkdown } from "@/components/InlineMarkdown";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { industries as allIndustries } from "@/lib/industryData";
@@ -236,6 +234,16 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
     }
   };
 
+  const handleCopyBriefOnly = async () => {
+    if (!selected?.body_markdown) return;
+    try {
+      await navigator.clipboard.writeText(selected.body_markdown);
+      toast.success("Brief copied — markdown only (no app chrome).");
+    } catch {
+      toast.error("Could not copy");
+    }
+  };
+
   const selected = rows.find((r) => r.id === selectedId) ?? rows[0];
   const wavesLeft = Math.max(0, RESEARCH_WAVES - jobStep);
   const etaResearchMin = wavesLeft * (TICK_MS / 60_000);
@@ -431,15 +439,17 @@ export function AlfredReadPanel({ geoHint, isPro }: { geoHint: string; isPro: bo
                     <Download className="h-4 w-4" />
                     Download PDF
                   </Button>
+                  <Button type="button" variant="outline" size="sm" className="rounded-lg gap-1.5" onClick={() => void handleCopyBriefOnly()}>
+                    <Copy className="h-4 w-4" />
+                    Copy brief only
+                  </Button>
                 </div>
                 <div
                   ref={printRef}
                   data-pdf-export="true"
-                  className="rounded-2xl border border-border/50 bg-card p-4 sm:p-6 prose prose-sm dark:prose-invert max-w-none prose-headings:font-display prose-a:text-primary"
+                  className="read-brief-markdown rounded-2xl border border-border/50 bg-card p-4 sm:p-6 max-w-none text-sm leading-relaxed text-foreground"
                 >
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {normalizeMarkdownInput(selected.body_markdown)}
-                  </ReactMarkdown>
+                  <BlockMarkdown content={selected.body_markdown} />
                 </div>
               </>
             )}

@@ -13,6 +13,8 @@ export function normalizeMarkdownInput(content: string): string {
   s = s.replace(/(^|\n)(\s{0,3})(#{1,6})([^\s#\r\n])/g, "$1$2$3 $4");
   // Tighten bold markers
   s = s.replace(/\*\*\s+/g, "**").replace(/\s+\*\*/g, "**");
+  // Models often emit invalid "***Label**:" (triple star open) — breaks CommonMark; convert to list + bold
+  s = s.replace(/\*\*\*([^*\n]{1,400}?)\*\*:/g, "- **$1**:");
   return s;
 }
 
