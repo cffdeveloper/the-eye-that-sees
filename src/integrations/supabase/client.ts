@@ -1,13 +1,36 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '@/lib/supabaseEnv';
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./types";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/supabaseEnv";
 
-// import { supabase } from "@/integrations/supabase/client";
+/**
+ * In dev, send Edge Function requests through the Vite `/supabase-functions` proxy so they stay
+ * same-origin (localhost). Otherwise the browser preflights OPTIONS to *.supabase.co and the
+ * gateway often fails CORS before our function runs.
+ */
+function devFunctionsProxyFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  if (!import.meta.env.DEV) {
+    return fetch(input, init);
+  }
+  const base = SUPABASE_URL.replace(/\/$/, "");
+  if (!base.startsWith("https://") || base.includes("invalid.localhost")) {
+    return fetch(input, init);
+  }
+  const url =
+    typeof input === "string" ? input : input instanceof Request ? input.url : input instanceof URL ? input.href : String(input);
+  if (url.startsWith(base) && url.includes("/functions/v1/")) {
+    const path = url.slice(base.length);
+    return fetch(`/supabase-functions${path}`, init);
+  }
+  return fetch(input, init);
+}
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false,
+  },
+  global: {
+    fetch: devFunctionsProxyFetch,
   },
 });
