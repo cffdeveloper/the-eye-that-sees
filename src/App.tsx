@@ -4,67 +4,30 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GeoProvider } from "@/contexts/GeoContext";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import AppLayout from "./components/layout/AppLayout";
-import Dashboard from "./pages/Dashboard";
-import IndustryPage from "./pages/IndustryPage";
-import SubFlowPage from "./pages/SubFlowPage";
-import IntelDashboard from "./pages/IntelDashboard";
-import CrossIntelPage from "./pages/CrossIntelPage";
-import CustomIntelPage from "./pages/CustomIntelPage";
-import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import OnboardingPage from "./pages/OnboardingPage";
-import ProfilePage from "./pages/ProfilePage";
 import SavedLibraryPage from "./pages/SavedLibraryPage";
 import OpportunityDeskPage from "./pages/OpportunityDeskPage";
 import OpportunityDeskDeepDivePage from "./pages/OpportunityDeskDeepDivePage";
+import EventsPage from "./pages/EventsPage";
+import ReadsPage from "./pages/ReadsPage";
 import { OPPORTUNITY_DESK_PATH, assistantDeepDivePath, assistantHomePath } from "@/lib/assistantBranding";
 import NotFound from "./pages/NotFound";
-import AdminPage from "./pages/AdminPage";
-import LandingPage from "./pages/LandingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
-import { Loader2 } from "lucide-react";
 import { SUPABASE_ENV_ERROR } from "@/lib/supabaseEnv";
-import { isAdminEmail } from "@/lib/adminConstants";
 
 const queryClient = new QueryClient();
 
-function HomeGate() {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-  }
-  if (user) return <Navigate to="/dashboard" replace />;
-  return <LandingPage />;
-}
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading } = useAuth();
+function LegacyAuthUrlRedirect() {
   const location = useLocation();
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-primary animate-spin" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/auth" replace />;
-  const adminBypassOnboarding =
-    location.pathname === "/admin" || location.pathname.startsWith("/admin/") ? isAdminEmail(user.email) : false;
-  if (user && profile && !profile.onboarding_completed && !adminBypassOnboarding) {
-    return <Navigate to="/onboarding" replace />;
-  }
-  return <>{children}</>;
+  const q = location.search || "";
+  return <Navigate to={`/opportunities${q}`} replace />;
 }
 
-/** Old `/alfred` and `/jordan` URLs → `/my-desk`. */
+/** Old assistant URLs → `/opportunities`. */
 function LegacyAssistantHomeRedirect() {
   return <Navigate to={assistantHomePath} replace />;
 }
@@ -75,69 +38,46 @@ function LegacyAssistantDeepDiveRedirect() {
   return <Navigate to={assistantDeepDivePath(insightId)} replace />;
 }
 
-function AdminRoute() {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-primary animate-spin" />
-      </div>
-    );
-  }
-  if (!user || !isAdminEmail(user.email)) return <Navigate to="/dashboard" replace />;
-  return <AdminPage />;
+function LegacyMyDeskHomeRedirect() {
+  return <Navigate to="/opportunities" replace />;
 }
 
-function OnboardingGuard({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-primary animate-spin" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/auth" replace />;
-  return <>{children}</>;
+function LegacyMyDeskDeepDiveRedirect() {
+  const { insightId } = useParams<{ insightId: string }>();
+  if (!insightId) return <Navigate to="/opportunities" replace />;
+  return <Navigate to={assistantDeepDivePath(insightId)} replace />;
 }
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<HomeGate />} />
+    <Route path="/" element={<Navigate to="/opportunities" replace />} />
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
     <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-    <Route path="/auth" element={<AuthPage />} />
+    <Route path="/auth" element={<LegacyAuthUrlRedirect />} />
     <Route path="/reset-password" element={<ResetPasswordPage />} />
-    <Route
-      path="/onboarding"
-      element={
-        <OnboardingGuard>
-          <OnboardingPage />
-        </OnboardingGuard>
-      }
-    />
-    <Route
-      element={
-        <ProtectedRoute>
-          <AppLayout />
-        </ProtectedRoute>
-      }
-    >
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/intel" element={<IntelDashboard />} />
-      <Route path="/cross-intel" element={<CrossIntelPage />} />
-      <Route path="/custom-intel" element={<CustomIntelPage />} />
+    <Route element={<AppLayout />}>
+      <Route path="/events" element={<EventsPage />} />
+      <Route path="/reads" element={<ReadsPage />} />
       <Route path={`/${OPPORTUNITY_DESK_PATH}`} element={<OpportunityDeskPage />} />
       <Route path={`/${OPPORTUNITY_DESK_PATH}/deep-dive/:insightId`} element={<OpportunityDeskDeepDivePage />} />
+      <Route path="/saved" element={<SavedLibraryPage />} />
+
+      <Route path="/my-desk" element={<LegacyMyDeskHomeRedirect />} />
+      <Route path="/my-desk/deep-dive/:insightId" element={<LegacyMyDeskDeepDiveRedirect />} />
       <Route path="/alfred" element={<LegacyAssistantHomeRedirect />} />
       <Route path="/alfred/deep-dive/:insightId" element={<LegacyAssistantDeepDiveRedirect />} />
       <Route path="/jordan" element={<LegacyAssistantHomeRedirect />} />
       <Route path="/jordan/deep-dive/:insightId" element={<LegacyAssistantDeepDiveRedirect />} />
-      <Route path="/industry/:slug" element={<IndustryPage />} />
-      <Route path="/industry/:slug/:subFlowId" element={<SubFlowPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/saved" element={<SavedLibraryPage />} />
-      <Route path="/admin" element={<AdminRoute />} />
+
+      <Route path="/dashboard" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/intel" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/cross-intel" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/custom-intel" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/profile" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/onboarding" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/admin" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/industry/:slug" element={<Navigate to="/opportunities" replace />} />
+      <Route path="/industry/:slug/:subFlowId" element={<Navigate to="/opportunities" replace />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>

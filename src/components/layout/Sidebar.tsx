@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { IndustryNavList } from "@/components/layout/IndustryNavList";
+import { PlatformNavList } from "@/components/layout/PlatformNavList";
 
 type SidebarProps = {
   open: boolean;
@@ -18,10 +18,10 @@ export function Sidebar({ open, overlay, onNavigate }: SidebarProps) {
         "border-r border-border/40 bg-sidebar overflow-y-auto overscroll-contain",
         overlay
           ? "fixed left-0 top-[60px] z-40 h-[calc(100dvh-60px)] w-[min(18rem,88vw)] shadow-2xl transition-transform duration-200"
-          : "w-60 shrink-0",
+          : "w-56 shrink-0",
       )}
     >
-      <IndustryNavList onNavigate={onNavigate} className="pb-8" />
+      <PlatformNavList onNavigate={onNavigate} className="pb-6" />
     </aside>
   );
 }

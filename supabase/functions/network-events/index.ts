@@ -41,6 +41,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const trainingCorpus = String(body.trainingCorpus || "").trim().slice(0, 24_000);
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
+    const wideScan = Boolean(body.wideScan);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TAVILY_API_KEY = Deno.env.get("TAVILY_API_KEY") || "";
@@ -69,19 +70,36 @@ serve(async (req) => {
     const bio = String(profile?.bio || "").slice(0, 600);
     const goals = Array.isArray(profile?.goals) ? (profile!.goals as string[]).slice(0, 8).join(", ") : "";
 
-    const topicLine = industries.length ? industries.map((s) => s.replace(/-/g, " ")).join(", ") : "technology, business, innovation";
+    const topicLine = wideScan
+      ? "Across ALL major sectors — finance, tech, healthcare, agriculture, energy, manufacturing, retail, media, education, infrastructure, consumer, sports, arts & culture, hospitality, real estate, logistics, climate, legal, nonprofit, defense, space, and more — plus networking and general-interest gatherings."
+      : industries.length
+        ? industries.map((s) => s.replace(/-/g, " ")).join(", ")
+        : "technology, business, innovation";
 
     const now = new Date();
     const currentYear = now.getFullYear();
     const nextYear = currentYear + 1;
 
-    const queries = [
-      `networking events conferences summits ${primary} ${topicLine} ${currentYear} ${nextYear} upcoming`,
-      `tech startup meetups hackathons pitch events ${primary} ${currentYear} ${nextYear}`,
-      `trade shows exhibitions ${topicLine} ${primary} ${currentYear} schedule registration`,
-      `finance fintech blockchain conferences ${primary} ${currentYear} ${nextYear} upcoming dates`,
-      `agriculture health innovation summits ${primary} ${currentYear} registration tickets`,
-    ];
+    const queries = wideScan
+      ? [
+          `international conferences trade shows summits exhibitions ${currentYear} ${nextYear} schedule registration`,
+          `networking mixers founder meetups VC dinners pitch nights ${primary} ${currentYear} ${nextYear}`,
+          `tech startup hackathons demo days developer conferences ${currentYear} ${nextYear}`,
+          `finance fintech banking asset management conferences ${currentYear} dates`,
+          `healthcare biotech medtech summits ${currentYear} registration`,
+          `agriculture food innovation climate agri summits ${currentYear}`,
+          `manufacturing industrial automation supply chain forums ${currentYear}`,
+          `sports tournaments marathon running festival community events ${primary} ${currentYear}`,
+          `arts film music design cultural festival gala awards ${currentYear} tickets`,
+          `education edtech policy government public sector forums ${currentYear}`,
+        ]
+      : [
+          `networking events conferences summits ${primary} ${topicLine} ${currentYear} ${nextYear} upcoming`,
+          `tech startup meetups hackathons pitch events ${primary} ${currentYear} ${nextYear}`,
+          `trade shows exhibitions ${topicLine} ${primary} ${currentYear} schedule registration`,
+          `finance fintech blockchain conferences ${primary} ${currentYear} ${nextYear} upcoming dates`,
+          `agriculture health innovation summits ${primary} ${currentYear} registration tickets`,
+        ];
 
     let evidence = "";
     if (TAVILY_API_KEY) {
@@ -93,7 +111,7 @@ serve(async (req) => {
     }
 
     const system = `You are a networking research assistant for Infinitygap users.
-They want to FIND IN-PERSON AND ONLINE EVENTS to meet people and learn — conferences, meetups, summits, trade shows, workshops, pitch nights, hackathons, sector forums.
+They want to FIND IN-PERSON AND ONLINE EVENTS — not only “business” events: include professional conferences, networking mixers, trade shows, sector forums, pitch nights, hackathons, charity galas, cultural festivals, sports/community runs, and other high-signal gatherings where they can learn, meet people, or have fun while building a broad network (future “business tycoon” mindset).
 
 CRITICAL DATE RULES:
 - Today's date is ${now.toISOString().slice(0, 10)}.
@@ -101,9 +119,9 @@ CRITICAL DATE RULES:
 - NEVER return events from past years (2024 or earlier). If evidence mentions a 2024 event, find its ${currentYear}/${nextYear} edition instead.
 - If you cannot find an upcoming date for an event, set start_date to null and note "Date TBC — check website" in relevance_note.
 
-USER CONTEXT (respect geography and industries):
+USER CONTEXT (respect geography; ${wideScan ? "CAST A VERY WIDE NET across industries — do not narrow to a single sector." : "weight profile industries."})
 - Region/market lens: ${primary}
-- Industries of interest: ${topicLine}
+- Industries / scope: ${topicLine}
 - Training notes (who they are): ${trainingCorpus.slice(0, 4000) || "(none)"}
 - Profile bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
@@ -125,8 +143,8 @@ RULES:
    - source_hint: short label e.g. "Conference website", "Eventbrite", "Meetup.com"
    - relevance_note: 2-3 sentences explaining why this event matters for THIS specific user based on their profile, and what they could gain from attending
    - topics: string[] 2-5 tags e.g. ["fintech", "Nairobi", "AI"]
-3. Prefer events that match their industries and region; include a mix across their sectors.
-4. Return 15–25 events. Sort by date ascending (soonest first), nulls last.
+3. ${wideScan ? "Include a deliberately diverse mix across many industries and event types (business + networking + culture/sports where relevant)." : "Prefer events that match their industries and region; include a mix across their sectors."}
+4. Return ${wideScan ? "28–40" : "15–25"} events. Sort by date ascending (soonest first), nulls last.
 5. For each event, try hard to find: the venue name, whether it's free or paid, and exact dates.
 6. If evidence is thin for an event, note "Verify on official website" in relevance_note.`;
 
@@ -140,8 +158,8 @@ RULES:
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        temperature: 0.3,
-        max_tokens: 10_000,
+        temperature: 0.35,
+        max_tokens: 14_000,
         messages: [
           { role: "system", content: system },
           { role: "user", content: userMsg },

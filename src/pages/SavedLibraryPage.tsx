@@ -30,6 +30,7 @@ const SOURCE_LABEL: Record<SavedContentSource, string> = {
   trial_showcase: "Showcase",
   region_analytics: "Region",
   custom_intel: "Infinity Lab",
+  opportunity_desk: "Opportunity",
   other: "Saved",
 };
 
@@ -54,7 +55,7 @@ export default function SavedLibraryPage() {
     if (silent) setListRefreshing(true);
     else setLoading(true);
     try {
-      const list = await listIntelItems();
+      const list = (await listIntelItems()).filter((x) => x.source === "opportunity_desk");
       setItems(list);
       setSelected((prev) => {
         if (!prev) return null;
@@ -90,12 +91,12 @@ export default function SavedLibraryPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 pb-10">
+    <div className="w-full max-w-6xl space-y-6 pb-10">
       <div className="space-y-1">
         <h1 className="font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">Saved</h1>
         <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-          Intel you&apos;ve saved stays on this device (IndexedDB) so you can reopen it anytime — no refetch, works offline.
-          Use <span className="font-semibold text-foreground">Save</span> when viewing a brief.
+          Opportunity deep dives you explicitly save from full analysis stay on this device (IndexedDB). Reads live under{" "}
+          <span className="font-semibold text-foreground">Reads</span> automatically.
         </p>
       </div>
 
@@ -119,7 +120,8 @@ export default function SavedLibraryPage() {
             <SavedLibraryListSkeleton />
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border/60 px-4 py-10 text-center text-sm text-muted-foreground">
-              Nothing saved yet. Open a brief and tap <strong className="text-foreground">Save</strong>.
+              Nothing saved yet. Open an opportunity <strong className="text-foreground">deep dive</strong> and tap{" "}
+              <strong className="text-foreground">Save</strong>.
             </div>
           ) : (
             <ScrollArea className="h-[min(70vh,520px)] pr-2">

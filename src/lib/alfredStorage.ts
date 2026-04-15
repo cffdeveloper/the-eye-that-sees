@@ -138,7 +138,8 @@ export function saveInsightsCache(
   return full;
 }
 
-export const ALFRED_REFRESH_MS = 24 * 60 * 60 * 1000;
+/** Autonomous opportunity refresh cadence (client + background runs). */
+export const ALFRED_REFRESH_MS = 2 * 60 * 60 * 1000;
 
 export function insightsNeedRefresh(cache: AlfredInsightsBundle | null): boolean {
   if (!cache) return true;
@@ -149,4 +150,43 @@ export function msUntilNextRefresh(cache: AlfredInsightsBundle | null): number {
   if (!cache) return 0;
   const elapsed = Date.now() - cache.generatedAt;
   return Math.max(0, ALFRED_REFRESH_MS - elapsed);
+}
+
+function insightDedupeKey(i: AlfredInsight): string {
+  return `${i.title.trim().toLowerCase()}|${i.category.trim().toLowerCase()}`;
+}
+
+/**
+ * Merges a freshly generated deck into the existing cache: new titles are appended,
+ * overlapping titles keep the higher priority score, list is sorted by priority desc.
+ */
+export function mergeInsightsCache(
+  incomingExec: string,
+  incomingInsightsRaw: unknown[],
+  incomingDisclaimer: string | undefined,
+  previous: AlfredInsightsBundle | null,
+): AlfredInsightsBundle {
+  const generatedAt = Date.now();
+  const normalizedNew = normalizeInsightsList(incomingInsightsRaw, generatedAt);
+  const map = new Map<string, AlfredInsight>();
+
+  for (const x of previous?.insights ?? []) {
+    map.set(insightDedupeKey(x), x);
+  }
+  for (const x of normalizedNew) {
+    const k = insightDedupeKey(x);
+    const prevRow = map.get(k);
+    if (!prevRow || x.priority > prevRow.priority) {
+      map.set(k, x);
+    }
+  }
+
+  const insights = [...map.values()].sort((a, b) => b.priority - a.priority);
+
+  return {
+    generatedAt,
+    executiveSummary: incomingExec || previous?.executiveSummary || "",
+    insights,
+    disclaimer: incomingDisclaimer ?? previous?.disclaimer,
+  };
 }

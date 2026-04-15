@@ -6,7 +6,12 @@ const DB_NAME = "infinitygap_saved_intel_v1";
 const STORE = "items";
 const DB_VERSION = 1;
 
-export type SavedContentSource = "trial_showcase" | "region_analytics" | "custom_intel" | "other";
+export type SavedContentSource =
+  | "trial_showcase"
+  | "region_analytics"
+  | "custom_intel"
+  | "opportunity_desk"
+  | "other";
 
 export interface SavedContentRecord {
   id: string;

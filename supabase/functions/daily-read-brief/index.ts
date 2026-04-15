@@ -1,15 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { requireAuthUser, debitCreditsOrResponse } from "../_shared/authUser.ts";
+import { corsHeadersForRequest } from "../_shared/cors.ts";
 import { USAGE_COST_USD } from "../_shared/creditsConfig.ts";
 import { tavilySearch } from "../_shared/searchTools.ts";
-
-const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
 
 const EXTENDED_RESEARCH_STEPS = 60;
 
@@ -20,6 +14,10 @@ type Body = {
   jobId?: string;
   focusIndustries?: string[];
   customFocus?: string;
+  /** When true, brief spans essentially all major industries (cross-sector radar). */
+  fullIndustrySweep?: boolean;
+  /** Short excerpts from recent digests — model must not repeat the same angles. */
+  priorDigestExcerpts?: string[];
 };
 
 function buildUniqueQuery(
@@ -227,11 +225,14 @@ Do not end until length floor is satisfied.`,
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const cors = corsHeadersForRequest(req);
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: cors });
+  }
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 
@@ -245,35 +246,57 @@ serve(async (req) => {
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
     const focusIndustries = Array.isArray(body.focusIndustries) ? body.focusIndustries.slice(0, 12) : [];
     const customFocus = typeof body.customFocus === "string" ? body.customFocus.trim().slice(0, 500) : "";
+    const fullIndustrySweep = Boolean(body.fullIndustrySweep);
+    const priorDigestExcerpts = Array.isArray(body.priorDigestExcerpts)
+      ? body.priorDigestExcerpts.map((s) => String(s).trim().slice(0, 1_400)).filter(Boolean).slice(0, 5)
+      : [];
+
+    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+    if (action === "list") {
+      const { data, error } = await sb
+        .from("user_read_briefs")
+        .select("*")
+        .eq("user_id", auth.userId)
+        .order("created_at", { ascending: false })
+        .limit(60);
+      if (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ briefs: data ?? [] }), {
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TAVILY_API_KEY = Deno.env.get("TAVILY_API_KEY") || "";
     if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY not configured" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
-
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     if (action === "status") {
       const jobId = String(body.jobId || "").trim();
       if (!jobId) {
         return new Response(JSON.stringify({ error: "jobId required" }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
       const { data: job, error } = await sb.from("user_read_brief_jobs").select("*").eq("id", jobId).eq("user_id", auth.userId).maybeSingle();
       if (error || !job) {
         return new Response(JSON.stringify({ error: "Job not found" }), {
           status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
       return new Response(JSON.stringify({ job }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -291,7 +314,7 @@ serve(async (req) => {
             error: "An extended research job is already in progress.",
             code: "JOB_ACTIVE",
           }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
         );
       }
 
@@ -300,7 +323,7 @@ serve(async (req) => {
         auth.userId,
         USAGE_COST_USD.daily_read_brief_extended,
         "daily_read_brief_extended_start",
-        corsHeaders,
+        cors,
         auth.email,
       );
       if (paywall) return paywall;
@@ -324,7 +347,7 @@ serve(async (req) => {
         console.error("start_extended", insErr);
         return new Response(JSON.stringify({ error: "Could not start job" }), {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
 
@@ -335,7 +358,7 @@ serve(async (req) => {
           maxSteps: job.max_steps,
           message: "Extended research started.",
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -344,7 +367,7 @@ serve(async (req) => {
       if (!jobId) {
         return new Response(JSON.stringify({ error: "jobId required" }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
 
@@ -358,7 +381,7 @@ serve(async (req) => {
       if (jobErr || !jobRow) {
         return new Response(JSON.stringify({ error: "Job not found" }), {
           status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
 
@@ -366,12 +389,12 @@ serve(async (req) => {
       const job = jobRow as any;
       if (job.status === "complete") {
         return new Response(JSON.stringify({ status: "complete", resultBriefId: job.result_brief_id }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
       if (job.status === "failed") {
         return new Response(JSON.stringify({ status: "failed", error: job.error || "failed" }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
 
@@ -405,7 +428,7 @@ serve(async (req) => {
             .eq("id", jobId);
           return new Response(JSON.stringify({ error: "TAVILY_API_KEY required for extended pipeline" }), {
             status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...cors, "Content-Type": "application/json" },
           });
         }
 
@@ -437,7 +460,7 @@ serve(async (req) => {
             phase: "research",
             message: `Research wave ${step + 1}/${EXTENDED_RESEARCH_STEPS} stored.`,
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...cors, "Content-Type": "application/json" } },
         );
       }
 
@@ -499,7 +522,7 @@ serve(async (req) => {
             phase: "compiled",
             brief: inserted,
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...cors, "Content-Type": "application/json" } },
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : "compile failed";
@@ -513,7 +536,7 @@ serve(async (req) => {
           .eq("id", jobId);
         return new Response(JSON.stringify({ error: msg, status: "failed" }), {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...cors, "Content-Type": "application/json" },
         });
       }
     }
@@ -522,7 +545,7 @@ serve(async (req) => {
     if (action !== "standard") {
       return new Response(JSON.stringify({ error: "Unknown action" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -531,7 +554,7 @@ serve(async (req) => {
       auth.userId,
       USAGE_COST_USD.daily_read_brief,
       "daily_read_brief",
-      corsHeaders,
+      cors,
       auth.email,
     );
     if (paywall) return paywall;
@@ -544,10 +567,15 @@ serve(async (req) => {
 
     let industries = (profile?.industries_of_interest as string[] | null)?.slice(0, 10) ?? [];
     if (focusIndustries.length > 0) industries = focusIndustries;
+    if (fullIndustrySweep) industries = [];
     const primary = String(profile?.primary_market || "").trim() || geoHint;
     const bio = String(profile?.bio || "").slice(0, 800);
     const goals = Array.isArray(profile?.goals) ? (profile!.goals as string[]).join(", ") : "";
-    const topicLine = industries.length ? industries.map((s) => s.replace(/-/g, " ")).join(", ") : "global markets, technology, policy";
+    const topicLine = fullIndustrySweep
+      ? "A deliberate cross-sector sweep: technology, finance, healthcare, industrials, energy, materials, consumer, retail, media, telecom, agriculture, food systems, climate, logistics, real estate, education, public sector, defense, aerospace, legal, nonprofit, sports, arts, and frontier topics — connect dots across industries."
+      : industries.length
+        ? industries.map((s) => s.replace(/-/g, " ")).join(", ")
+        : "global markets, technology, policy";
 
     const focusNote = customFocus
       ? `\nSPECIAL FOCUS: The reader specifically wants to read about "${customFocus}". Make this the central theme while connecting to their broader context.\n`
@@ -559,12 +587,20 @@ serve(async (req) => {
       const q1 = await tavilySearch(`latest sector market developments ${searchTopic} last 14 days`, TAVILY_API_KEY);
       const q2 = await tavilySearch(`global macro policy regulatory outlook ${searchTopic}`, TAVILY_API_KEY);
       const q3 = await tavilySearch(`${searchTopic} competitive landscape investment funding trends`, TAVILY_API_KEY);
-      evidence = `${q1}\n\n${q2}\n\n${q3}`.slice(0, 32_000);
+      const q4 = fullIndustrySweep
+        ? await tavilySearch(`cross-industry disruptions emerging markets labor commodities ${primary} last 14 days`, TAVILY_API_KEY)
+        : "";
+      evidence = `${q1}\n\n${q2}\n\n${q3}${q4 ? `\n\n${q4}` : ""}`.slice(0, 32_000);
     } else {
       evidence = "(Limited: add TAVILY_API_KEY for fresher web grounding.)";
     }
 
     const dayStr = new Date().toISOString().slice(0, 10);
+
+    const antiRepeat =
+      priorDigestExcerpts.length > 0
+        ? `\n\nNON-REPETITION RULE:\nThe reader already has recent digests. Do **not** reuse the same framing, section titles, or dominant stories as these excerpts — find fresh developments and different sector emphasis:\n${priorDigestExcerpts.map((x, i) => `--- Prior excerpt ${i + 1} ---\n${x}`).join("\n\n")}\n`
+        : "";
 
     const system = `You are Infinitygap's research editor. Write **one** Markdown **daily intelligence gazette** — comprehensive, global, cross-industry, personalized to the reader's training notes.
 
@@ -583,7 +619,7 @@ READER:
 - Bio: ${bio || "(none)"}
 - Goals: ${goals || "(none)"}
 - Training notes (memory): ${trainingCorpus.slice(0, 9000) || "(none)"}
-
+${antiRepeat}
 FRESH WEB SNIPPETS:
 ${evidence}
 
@@ -618,7 +654,7 @@ DOCUMENT:
       console.error("daily-read-brief standard", response.status, t);
       return new Response(JSON.stringify({ error: "AI gateway error", detail: t.slice(0, 400) }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -627,7 +663,7 @@ DOCUMENT:
     if (bodyMarkdown.length < 2_000) {
       return new Response(JSON.stringify({ error: "Brief too short — try again." }), {
         status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -649,18 +685,18 @@ DOCUMENT:
       console.error("insert user_read_briefs", insErr);
       return new Response(JSON.stringify({ error: "Could not save brief" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
     return new Response(JSON.stringify({ brief: inserted, action: "standard" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("daily-read-brief", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Server error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 });

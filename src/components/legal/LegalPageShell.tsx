@@ -44,7 +44,7 @@ export function LegalPageShell({ title, lastUpdated = "March 22, 2026", children
           <Link to="/terms-of-service" className="text-primary font-medium hover:underline">
             Terms of service
           </Link>
-          <Link to="/auth" className="text-muted-foreground hover:text-foreground">
+          <Link to="/opportunities" className="text-muted-foreground hover:text-foreground">
             Sign in
           </Link>
         </footer>

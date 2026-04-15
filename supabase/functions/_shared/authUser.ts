@@ -4,34 +4,38 @@ export type AuthResult =
   | { ok: true; userId: string; email?: string }
   | { ok: false; response: Response };
 
-export async function requireAuthUser(req: Request, anonKey: string, supabaseUrl: string): Promise<AuthResult> {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader) {
+/**
+ * No end-user JWT: all app traffic uses one shared Supabase user id.
+ * Set Edge Function secret `APP_SHARED_USER_ID` to a real `auth.users.id` (Dashboard → Authentication → Users).
+ */
+export async function requireAuthUser(
+  _req: Request,
+  _anonKey: string,
+  _supabaseUrl: string,
+): Promise<AuthResult> {
+  const id = Deno.env.get("APP_SHARED_USER_ID")?.trim();
+  if (!id) {
     return {
       ok: false,
-      response: new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      }),
+      response: new Response(
+        JSON.stringify({
+          error:
+            "Set Edge Function secret APP_SHARED_USER_ID to a valid auth.users UUID (Supabase Dashboard → Authentication → Users).",
+        }),
+        {
+          status: 503,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers":
+              "authorization, x-client-info, apikey, content-type, prefer, accept, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+          },
+        },
+      ),
     };
   }
-  const supabase = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-  });
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) {
-    return {
-      ok: false,
-      response: new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      }),
-    };
-  }
-  return { ok: true, userId: user.id, email: user.email };
+  return { ok: true, userId: id, email: undefined };
 }
 
 /**

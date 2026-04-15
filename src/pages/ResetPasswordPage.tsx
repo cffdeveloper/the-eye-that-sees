@@ -35,7 +35,7 @@ export default function ResetPasswordPage() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast.success("Password updated successfully!");
-      navigate("/dashboard");
+      navigate("/opportunities");
     } catch (err: any) {
       toast.error(err.message || "Failed to reset password");
     } finally {
@@ -72,7 +72,7 @@ export default function ResetPasswordPage() {
             </p>
           </div>
           <Button className="w-full h-11 rounded-xl font-semibold" asChild>
-            <Link to="/auth?mode=forgot">Request new link</Link>
+            <Link to="/opportunities">Back to app</Link>
           </Button>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function ResetPasswordPage() {
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <ThemeToggle size="sm" />
             <Link
-              to="/auth"
+              to="/opportunities"
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/50 bg-background/60 px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:border-border hover:bg-muted/50 hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />

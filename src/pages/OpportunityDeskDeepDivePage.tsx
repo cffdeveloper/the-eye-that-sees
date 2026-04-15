@@ -12,12 +12,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGeoContext } from "@/contexts/GeoContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import { ProUpgradePrompt, ProGateLoading } from "@/components/ProUpgradePrompt";
 import { Button } from "@/components/ui/button";
+import { SaveIntelButton } from "@/components/saved/SaveIntelButton";
 import { cn } from "@/lib/utils";
 import { assistantHomePath } from "@/lib/assistantBranding";
-import { deskNavLabel, profileFirstName } from "@/lib/profileDisplayName";
+import { profileFirstName } from "@/lib/profileDisplayName";
 import {
   findInsightById,
   getTrainingCorpus,
@@ -58,6 +57,68 @@ function insightResearchUrl(insight: AlfredInsight): string {
   return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
 }
 
+function buildDeepDiveMarkdown(insight: AlfredInsight, analysis: DeepDiveAnalysis): string {
+  const parts: string[] = [];
+  parts.push(`# ${insight.title}`, "");
+  parts.push(
+    "::: insight_snapshot",
+    `**Category:** ${insight.category.replace(/_/g, " ")} · **Timing:** ${insight.timing} · **Priority:** ${insight.priority}`,
+    "",
+    insight.summary,
+    ":::",
+    "",
+  );
+  if (analysis.userProfileMirror) parts.push("## How this applies to you", "", analysis.userProfileMirror, "");
+  if (analysis.executiveThesis) parts.push("## Executive thesis", "", analysis.executiveThesis, "");
+  if (analysis.landscape) parts.push("## Landscape & forces", "", analysis.landscape, "");
+  if (analysis.crossIndustry.length > 0) {
+    parts.push("## Cross-industry connections", "");
+    analysis.crossIndustry.forEach((row, i) => {
+      parts.push(`### ${i + 1}. ${row.industry}`, "", row.whyItMattersForTheUser, "", `*Bridge:* ${row.linkToThisIdea}`, "");
+    });
+  }
+  if (analysis.gapBridges.length > 0) {
+    parts.push("## Gaps you could bridge", "");
+    analysis.gapBridges.forEach((g, i) => {
+      parts.push(
+        `### ${i + 1}. ${g.gap}`,
+        "",
+        `**Difficulty:** ${g.roughDifficulty}`,
+        "",
+        `**Underserved:** ${g.whoIsUnderserved}`,
+        "",
+        `**How you could fill it:** ${g.howYouCouldFill}`,
+        "",
+        g.industriesInvolved.length ? `*Industries:* ${g.industriesInvolved.join(", ")}` : "",
+        "",
+      );
+    });
+  }
+  if (analysis.positioningPlaybook) parts.push("## Positioning playbook", "", analysis.positioningPlaybook, "");
+  if (analysis.monetizationPaths.length > 0) {
+    parts.push("## Monetization paths", "");
+    analysis.monetizationPaths.forEach((line, i) => parts.push(`${i + 1}. ${line}`));
+    parts.push("");
+  }
+  if (analysis.ninetyDayPlan.length > 0) {
+    parts.push("## ~90 day execution map", "");
+    analysis.ninetyDayPlan.forEach((line, i) => parts.push(`${i + 1}. ${line}`));
+    parts.push("");
+  }
+  if (analysis.risksMissteps.length > 0) {
+    parts.push("## Risks & missteps", "");
+    analysis.risksMissteps.forEach((line) => parts.push(`- ${line}`));
+    parts.push("");
+  }
+  if (analysis.researchQueries.length > 0) {
+    parts.push("## Suggested research queries", "");
+    analysis.researchQueries.forEach((q) => parts.push(`- ${q}`));
+    parts.push("");
+  }
+  if (analysis.disclaimer) parts.push("## Disclaimer", "", analysis.disclaimer, "");
+  return parts.join("\n\n").trim();
+}
+
 function SectionTitle({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <h2
@@ -72,15 +133,13 @@ function SectionTitle({ children, className }: { children: ReactNode; className?
 }
 
 function BackLink() {
-  const { profile, user } = useAuth();
-  const label = deskNavLabel(profile, user?.email);
   return (
     <Link
       to={assistantHomePath}
       className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
     >
       <ArrowLeft className="h-4 w-4 shrink-0" />
-      Back to {label}
+      Back to opportunities
     </Link>
   );
 }
@@ -89,7 +148,6 @@ export default function OpportunityDeskDeepDivePage() {
   const { insightId } = useParams<{ insightId: string }>();
   const { geoString, isGlobal } = useGeoContext();
   const { profile, user } = useAuth();
-  const { isPro, loading: subscriptionLoading } = useSubscription();
   const geoHint = isGlobal ? "global markets" : geoString;
   const addressAs = profileFirstName(profile, user?.email);
 
@@ -140,30 +198,22 @@ export default function OpportunityDeskDeepDivePage() {
   );
 
   useEffect(() => {
-    if (!insight || !isPro || subscriptionLoading) return;
+    if (!insight) return;
     void runDeepDive(insight);
-  }, [insight, runDeepDive, isPro, subscriptionLoading]);
+  }, [insight, runDeepDive]);
 
   if (!insightId) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
+      <div className="w-full max-w-6xl py-12">
         <BackLink />
         <p className="mt-6 text-sm text-muted-foreground">Missing opportunity id.</p>
       </div>
     );
   }
 
-  if (subscriptionLoading) {
-    return (
-      <div className="mx-auto max-w-3xl pb-12">
-        <ProGateLoading />
-      </div>
-    );
-  }
-
   if (!insight) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6 pb-16 px-4 sm:px-0">
+      <div className="w-full max-w-6xl space-y-6 pb-16">
         <BackLink />
         <div className="rounded-2xl border border-dashed border-border/70 bg-muted/20 p-8 text-center space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -171,36 +221,15 @@ export default function OpportunityDeskDeepDivePage() {
             card.
           </p>
           <Button type="button" className="rounded-xl font-semibold" asChild>
-            <Link to={assistantHomePath}>Back to desk</Link>
+            <Link to={assistantHomePath}>Back to opportunities</Link>
           </Button>
         </div>
       </div>
     );
   }
 
-  if (!isPro) {
-    return (
-      <div className="mx-auto max-w-3xl space-y-8 pb-16 px-4 sm:px-0">
-        <BackLink />
-        <div className="rounded-2xl border border-border/60 bg-card/50 p-6 sm:p-8 space-y-4">
-          <h1 className="font-display text-xl font-bold text-foreground">Full deep dive is a Pro feature</h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Upgrade to generate long-form cross-industry analysis, gap maps, positioning playbooks, and 90-day execution plans for
-            each opportunity.
-          </p>
-          <div className="rounded-xl border border-border/50 bg-muted/20 p-4">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Preview — your card</p>
-            <p className="text-sm font-semibold text-foreground">{insight.title}</p>
-            <p className="text-sm text-muted-foreground mt-2 line-clamp-4">{insight.summary}</p>
-          </div>
-          <ProUpgradePrompt feature="Unlock full deep-dive briefs, unlimited deck cards, and complete executive summaries on your personal opportunity desk." />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto max-w-3xl space-y-10 pb-20 px-4 sm:px-0">
+    <div className="w-full max-w-6xl space-y-10 pb-20">
       <header className="space-y-4">
         <BackLink />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -235,6 +264,16 @@ export default function OpportunityDeskDeepDivePage() {
                 Web search
               </a>
             </Button>
+            {analysis && (
+              <SaveIntelButton
+                title={`${insight.title} — deep dive`}
+                subtitle="Opportunity desk"
+                source="opportunity_desk"
+                sourceDetail={profile?.display_name || user?.email || undefined}
+                size="sm"
+                getBody={() => buildDeepDiveMarkdown(insight, analysis)}
+              />
+            )}
           </div>
         </div>
       </header>

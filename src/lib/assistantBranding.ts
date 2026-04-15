@@ -1,8 +1,8 @@
 /**
- * Stable URL segment for the personal opportunity desk (name comes from profile in UI).
- * Legacy paths `/alfred` and `/jordan` redirect here.
+ * Personal opportunity workspace — deep dives live under this path.
+ * Legacy `/my-desk`, `/alfred`, `/jordan` redirect here.
  */
-export const OPPORTUNITY_DESK_PATH = "my-desk";
+export const OPPORTUNITY_DESK_PATH = "opportunities";
 
 export const assistantHomePath = `/${OPPORTUNITY_DESK_PATH}` as const;
 

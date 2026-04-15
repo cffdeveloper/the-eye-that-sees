@@ -61,7 +61,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-0 sm:space-y-8">
+    <div className="w-full max-w-6xl space-y-6 sm:space-y-8">
       <div>
         <h1 className="font-display text-xl font-bold text-foreground sm:text-2xl">My Profile</h1>
         <p className="text-sm text-muted-foreground mt-1">Manage your account and how Infinitygap personalizes briefs</p>
