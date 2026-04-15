@@ -23,8 +23,23 @@ function googleSiteVerificationPlugin(mode: string): Plugin {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
-  const supabaseUrl = env.VITE_SUPABASE_URL?.trim();
+  const envDir = process.cwd();
+  // Use VITE_ prefix explicitly so .env is always picked up the same way as the client bundle.
+  const viteEnv = loadEnv(mode, envDir, "VITE_");
+  const supabaseUrl = (
+    viteEnv.VITE_SUPABASE_URL ||
+    process.env.VITE_SUPABASE_URL ||
+    ""
+  )
+    .trim()
+    .replace(/\/+$/, "");
+
+  if (mode === "development" && !supabaseUrl) {
+    console.warn(
+      "[vite] VITE_SUPABASE_URL is missing — the /supabase-functions dev proxy is OFF. Edge calls will 404 on localhost. Add VITE_SUPABASE_URL to .env (see .env.example).",
+    );
+  }
+
   return {
   server: {
     host: "::",

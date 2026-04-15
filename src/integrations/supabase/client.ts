@@ -19,7 +19,8 @@ function devFunctionsProxyFetch(input: RequestInfo | URL, init?: RequestInit): P
     typeof input === "string" ? input : input instanceof Request ? input.url : input instanceof URL ? input.href : String(input);
   if (url.startsWith(base) && url.includes("/functions/v1/")) {
     const path = url.slice(base.length);
-    return fetch(`/supabase-functions${path}`, init);
+    const prefix = `${(import.meta.env.BASE_URL ?? "/").replace(/\/$/, "")}/supabase-functions`;
+    return fetch(`${prefix}${path}`, init);
   }
   return fetch(input, init);
 }
