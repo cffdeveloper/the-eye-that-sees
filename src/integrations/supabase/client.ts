@@ -20,7 +20,14 @@ function devFunctionsProxyFetch(input: RequestInfo | URL, init?: RequestInit): P
   if (url.startsWith(base) && url.includes("/functions/v1/")) {
     const path = url.slice(base.length);
     const prefix = `${(import.meta.env.BASE_URL ?? "/").replace(/\/$/, "")}/supabase-functions`;
-    return fetch(`${prefix}${path}`, init);
+    return fetch(`${prefix}${path}`, init).then((res) => {
+      // Some local setups can return 404/502 before proxy middleware handles the route.
+      // Fall back to direct Supabase call rather than hard-failing the request.
+      if (res.status === 404 || res.status === 502) {
+        return fetch(url, init);
+      }
+      return res;
+    });
   }
   return fetch(input, init);
 }
