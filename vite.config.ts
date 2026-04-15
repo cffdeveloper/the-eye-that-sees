@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { supabaseEdgeProxyPlugin } from "./vite-plugins/supabaseEdgeProxyPlugin";
 
 function escapeHtmlAttr(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -48,38 +49,17 @@ export default defineConfig(({ mode }) => {
     hmr: {
       overlay: false,
     },
-    // Dev-only: same-origin proxy so Edge Function calls avoid browser CORS preflight to *.supabase.co.
-    ...(supabaseUrl
-      ? {
-          proxy: {
-            "/supabase-functions": {
-              target: supabaseUrl,
-              changeOrigin: true,
-              secure: true,
-              rewrite: (path) => path.replace(/^\/supabase-functions/, ""),
-            },
-          },
-        }
-      : {}),
   },
   preview: {
     host: "::",
     port: 10000,
     allowedHosts: ["infinitygap.onrender.com", "intelgoldmine.onrender.com", ".onrender.com"],
-    ...(supabaseUrl
-      ? {
-          proxy: {
-            "/supabase-functions": {
-              target: supabaseUrl,
-              changeOrigin: true,
-              secure: true,
-              rewrite: (path) => path.replace(/^\/supabase-functions/, ""),
-            },
-          },
-        }
-      : {}),
   },
-  plugins: [react(), googleSiteVerificationPlugin(mode)],
+  plugins: [
+    supabaseEdgeProxyPlugin(supabaseUrl),
+    react(),
+    googleSiteVerificationPlugin(mode),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
