@@ -1,2 +1,2 @@
-/** Primary logo asset in `public/` — single source; `favicon.png` / `og-image.png` are copies for short URLs. */
-export const BRAND_LOGO_PATH = "/Final Logo.png";
+/** Primary logo asset in `public/` — use the slugged filename for local/dev compatibility. */
+export const BRAND_LOGO_PATH = "/final-logo.png";
