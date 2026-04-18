@@ -135,12 +135,40 @@ serve(async (req) => {
         `Bio/title: ${profile.bio || ""} ${profile.title || ""}`,
       ].join("\n");
 
+      // Pull buffered candidates from the most recent two 2h windows (current + previous,
+      // in case this scanner ran slightly after the window rolled over).
+      const twoH = 2 * 60 * 60 * 1000;
+      const windowStart = Math.floor(Date.now() / twoH) * twoH;
+      const prevWindowStart = windowStart - twoH;
+      const bufferKeys = [`microscan_buffer_${windowStart}`, `microscan_buffer_${prevWindowStart}`];
+      const { data: bufferRows } = await sb
+        .from("proactive_search_cache")
+        .select("cache_key, payload")
+        .in("cache_key", bufferKeys);
+
+      const allBuffered: Record<string, unknown>[] = [];
+      for (const row of (bufferRows || []) as { payload: { candidates?: unknown[] } }[]) {
+        const cs = Array.isArray(row.payload?.candidates) ? row.payload.candidates : [];
+        for (const c of cs) allBuffered.push(c as Record<string, unknown>);
+      }
+
+      const bufferedSeedsText = allBuffered.length
+        ? allBuffered
+            .slice(-80)
+            .map(
+              (c, i) =>
+                `${i + 1}. [${c.category || "?"}] ${c.title || "(untitled)"} — ${c.one_liner || ""} | buyer: ${c.buyer || "?"} | supplier: ${c.supplier_or_source || "?"} | channel: ${c.channel || "?"} | cap: ${c.ballpark_capital_usd || "?"} | rev: ${c.ballpark_monthly_revenue_usd || "?"} | why_now: ${c.why_now || "?"}`,
+            )
+            .join("\n")
+        : "";
+
       const system = proactiveScannerSystemPrompt(ctx as UserGuardrailContext);
       const userMsg = proactiveScannerUserMessage({
         profile_summary: profileSummary,
         memory_excerpts: memoryExcerpts,
         search_evidence: searchEvidence,
         industries: ctx.industries_of_interest,
+        buffered_seeds: bufferedSeedsText,
       });
 
       const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
