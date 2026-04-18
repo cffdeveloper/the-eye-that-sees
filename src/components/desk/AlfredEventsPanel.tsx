@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { getTrainingCorpus } from "@/lib/alfredStorage";
+import { getTrainingCorpus, normalizeInsightsList } from "@/lib/alfredStorage";
 import { loadEventsFeed, mergeServerEvents, setEventArchived, type StoredNetworkEvent } from "@/lib/eventsFeedStorage";
 import type { NetworkEventRow } from "@/lib/networkEventTypes";
 
@@ -69,6 +69,23 @@ function formatBadgeLabel(format: string) {
   }
 }
 
+function opportunityInsightsToEvents(insightsRaw: unknown[], geoHint: string): NetworkEventRow[] {
+  const insights = normalizeInsightsList(Array.isArray(insightsRaw) ? insightsRaw : [], Date.now());
+  return insights.slice(0, 24).map((ins) => ({
+    title: ins.title,
+    start_date: null,
+    end_date: null,
+    location: geoHint,
+    venue: ins.category.replace(/_/g, " "),
+    format: "unknown",
+    entrance_fee: null,
+    url: null,
+    source_hint: "opportunity-radar",
+    relevance_note: ins.summary,
+    topics: [ins.category, ins.timing, ...ins.actions.slice(0, 2)].filter(Boolean),
+  }));
+}
+
 export function AlfredEventsPanel({ geoHint }: { geoHint: string }) {
   const [events, setEvents] = useState<StoredNetworkEvent[]>(() => loadEventsFeed());
   const [disclaimer, setDisclaimer] = useState("");
@@ -86,8 +103,8 @@ export function AlfredEventsPanel({ geoHint }: { geoHint: string }) {
     setLoading(true);
     try {
       const trainingCorpus = getTrainingCorpus();
-      const { data, error } = await supabase.functions.invoke("network-events", {
-        body: { trainingCorpus, geoHint, wideScan: true },
+      const { data, error } = await supabase.functions.invoke("alfred-opportunities", {
+        body: { trainingCorpus, geoHint, mergeProactiveGaps: true },
       });
       if (error) throw error;
       if (data?.code === "INSUFFICIENT_CREDITS") {
@@ -95,10 +112,14 @@ export function AlfredEventsPanel({ geoHint }: { geoHint: string }) {
         return;
       }
       if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
-      const batch = Array.isArray(data.events) ? (data.events as NetworkEventRow[]) : [];
+      const batch = opportunityInsightsToEvents(data?.insights, geoHint);
       mergeServerEvents(batch);
       syncFromStorage();
-      setDisclaimer(typeof data.disclaimer === "string" ? data.disclaimer : "");
+      setDisclaimer(
+        typeof data?.disclaimer === "string"
+          ? data.disclaimer
+          : "Mapped from opportunity radar so Events stays synced with the strongest pulling pipeline.",
+      );
       toast.success("Events updated");
     } catch (e) {
       console.error(e);

@@ -86,7 +86,9 @@ function InsightCard({ insight, rank }: { insight: AlfredInsight; rank: number }
       )}
     >
       <InsightMetaRow insight={insight} rank={rank} />
-      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{insight.summary}</p>
+      <p className="mt-3 max-h-[min(28rem,55vh)] overflow-y-auto pr-1 text-sm text-muted-foreground leading-relaxed [scrollbar-gutter:stable]">
+        {insight.summary}
+      </p>
       {insight.actions.length > 0 && (
         <ol className="mt-3 space-y-1.5 text-xs text-foreground/90 list-decimal list-inside">
           {insight.actions.map((a, i) => (
@@ -149,6 +151,8 @@ export default function OpportunityDeskPage() {
             geoHint,
             addressAs: addressAs || undefined,
             mergeProactiveGaps: true,
+            businessMode: true,
+            microScanCount: 14,
           },
         });
         if (error) throw error;
@@ -208,8 +212,8 @@ export default function OpportunityDeskPage() {
           <div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{pageTitle}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Cross-industry ideas ranked for you. New runs merge into this list every two hours (lower-fit ideas stay lower). Geography:{" "}
-              {geoHint}.
+              Operator mode: practical revenue plays (buy-sell, services, niche B2B). Each automated run performs many internal research waves,
+              then merges fresh rows into this list about every two hours — duplicates collapse, the rest stack. Geography: {geoHint}.
             </p>
           </div>
         </div>

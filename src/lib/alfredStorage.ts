@@ -34,8 +34,8 @@ export function normalizeInsight(
   raw: Record<string, unknown>,
   idContext?: { generatedAt: number; index: number },
 ): AlfredInsight {
-  const actions = Array.isArray(raw.actions) ? raw.actions.map((a) => String(a).slice(0, 400)).slice(0, 8) : [];
-  const caveats = Array.isArray(raw.caveats) ? raw.caveats.map((c) => String(c).slice(0, 400)).slice(0, 6) : [];
+  const actions = Array.isArray(raw.actions) ? raw.actions.map((a) => String(a).slice(0, 900)).slice(0, 14) : [];
+  const caveats = Array.isArray(raw.caveats) ? raw.caveats.map((c) => String(c).slice(0, 500)).slice(0, 8) : [];
   const title = String(raw.title || "Opportunity").slice(0, 200);
   let id = typeof raw.id === "string" && raw.id.length > 0 ? raw.id : "";
   if (!id && idContext) id = deterministicInsightId(idContext.generatedAt, idContext.index, title);
@@ -44,7 +44,7 @@ export function normalizeInsight(
     id,
     priority: Math.min(100, Math.max(1, Number(raw.priority) || 50)),
     title,
-    summary: String(raw.summary || "").slice(0, 1200),
+    summary: String(raw.summary || "").slice(0, 12_000),
     category: String(raw.category || "other").slice(0, 80),
     timing: String(raw.timing || "watchlist").slice(0, 80),
     actions,
@@ -152,8 +152,35 @@ export function msUntilNextRefresh(cache: AlfredInsightsBundle | null): number {
   return Math.max(0, ALFRED_REFRESH_MS - elapsed);
 }
 
+const DEDUPE_STOPWORDS = new Set([
+  "powered",
+  "driven",
+  "based",
+  "platform",
+  "solution",
+  "solutions",
+  "tools",
+  "tool",
+  "market",
+  "markets",
+  "global",
+  "africa",
+  "african",
+  "emerging",
+  "digital",
+  "smart",
+  "advanced",
+]);
+
+/** Fuzzy-ish key so near-duplicate headlines collapse, but genuinely different ideas stay separate. */
 function insightDedupeKey(i: AlfredInsight): string {
-  return `${i.title.trim().toLowerCase()}|${i.category.trim().toLowerCase()}`;
+  const words = i.title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 3 && !DEDUPE_STOPWORDS.has(w))
+    .slice(0, 8);
+  return words.join(" ") || i.title.trim().toLowerCase();
 }
 
 /**
@@ -181,7 +208,7 @@ export function mergeInsightsCache(
     }
   }
 
-  const insights = [...map.values()].sort((a, b) => b.priority - a.priority);
+  const insights = [...map.values()].sort((a, b) => b.priority - a.priority).slice(0, 200);
 
   return {
     generatedAt,

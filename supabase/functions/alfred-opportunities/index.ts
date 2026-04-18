@@ -11,6 +11,45 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+function extractJsonObject(text: string): Record<string, unknown> {
+  const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  return JSON.parse(start >= 0 ? cleaned.slice(start, end + 1) : cleaned);
+}
+
+async function lovableChatJson(params: {
+  apiKey: string;
+  system: string;
+  user: string;
+  maxTokens: number;
+  temperature: number;
+}): Promise<Record<string, unknown>> {
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${params.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: params.system },
+        { role: "user", content: params.user },
+      ],
+      temperature: params.temperature,
+      max_tokens: params.maxTokens,
+    }),
+  });
+  if (!response.ok) {
+    const t = await response.text();
+    throw new Error(`AI gateway ${response.status}: ${t.slice(0, 400)}`);
+  }
+  const aiData = await response.json();
+  const content = aiData.choices?.[0]?.message?.content || "{}";
+  return extractJsonObject(String(content));
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -29,6 +68,8 @@ serve(async (req) => {
     const geoHint = String(body.geoHint || "global").trim().slice(0, 200);
     const addressAs = String(body.addressAs || "the user").trim().slice(0, 48) || "the user";
     const mergeProactiveGaps = Boolean(body.mergeProactiveGaps);
+    const microScanCount = Math.min(16, Math.max(4, Number(body.microScanCount) || 12));
+    const businessMode = body.businessMode !== false;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -49,7 +90,88 @@ serve(async (req) => {
     );
     if (paywall) return paywall;
 
-    const system = `You are Infinitygap's personal opportunity research assistant.
+    let waves: unknown[] = [];
+    if (businessMode) {
+      const waveSystem = `Return VALID JSON ONLY — no markdown, no commentary.
+Schema: {"waves":[{"query":"string","regionHint":"string","pain":"string","whyNow":"string"}]}
+Rules:
+- Exactly ${microScanCount} waves.
+- Each wave must be a DISTINCT business angle (examples: import-and-resell arbitrage, niche B2B micro-SaaS, compliance-as-a-service, cross-border services sold remotely, physical product bundle, marketplace liquidity play, capital-light agency, industrial consumables FBA, obscure B2B lead-gen, EU/US regulatory paperwork sold remotely, UAE/Türkiye/China→EA import plays).
+- At least half the waves must be anchored OUTSIDE Kenya unless GEO explicitly names Kenya as primary market.
+- Do NOT make every wave a reframing of the same CV flagship (e.g. repeating one dashboard/token project); at least 6 waves must NOT hinge on the user's past project names.
+- Avoid "read more books", generic career advice, or vague AI hype — every wave must imply revenue and a buyer.`;
+
+      const waveUser =
+        trainingCorpus.length > 0
+          ? `GEO / MARKET LENS: ${geoHint}\n\nTRAINING NOTES (signals only, do not quote verbatim):\n${trainingCorpus.slice(0, 12_000)}`
+          : `GEO / MARKET LENS: ${geoHint}\n\nNo training notes — still output diverse global business angles.`;
+
+      try {
+        const wavesJson = await lovableChatJson({
+          apiKey: LOVABLE_API_KEY,
+          system: waveSystem,
+          user: waveUser,
+          maxTokens: 2048,
+          temperature: 0.92,
+        });
+        waves = Array.isArray(wavesJson.waves) ? wavesJson.waves : [];
+      } catch (e) {
+        console.error("alfred-opportunities waves:", e);
+        return new Response(JSON.stringify({ error: "Could not generate research waves", detail: String(e) }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const system = businessMode
+      ? `You are Infinitygap's **operator research partner** for "${addressAs}".
+
+MODE — **TYCOON / FULL BUSINESS**: they want to run many cash-flowing ventures (buy-sell, agencies, SaaS, marketplaces, regulated services where feasible). Assume they will **hire operators**; do NOT optimize for "study more" or passive reading lists.
+
+INPUT WAVES (rapid micro-scans aggregated into this run):
+${JSON.stringify(waves).slice(0, 18_000)}
+
+STRICT RULES:
+1. Output VALID JSON ONLY — no markdown fences, no prose outside the JSON object.
+2. executiveSummary: 4–7 sentences. State operating constraints you infer from training notes (capital, time, skills, risk). Explain how THIS batch respects them and how waves were synthesized. Do not tell them to read for leisure or "skill up" unless it is a specific paid certification required for a license.
+3. Produce **10–14** insights in "insights". Each must be a **different** business — **no duplicate titles** and no two insights may share the same core product shape (e.g. only one "central bank regtech cockpit" style idea; only one "receivables tokenization" variant).
+4. Each insight must feel **non-obvious**: name a contrarian angle, a wedge geography, or a distribution hack people are under-serving. Include at least **3** ideas that are explicitly **inventory / buy-sell / arbitrage / agency with deliverables** (not generic SaaS clones of the user's CV projects).
+5. "priority" 1–100 (100 = fastest path to cash for THIS operator given constraints).
+6. Categories may include: ecommerce, online_business, freelancing, ai_tools, fintech, policy_regulatory, labor_market, geo_arbitrage, commodities, real_estate, content, skills, other.
+7. "summary" must be **long-form** (aim **250–550 words** per insight in plain prose, no markdown). Include:
+   - Market dynamics & who pays today
+   - Offer / SKU / service package
+   - ICP + where to find them (channels, communities, events)
+   - Pricing hypothesis & unit economics sketch
+   - **Start plan** (week 1, weeks 2–4) with concrete tasks
+   - **Scale plan** (systems, hiring roles, SOPs)
+   - **Compliance / licensing** checklist (jurisdiction-aware; if unknown, say what to verify and with whom)
+   - **Risks & kill criteria**
+8. "actions" must be **10–14** bullets. Each bullet is a **single executable work package** (not vague). Include where to buy/source (specific marketplaces or supplier types), what tools to use, what landing page to ship, what outreach scripts to run, what metrics to track, and **who to hire first** if the operator will not execute hands-on.
+9. caveats: 3–6 bullets; include "not financial/legal advice" + verification steps.
+10. GEO lens: ${geoHint} — still pull **global waves** they can catch remotely unless GEO is explicitly a single country.
+11. At most **one** insight may center on re-packaging a single past portfolio artifact named in training notes; the rest must be new buyers/SKUs/motions even if skills transfer.
+
+${temporalIntelRules()}
+
+JSON schema:
+{
+  "executiveSummary": "string",
+  "insights": [
+    {
+      "priority": 85,
+      "title": "string",
+      "summary": "string (250-550 words)",
+      "category": "ecommerce",
+      "timing": "this_week | this_month | this_quarter | watchlist",
+      "actions": ["10-14 strings"],
+      "caveats": ["3-6 strings"]
+    }
+  ],
+  "disclaimer": "string"
+}`
+      : `You are Infinitygap's personal opportunity research assistant.
 
 The user prefers to be addressed as "${addressAs}" in executiveSummary tone where natural (not in JSON keys).
 
@@ -100,46 +222,22 @@ Produce the JSON opportunity brief now. Insights must span multiple industries a
 
 No personal training notes yet. Produce a cross-industry, gap-focused opportunity deck anyway, and in executiveSummary clearly say you do not yet know their profile — urge them to add training notes with goals, skills, capital, time, and country.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: userMsg },
-        ],
-        temperature: 0.55,
-      }),
-    });
-
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("alfred-opportunities gateway:", response.status, t);
-      return new Response(JSON.stringify({ error: "AI gateway error", detail: t.slice(0, 500) }), {
-        status: response.status === 402 ? 402 : 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const aiData = await response.json();
-    const content = aiData.choices?.[0]?.message?.content || "{}";
     let parsed: {
       executiveSummary?: string;
       insights?: unknown[];
       disclaimer?: string;
     };
     try {
-      const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      const start = cleaned.indexOf("{");
-      const end = cleaned.lastIndexOf("}");
-      parsed = JSON.parse(start >= 0 ? cleaned.slice(start, end + 1) : cleaned);
+      parsed = (await lovableChatJson({
+        apiKey: LOVABLE_API_KEY,
+        system,
+        user: userMsg,
+        maxTokens: businessMode ? 16_384 : 8192,
+        temperature: businessMode ? 0.45 : 0.55,
+      })) as typeof parsed;
     } catch (e) {
-      console.error("alfred JSON parse:", e, content.slice(0, 400));
-      return new Response(JSON.stringify({ error: "Could not parse AI response" }), {
+      console.error("alfred JSON parse:", e);
+      return new Response(JSON.stringify({ error: "Could not parse AI response", detail: String(e) }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -151,11 +249,11 @@ No personal training notes yet. Produce a cross-industry, gap-focused opportunit
         id: typeof x.id === "string" ? x.id : undefined,
         priority: Math.min(100, Math.max(1, Number(x.priority) || 50)),
         title: String(x.title || "Opportunity").slice(0, 200),
-        summary: String(x.summary || "").slice(0, 1200),
+        summary: String(x.summary || "").slice(0, 12_000),
         category: String(x.category || "other").slice(0, 80),
         timing: String(x.timing || "watchlist").slice(0, 80),
-        actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 400)).slice(0, 8) : [],
-        caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 400)).slice(0, 6) : [],
+        actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 900)).slice(0, 14) : [],
+        caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 500)).slice(0, 8) : [],
       }))
       .sort((a, b) => b.priority - a.priority);
 
@@ -181,7 +279,7 @@ No personal training notes yet. Produce a cross-industry, gap-focused opportunit
               id: typeof x.id === "string" ? x.id : undefined,
               priority: Math.min(100, Math.max(1, Number(x.priority) || 62)),
               title,
-              summary: String(x.summary || "").slice(0, 1200),
+              summary: String(x.summary || "").slice(0, 12_000),
               category: String(x.category || "other").slice(0, 80),
               timing: String(x.timing || "watchlist").slice(0, 80),
               actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 400)).slice(0, 8) : [],
@@ -195,7 +293,7 @@ No personal training notes yet. Produce a cross-industry, gap-focused opportunit
           seen.add(k);
           return true;
         });
-        insights = merged.slice(0, 24);
+        insights = merged.slice(0, 80);
       } catch (e) {
         console.warn("mergeProactiveGaps:", e);
       }

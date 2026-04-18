@@ -2,79 +2,133 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BookOpen, Copy, Download, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
-import { getTrainingCorpus } from "@/lib/alfredStorage";
+import { getTrainingCorpus, normalizeInsightsList } from "@/lib/alfredStorage";
 import { downloadIntelBriefPdf } from "@/lib/exportIntelBriefPdf";
 import { BlockMarkdown } from "@/components/InlineMarkdown";
 import { formatDistanceToNow } from "date-fns";
 
-type BriefRow = Database["public"]["Tables"]["user_read_briefs"]["Row"];
+type ReadRow = {
+  id: string;
+  title: string;
+  body_markdown: string;
+  created_at: string;
+};
 
 const AUTO_DIGEST_MS = 2 * 60 * 60 * 1000;
+const READS_CACHE_KEY = "reads_from_opportunities_v1";
+
+function loadCachedRows(): ReadRow[] {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(READS_CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ReadRow[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCachedRows(rows: ReadRow[]) {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(READS_CACHE_KEY, JSON.stringify(rows.slice(0, 30)));
+}
+
+function markdownFromOpportunityPayload(data: Record<string, unknown>): string {
+  const executiveSummary = String(data.executiveSummary || "").trim();
+  const normalizedInsights = normalizeInsightsList(
+    Array.isArray(data.insights) ? data.insights : [],
+    Date.now(),
+  ).slice(0, 10);
+
+  const sections = [
+    executiveSummary ? `## Executive Summary\n\n${executiveSummary}` : "",
+    "## Cross-Industry Highlights",
+    ...normalizedInsights.map((ins, idx) => {
+      const actions =
+        ins.actions.length > 0
+          ? `\n\n**Actions**\n${ins.actions.map((a) => `- ${a}`).join("\n")}`
+          : "";
+      const caveats =
+        ins.caveats.length > 0
+          ? `\n\n**Caveats**\n${ins.caveats.map((c) => `- ${c}`).join("\n")}`
+          : "";
+      return `### ${idx + 1}. ${ins.title}\n\n- **Priority:** ${ins.priority}\n- **Category:** ${ins.category}\n- **Timing:** ${ins.timing}\n\n${ins.summary}${actions}${caveats}`;
+    }),
+    data.disclaimer ? `## Disclaimer\n\n${String(data.disclaimer)}` : "",
+  ].filter(Boolean);
+
+  return sections.join("\n\n");
+}
 
 export function AlfredReadPanel({ geoHint }: { geoHint: string }) {
-  const [rows, setRows] = useState<BriefRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState<ReadRow[]>(() => loadCachedRows());
+  const [loading, setLoading] = useState(rows.length === 0);
   const [generating, setGenerating] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
-  const rowsRef = useRef<BriefRow[]>([]);
+  const rowsRef = useRef<ReadRow[]>([]);
   rowsRef.current = rows;
+
+  const pullFromOpportunities = useCallback(async () => {
+    const trainingCorpus = getTrainingCorpus();
+    const { data, error } = await supabase.functions.invoke("alfred-opportunities", {
+      body: { trainingCorpus, geoHint, mergeProactiveGaps: true },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
+    return (data ?? {}) as Record<string, unknown>;
+  }, [geoHint]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("daily-read-brief", {
-        body: { action: "list" },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
-      const list = (data?.briefs as BriefRow[]) || [];
-      setRows(list);
-      if (list[0]?.id) setSelectedId(list[0].id);
+      const payload = await pullFromOpportunities();
+      const nowIso = new Date().toISOString();
+      const row: ReadRow = {
+        id: crypto.randomUUID(),
+        title: "Cross-Industry Intelligence Brief",
+        body_markdown: markdownFromOpportunityPayload(payload),
+        created_at: nowIso,
+      };
+      const next = [row, ...rowsRef.current].slice(0, 30);
+      setRows(next);
+      saveCachedRows(next);
+      setSelectedId(row.id);
     } catch (e) {
       console.error(e);
-      toast.error(e instanceof Error ? e.message : "Could not load briefs");
+      toast.error(e instanceof Error ? e.message : "Could not load brief");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pullFromOpportunities]);
 
   const runStandardDigest = useCallback(
     async (opts?: { silent?: boolean }) => {
       setGenerating(true);
       try {
-        const trainingCorpus = getTrainingCorpus();
-        const priorDigestExcerpts = rowsRef.current.slice(0, 3).map((r) => (r.body_markdown || "").slice(0, 560));
-        const { data, error } = await supabase.functions.invoke("daily-read-brief", {
-          body: {
-            action: "standard",
-            trainingCorpus,
-            geoHint,
-            fullIndustrySweep: true,
-            priorDigestExcerpts,
-          },
-        });
-        if (error) throw error;
-        if (data?.code === "INSUFFICIENT_CREDITS") {
-          toast.error("Add credits to generate digests.");
-          return;
-        }
-        if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Request failed");
-        if (data?.brief?.id) {
-          if (!opts?.silent) toast.success("Digest saved");
-          await load();
-          setSelectedId(data.brief.id);
-        }
+        const payload = await pullFromOpportunities();
+        const nowIso = new Date().toISOString();
+        const row: ReadRow = {
+          id: crypto.randomUUID(),
+          title: "Cross-Industry Intelligence Brief",
+          body_markdown: markdownFromOpportunityPayload(payload),
+          created_at: nowIso,
+        };
+        const next = [row, ...rowsRef.current].slice(0, 30);
+        setRows(next);
+        saveCachedRows(next);
+        setSelectedId(row.id);
+        if (!opts?.silent) toast.success("Brief refreshed");
       } catch (e) {
         console.error(e);
-        if (!opts?.silent) toast.error(e instanceof Error ? e.message : "Could not generate");
+        if (!opts?.silent) toast.error(e instanceof Error ? e.message : "Could not refresh brief");
       } finally {
         setGenerating(false);
       }
     },
-    [geoHint, load],
+    [pullFromOpportunities],
   );
 
   useEffect(() => {
