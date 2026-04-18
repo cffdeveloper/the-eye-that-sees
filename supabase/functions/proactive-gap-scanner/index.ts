@@ -135,12 +135,40 @@ serve(async (req) => {
         `Bio/title: ${profile.bio || ""} ${profile.title || ""}`,
       ].join("\n");
 
+      // Pull buffered candidates from the most recent two 2h windows (current + previous,
+      // in case this scanner ran slightly after the window rolled over).
+      const twoH = 2 * 60 * 60 * 1000;
+      const windowStart = Math.floor(Date.now() / twoH) * twoH;
+      const prevWindowStart = windowStart - twoH;
+      const bufferKeys = [`microscan_buffer_${windowStart}`, `microscan_buffer_${prevWindowStart}`];
+      const { data: bufferRows } = await sb
+        .from("proactive_search_cache")
+        .select("cache_key, payload")
+        .in("cache_key", bufferKeys);
+
+      const allBuffered: Record<string, unknown>[] = [];
+      for (const row of (bufferRows || []) as { payload: { candidates?: unknown[] } }[]) {
+        const cs = Array.isArray(row.payload?.candidates) ? row.payload.candidates : [];
+        for (const c of cs) allBuffered.push(c as Record<string, unknown>);
+      }
+
+      const bufferedSeedsText = allBuffered.length
+        ? allBuffered
+            .slice(-80)
+            .map(
+              (c, i) =>
+                `${i + 1}. [${c.category || "?"}] ${c.title || "(untitled)"} — ${c.one_liner || ""} | buyer: ${c.buyer || "?"} | supplier: ${c.supplier_or_source || "?"} | channel: ${c.channel || "?"} | cap: ${c.ballpark_capital_usd || "?"} | rev: ${c.ballpark_monthly_revenue_usd || "?"} | why_now: ${c.why_now || "?"}`,
+            )
+            .join("\n")
+        : "";
+
       const system = proactiveScannerSystemPrompt(ctx as UserGuardrailContext);
       const userMsg = proactiveScannerUserMessage({
         profile_summary: profileSummary,
         memory_excerpts: memoryExcerpts,
         search_evidence: searchEvidence,
         industries: ctx.industries_of_interest,
+        buffered_seeds: bufferedSeedsText,
       });
 
       const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -150,7 +178,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "google/gemini-2.5-pro",
           messages: [
             { role: "system", content: system },
             { role: "user", content: userMsg },
@@ -182,8 +210,8 @@ serve(async (req) => {
 
       for (let i = 0; i < rawList.length; i++) {
         const x = rawList[i] as Record<string, unknown>;
-        const title = String(x.title || "Opportunity").slice(0, 200);
-        const summary = String(x.summary || "").slice(0, 1200);
+        const title = String(x.title || "Opportunity").slice(0, 240);
+        const summary = String(x.summary || "").slice(0, 4000);
         const rej = hardRejectGap(summary, title, ctx as UserGuardrailContext);
         if (rej.reject) continue;
 
@@ -194,8 +222,21 @@ serve(async (req) => {
           summary,
           category: String(x.category || "other").slice(0, 80),
           timing: String(x.timing || "watchlist").slice(0, 80),
-          actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 400)).slice(0, 8) : [],
-          caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 400)).slice(0, 6) : [],
+          actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 600)).slice(0, 10) : [],
+          caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 600)).slice(0, 8) : [],
+          plan: {
+            market_dynamics: String(x.market_dynamics || "").slice(0, 3000),
+            what_you_need: Array.isArray(x.what_you_need) ? (x.what_you_need as unknown[]).map((v) => String(v).slice(0, 400)).slice(0, 30) : [],
+            where_to_locate: String(x.where_to_locate || "").slice(0, 1500),
+            suppliers_and_sources: Array.isArray(x.suppliers_and_sources) ? (x.suppliers_and_sources as unknown[]).slice(0, 15) : [],
+            how_to_start_30_days: x.how_to_start_30_days ?? {},
+            how_to_scale: x.how_to_scale ?? {},
+            hiring_plan: Array.isArray(x.hiring_plan) ? (x.hiring_plan as unknown[]).slice(0, 15) : [],
+            compliance_and_licensing: Array.isArray(x.compliance_and_licensing) ? (x.compliance_and_licensing as unknown[]).slice(0, 20) : [],
+            financials: x.financials ?? {},
+            risks_and_moats: x.risks_and_moats ?? {},
+            first_revenue_in_days: Number(x.first_revenue_in_days) || null,
+          },
         };
 
         const feasibility = {
