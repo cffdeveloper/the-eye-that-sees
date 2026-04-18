@@ -210,8 +210,8 @@ serve(async (req) => {
 
       for (let i = 0; i < rawList.length; i++) {
         const x = rawList[i] as Record<string, unknown>;
-        const title = String(x.title || "Opportunity").slice(0, 200);
-        const summary = String(x.summary || "").slice(0, 1200);
+        const title = String(x.title || "Opportunity").slice(0, 240);
+        const summary = String(x.summary || "").slice(0, 4000);
         const rej = hardRejectGap(summary, title, ctx as UserGuardrailContext);
         if (rej.reject) continue;
 
@@ -222,8 +222,21 @@ serve(async (req) => {
           summary,
           category: String(x.category || "other").slice(0, 80),
           timing: String(x.timing || "watchlist").slice(0, 80),
-          actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 400)).slice(0, 8) : [],
-          caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 400)).slice(0, 6) : [],
+          actions: Array.isArray(x.actions) ? x.actions.map((a: unknown) => String(a).slice(0, 600)).slice(0, 10) : [],
+          caveats: Array.isArray(x.caveats) ? x.caveats.map((c: unknown) => String(c).slice(0, 600)).slice(0, 8) : [],
+          plan: {
+            market_dynamics: String(x.market_dynamics || "").slice(0, 3000),
+            what_you_need: Array.isArray(x.what_you_need) ? (x.what_you_need as unknown[]).map((v) => String(v).slice(0, 400)).slice(0, 30) : [],
+            where_to_locate: String(x.where_to_locate || "").slice(0, 1500),
+            suppliers_and_sources: Array.isArray(x.suppliers_and_sources) ? (x.suppliers_and_sources as unknown[]).slice(0, 15) : [],
+            how_to_start_30_days: x.how_to_start_30_days ?? {},
+            how_to_scale: x.how_to_scale ?? {},
+            hiring_plan: Array.isArray(x.hiring_plan) ? (x.hiring_plan as unknown[]).slice(0, 15) : [],
+            compliance_and_licensing: Array.isArray(x.compliance_and_licensing) ? (x.compliance_and_licensing as unknown[]).slice(0, 20) : [],
+            financials: x.financials ?? {},
+            risks_and_moats: x.risks_and_moats ?? {},
+            first_revenue_in_days: Number(x.first_revenue_in_days) || null,
+          },
         };
 
         const feasibility = {
